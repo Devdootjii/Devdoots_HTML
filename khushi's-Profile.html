@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile & Tech Showcase - Khushi Yadav</title>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>Khushi Yadav</h1>
+        <p><strong>Role:</strong> Cloud Engineer / Core Developer</p>
+        <!-- Profile Image: Ensure profile.jpg is in the same folder as this file -->
+        <img src="profile.jpg.jpeg" alt="Khushi Yadav Profile Picture" width="160" height="200" style="object-fit: cover; border-radius: 6px;">
+    </header>
+
+    <hr>
+
+    <!-- Main Content Area -->
+    <main>
+        <!-- Member Profile Section -->
+        <section id="profile">
+            <h2>About Me</h2>
+            <p>B.Tech student passionate about cloud infrastructure, Artificial Intelligence, and Cloud Architecture with Team Devdoots.</p>
+        </section>
+
+        <!-- Tech Stack Table Section -->
+        <section id="tech-stack">
+            <h2>Tech Stack Showcase</h2>
+            <table border="1" cellpadding="8" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Skill Name</th>
+                        <th>Proficiency Level</th>
+                        <th>Domain/Project Area</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>HTML5 & CSS</td>
+                        <td>Beginner</td>
+                        <td>Web Development</td>
+                    </tr>
+                    <tr>
+                        <td>Python</td>
+                        <td>Beginner</td>
+                        <td>AIML & Scripting</td>
+                    </tr>
+                    <tr>
+                        <td>C Programming</td>
+                        <td>Beginner</td>
+                        <td>Logic & Problem Solving</td>
+                    </tr>
+                    <tr>
+                        <td>Git & GitHub</td>
+                        <td>Beginner</td>
+                        <td>Version Control</td>
+                    </tr>
+                    <tr>
+                        <td>Cloud Computing & AWS</td>
+                        <td>Beginner</td>
+                        <td>Cloud Infrastructure</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <br>
+
+        <!-- Interactive Task Update Form Section -->
+        <section id="task-form">
+            <h2>Task Update Form</h2>
+            <form action="#" method="POST">
+                
+                <p>
+                    <label for="task-name">Task Name:</label><br>
+                    <input type="text" id="task-name" name="task_name" placeholder="Enter task name" required>
+                </p>
+
+                <p>
+                    <label for="task-status">Status:</label><br>
+                    <select id="task-status" name="task_status" required>
+                        <option value="">-- Select Status --</option>
+                        <option value="Completed">Completed</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Blocked">Blocked</option>
+                    </select>
+                </p>
+
+                <p>
+                    <label for="comments">Comments/Blockers:</label><br>
+                    <textarea id="comments" name="comments" rows="4" cols="40" placeholder="Write any blockers or notes..."></textarea>
+                </p>
+
+                <p>
+                    <button type="submit">Submit Task Update</button>
+                </p>
+
+            </form>
+        </section>
+    </main>
+
+    <hr>
+
+    <!-- Footer Section with External Profile Link -->
+    <footer>
+        <p>Connect with me:</p>
+        <p>
+            <a href="https://github.com/khushiyadav-Dev" target="_blank" rel="noopener noreferrer">My Personal GitHub Profile</a>
+        </p>
+        <p>&copy; 2026 Khushi Yadav | Team Devdoots</p>
+    </footer>
+
+</body>
+</html>

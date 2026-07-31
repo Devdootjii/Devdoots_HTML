@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Devdoots Data Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Team Devdoots Data Portal</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="portal.html" class="active">Data Portal</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>Member Registration</h2>
+            <div class="card">
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label for="name">Enter Your Name:</label>
+                    <input type="text" id="name" name="name" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Enter Your Email:</label>
+                    <input type="email" id="email" name="email" placeholder="devdoots@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Choose Your Role:</label>
+                    <select id="role" name="role" required>
+                        <option value="" disabled selected>Select a role</option>
+                        <option value="Project Manager">Project Manager</option>
+                        <option value="Data Scientist">Data Scientist</option>
+                        <option value="Core Engineer">Core Engineer</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn">Submit Data</button>
+            </form>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Active Team Members</h2>
+            <div class="card">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Member Name</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Balram</td>
+                        <td>Data Scientist</td>
+                        <td><span class="status active">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Ritesh</td>
+                        <td>Data Scientist</td>
+                        <td><span class="status active">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Harsh</td>
+                        <td>Core Engineer</td>
+                        <td><span class="status active">Active</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Required Tech Stack</h3>
+            <ul class="tech-list">
+                <li>Python</li>
+                <li>HTML / CSS</li>
+                <li>SQL</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Team Devdoots. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

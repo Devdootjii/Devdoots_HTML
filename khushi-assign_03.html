@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Khushi Yadav - Profile</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f8; color: #333; margin: 15px; }
+        header, main, footer { background: #fff; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+        header { text-align: center; border-bottom: 3px solid #0056b3; }
+        header img { width: 140px; height: 170px; border: 2px solid #0056b3; margin-top: 8px; }
+        h2 { color: #0056b3; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #0056b3; color: #fff; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        input[type="text"], select, textarea { width: 100%; padding: 6px; margin: 4px 0 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #28a745; color: #fff; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        footer { text-align: center; font-size: 13px; }
+        footer a { color: #0056b3; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Khushi Yadav</h1>
+        <p><b>Role:</b> Cloud Engineer / Core Developer</p>
+        <img src="profile.jpg.jpeg" alt="Khushi Yadav Profile Picture">
+    </header>
+    <main>
+        <section>
+            <h2>About Me</h2>
+            <p>B.Tech AIML student passionate about Web Development and Cloud Infrastructure with Team Devdoots.</p>
+        </section>
+        <section>
+            <h2>Tech Stack Showcase</h2>
+            <table>
+                <tr><th>Skill Name</th><th>Proficiency Level</th><th>Domain/Project Area</th></tr>
+                <tr><td>HTML5 & CSS</td><td>Beginner</td><td>Web Development</td></tr>
+                <tr><td>Python</td><td>Beginner</td><td>AIML & Scripting</td></tr>
+                <tr><td>C Programming</td><td>Beginner</td><td>Logic & Problem Solving</td></tr>
+                <tr><td>Git & GitHub</td><td>Beginner</td><td>Version Control</td></tr>
+                <tr><td>Cloud Computing & AWS</td><td>Beginner</td><td>Cloud Infrastructure</td></tr>
+            </table>
+        </section>
+        <section>
+            <h2>Task Update Form</h2>
+            <form action="#" method="POST">
+                <label for="task-name">Task Name:</label>
+                <input type="text" id="task-name" name="task_name" required>
+                <label for="task-status">Status:</label>
+                <select id="task-status" name="task_status" required>
+                    <option value="">-- Select Status --</option>
+                    <option value="Completed">Completed</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Blocked">Blocked</option>
+                </select>
+                <label for="comments">Comments/Blockers:</label>
+                <textarea id="comments" name="comments" rows="3"></textarea>
+                <button type="submit">Submit Task Update</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>Connect: <a href="https://github.com/khushiyadav-Dev" target="_blank">My GitHub Profile</a> | Copyright 2026 Khushi Yadav</p>
+    </footer>
+</body>
+</html>

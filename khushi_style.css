@@ -1,0 +1,29 @@
+:root {
+  --bg: #0f172a; --card: #1e293b; --blue: #2563eb; 
+  --cyan: #38bdf8; --text: #f8fafc; --border: #334155; --green: #22c55e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+body { background: var(--bg); color: var(--text); line-height: 1.5; }
+
+header { position: sticky; top: 0; display: flex; justify-content: space-between; background: var(--bg); padding: 1rem 2rem; border-bottom: 1px solid var(--border); z-index: 10; }
+.logo span, nav a { color: var(--cyan); }
+nav a { text-decoration: none; margin-left: 1rem; font-weight: 500; }
+
+.section-container { padding: 3rem 2rem; max-width: 900px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+h2 { color: var(--cyan); margin-bottom: 1rem; }
+.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.card { background: var(--card); padding: 1rem; border-radius: 6px; border: 1px solid var(--border); }
+.tag { display: inline-block; margin-top: 0.5rem; background: var(--blue); color: #fff; padding: 0.1rem 0.5rem; font-size: 0.75rem; border-radius: 4px; }
+
+
+table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 6px; }
+th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--cyan); }
+@keyframes pulse { 0%, 100% { transform: scale(0.9); opacity: 0.6; } 50% { transform: scale(1.2); opacity: 1; } }
+.live-badge { display: inline-block; width: 8px; height: 8px; background: var(--green); border-radius: 50%; margin-right: 5px; animation: pulse 1.5s infinite; }
+
+
+.custom-form { background: var(--card); padding: 1rem; border-radius: 6px; display: flex; flex-direction: column; gap: 0.8rem; }
+.custom-form input, .custom-form select { padding: 0.6rem; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; }
+.submit-btn { background: var(--blue); color: #fff; padding: 0.6rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+footer { text-align: center; padding: 1.5rem; color: #64748b; }

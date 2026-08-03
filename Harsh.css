@@ -1,0 +1,33 @@
+.skill-table {
+    border-collapse: collapse;
+    width: 80%;
+    font-family: Arial, sans-serif;
+    margin-top: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.skill-table th,
+.skill-table td {
+    border: 1px solid #dddddd;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.skill-table th {
+    background-color: #2c3e50;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.skill-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.skill-table tr:hover {
+    background-color: #e2e6ea;
+    cursor: pointer
+}body {
+    background-color: #f4f6f9; 
+    color: #333333; 
+}
+

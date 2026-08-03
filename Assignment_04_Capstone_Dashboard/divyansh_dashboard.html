@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devdoots Telemetry & Profile Dashboeard</title>
+    <link rel="stylesheet" href="divyansh_style.css">
+</head>
+<body>
+    <header>
+        <div class="Brand">
+            <h2>Team Devdoots</h2>
+            <span>Divyansh | TPM</span>
+        </div>
+        <nav>
+            <a href="#profile">Profile</a>
+            <a href="#telemetry">Live Telemetry</a>
+            <a href="#tasks">Task Submission</a>
+
+        </nav>
+    </header>
+    <main class="container">
+        <section id="profile" class="peofile-section">
+            <img src="pro.jpg" alt="Divyansh Profile" class="profile-img">
+            <div class="profile-info">
+                <h1>Divyansh Kumar</h1>
+                <p class="role-title">Technical Project Manager (TPM) & AI/ML Lead</p>
+                <p class="bio">Managing Devdoots swarm robotics & web automation workflows.</p>
+                </div>
+        </section>
+        <section class="tech-section">
+            <h2>Tech Stack & Core Skills</h2>
+            <div class="grid-container">
+                <div class="card">
+                    <h3>Python Programing</h3>
+                    <p class="domain">Core / AI ML UI</p>
+                    <span class="level">Intermediate</span>
+                </div>
+                <div class="card">
+                    <h3>HTML5 & CSS3</h3>
+                    <p class="domain">Frontend UI</p>
+                    <span class="level">Advanced</span>
+                </div>
+                <div class="card">
+                    <h3>Git & Version Control</h3>
+                    <p class="domain">DevOps / Workflow</p>
+                    <span class="level">Intermediate</span>
+                </div>
+                <div class="card">
+                    <h3>Swarm Robotics (DAIVY)</h3>
+                    <p class="domain">Hardware / Logic</p>
+                    <span class="level">Phase 1 (Crawl)</span>
+                </div>
+            </div>
+        </section>
+        
+        <section id="telemetry" class="telemetry-section">
+            
+         
+            <div class="section-header">
+                <h2>DAIVY Swarm Telemetry Status</h2>
+                
+           
+                <div class="status-indicator">
+                 
+                    <span class="live-badge"></span>
+                    <span class="status-text">System Live</span>
+                </div>
+            </div>
+
+           
+            <div class="table-container">
+                <table>
+                   
+                    <thead>
+                        <tr>
+                            <th>Node ID</th>
+                            <th>Cell Architecture</th>
+                            <th>Battery Level</th>
+                            <th>Signal (EPM)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    
+                   
+                    <tbody>
+                      
+                        <tr>
+                            <td>Node-01 (Divya-Alpha)</td>
+                            <td>Rhombic Dodecahedron</td>
+                            <td>92% (Solid State)</td>
+                            <td>Strong (-42 dBm)</td>
+                            <td><span class="badge active">Active</span></td>
+                        </tr>
+                        
+                     
+                        <tr>
+                            <td>Node-02 (Divya-Beta)</td>
+                            <td>Rhombic Dodecahedron</td>
+                            <td>88% (Solid State)</td>
+                            <td>Optimal (-50 dBm)</td>
+                            <td><span class="badge active">Active</span></td>
+                        </tr>
+                        
+                       
+                        <tr>
+                            <td>Node-03 (Divya-Gamma)</td>
+                            <td>Rhombic Dodecahedron</td>
+                            <td>45% (Solid State)</td>
+                            <td>Weak (-78 dBm)</td>
+                            <td><span class="badge warning">Charging</span></td>
+                        </tr>
+                        
+              
+                        <tr>
+                            <td>Node-04 (Divya-Delta)</td>
+                            <td>Rhombic Dodecahedron</td>
+                            <td>12% (Solid State)</td>
+                            <td>Disconnected</td>
+                            <td><span class="badge offline">Offline</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+  
+        <section id="tasks" class="form-section">
+            
+            <h2>Submit Task / Log Telemetry</h2>
+            <p class="form-subtitle">Fill out the form below to push new task updates or upload swarm log files.</p>
+
+            <form action="#" method="POST" class="telemetry-form">
+                
+                <div class="form-group">
+                    <label for="taskName">Task / Module Name:</label>
+                    <input type="text" id="taskName" name="taskName" placeholder="e.g., EPM Magnet Test / Cell Calibration" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="taskStatus">Execution Status:</label>
+                    <select id="taskStatus" name="taskStatus" required>
+                        <option value="" disabled selected>Select status...</option>
+                        <option value="Completed">Completed</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Blocked">Blocked / Blocker Found</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="logFile">Upload Telemetry / Code Log (Optional):</label>
+                    <input type="file" id="logFile" name="logFile" class="file-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="comments">Comments & Technical Notes:</label>
+                    <textarea id="comments" name="comments" rows="4" placeholder="Mention any hardware anomalies, voltage drops, or Git PR updates..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <span>Submit Update</span>
+                </button>
+
+            </form>
+
+        </section>
+    </main>
+
+    
+    <footer>
+        <p>&copy; 2026 Team Devdoots. All rights reserved. | Built by Divyansh (TPM) with help of AI</p>
+    </footer>
+    </main>
+</body>
+</html>

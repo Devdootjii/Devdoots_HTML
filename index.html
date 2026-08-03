@@ -1,58 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Assignment 2 - Balram</title>
+    <title>Assignment 3 - Balram</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>Balram Singh</h1>
-    <h2>Data Scientist</h2>
-    <img src="profile.jpeg" alt="my photo" width="180">
-    <br><br>
+    <div class="main-box">
+        
+        <div class="card">
+            <h1>Balram Singh</h1>
+            <h2>Data Scientist</h2>
+            <img src="profile.jpeg" alt="my photo" width="150">
+        </div>
 
-    <h3>Skills Table</h3>
-    <table border="1">
-        <tr>
-            <th>Skill Name</th>
-            <th>Level</th>
-        </tr>
-        <tr>
-            <td>Python</td>
-            <td>Intermediate</td>
-        </tr>
-        <tr>
-            <td>SQL</td>
-            <td>Beginner</td>
-        </tr>
-        <tr>
-            <td>C Language</td>
-            <td>Intermediate</td>
-        </tr>
-    </table>
-    <br><hr><br>
+        <div class="card">
+            <h3>Skills Table</h3>
+            <table>
+                <tr>
+                    <th>Skill Name</th>
+                    <th>Level</th>
+                </tr>
+                <tr>
+                    <td>Python</td>
+                    <td>Intermediate</td>
+                </tr>
+                <tr>
+                    <td>SQL</td>
+                    <td>Beginner</td>
+                </tr>
+                <tr>
+                    <td>C Language</td>
+                    <td>Intermediate</td>
+                </tr>
+            </table>
+        </div>
 
-    <h3>Task Form</h3>
-    <form>
-        Task Name: 
-        <input type="text" name="taskName"> 
-        <br><br>
+        <div class="card">
+            <h3>Task Form</h3>
+            <form>
+                Task Name: <br>
+                <input type="text" name="taskName"> 
+                <br><br>
 
-        Status: 
-        <select name="taskStatus">
-            <option value="progress">In Progress</option>
-            <option value="done">Completed</option>
-        </select> 
-        <br><br>
+                Status: <br>
+                <select name="taskStatus">
+                    <option value="progress">In Progress</option>
+                    <option value="done">Completed</option>
+                </select> 
+                <br><br>
 
-        Comments: <br>
-        <textarea name="commentBox" rows="4" cols="25"></textarea> 
-        <br><br>
+                Comments: <br>
+                <textarea name="commentBox" rows="4"></textarea> 
+                <br><br>
 
-        <input type="submit" value="Submit">
-    </form>
-    <br>
+                <input type="submit" value="Submit" class="btn">
+            </form>
+        </div>
 
-    <a href="https://github.com/yourusername" target="_blank">My GitHub Link</a>
+        <br>
+        <a href="https://github.com/balramsingh123" target="_blank">My GitHub Link</a>
+        
+    </div>
 
 </body>
 </html>

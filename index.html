@@ -1,102 +1,92 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practice sheet</title>
+    <title>Devdoots Capstone - Balram</title>
+    <link rel="stylesheet" href="balram_style.css">
 </head>
 <body>
-    <!--it was just bigning-->
-    <h1>Hello World</h1>
-    <pre>let us see 
-        how it works !
-    </pre>
-    <small>this is small</small>
-    <br>
-    <big>this is big</big>
-    <hr>
-    <!-- abslute link -->
-    <a href="https://upskill.tutedude.com/dashboard/">tutedude</a>
-    <br>
-    <!-- relative link -->
-    <a href="/hello.html">Go to hello</a>
-    <br>
-    <img src="dev.jpeg" alt="Devdoot" height="100"/>
-    <br>
-    <p>
-    <u>underline</u>
-    <br>
-    
-    <b>bold</b>
-    <br>
-    <i>italic</i>
-    <br>
-    </p>
-    H<sub>2</sub>O
-    <br>
-    2<sup>2</sup> = 4
+
+    <header class="sticky-header">
+        <div class="logo">Devdoots</div>
+        <nav>
+            <a href="#profile">Profile</a>
+            <a href="#telemetry">Telemetry</a>
+            <a href="#tasks">Tasks</a>
+        </nav>
+    </header>
+
+    <main>
+        
+        <section id="profile" class="profile-section">
+            <img src="profile.jpeg" alt="Balram Singh" class="profile-img">
+            <h1>Balram Singh</h1>
+            <p>Data Scientist | AI & ML</p>
+            
+            <div class="skills-grid">
+                <div class="skill-card">Python</div>
+                <div class="skill-card">SQL</div>
+                <div class="skill-card">C Language</div>
+                <div class="skill-card">React</div>
+                <div class="skill-card">Git</div>
+            </div>
+        </section>
+
+        <section id="telemetry" class="telemetry-section">
+            <h2>Swarm Robot Telemetry</h2>
+            <div class="status">
+                System Status <span class="pulse-dot"></span>
+            </div>
+            <table>
+                <tr>
+                    <th>Robot ID</th>
+                    <th>Battery</th>
+                    <th>Signal Strength</th>
+                </tr>
+                <tr>
+                    <td>Alpha-01</td>
+                    <td>85%</td>
+                    <td>Strong</td>
+                </tr>
+                <tr>
+                    <td>Beta-02</td>
+                    <td>42%</td>
+                    <td>Weak</td>
+                </tr>
+                <tr>
+                    <td>Gamma-03</td>
+                    <td>98%</td>
+                    <td>Excellent</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="tasks" class="form-section">
+            <h2>Task Update Form</h2>
+            <form>
+                <label>Task Name:</label>
+                <input type="text" name="task_name" required>
+
+                <label>Priority:</label>
+                <select name="priority">
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+
+                <label>Upload Log File:</label>
+                <input type="file" name="log_file">
+
+                <button type="submit" class="submit-btn">Submit Update</button>
+            </form>
+        </section>
+        
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Devdoots Team - Balram Singh</p>
+    </footer>
+
 </body>
 </html>
-
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practice sheet</title>
-</head>
-<body>
-    <!--it was just bigning-->
-    <h1>Hello World</h1>
-    <pre>let us see 
-        how it works !
-    </pre>
-    <small>this is small</small>
-    <br>
-    <big>this is big</big>
-    <hr>
-    <!-- abslute link -->
-    <a href="https://upskill.tutedude.com/dashboard/">tutedude</a>
-    <br>
-    <!-- relative link -->
-    <a href="/hello.html">Go to hello</a>
-    <br>
-    <img src="dev.jpeg" alt="Devdoot" height="100"/>
-    <br>
-    <p>
-    <u>underline</u>
-    <br>
-    
-    <b>bold</b>
-    <br>
-    <i>italic</i>
-    <br>
-    </p>
-    H<sub>2</sub>O
-    <br>
-    2<sup>2</sup> = 4
-    <ul>
-        <li>apple</li>
-        <li>mango</li>
-    </ul>
-    <ol>
-        <li>seb</li>
-        <li>kela</li>
-    </ol>
-    <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Roll no</th>
-        </tr>
-
-        <tr>
-            <td>Divyansh</td>
-            <td>20</td>
-        </tr>
-    </table>
-</body>
-</html>
-
->>>>>>> 1ffacea (Initial HTML files upload)

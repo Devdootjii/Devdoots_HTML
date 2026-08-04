@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Devdoots - Ritesh Profile Dashboard</title>
+    
+    <link rel="stylesheet" href="ritesh_stylesheet.css">
+</head>
+<body>
+   <header>
+    <div class="brand">
+        <h1>Team Devdoots</h1>
+        <span class="role-tag">Data Scientist</span>
+    </div>
+<nav>
+    <a href="#profile">Profile</a>
+    <a href="#skills">Tech Matrix</a>
+    <a href="#telemetry">Swarm Telemetry</a>
+    <a href="#feedback">Task Form</a>
+</nav>
+   </header>
+        <main class="container">
+            <section id="profile" class="profile-section">
+                <article class="profile-card">
+                    <img src="Ritesh.png" alt="Ritesh profile picture" class="profile-image">
+                    <header class="profile-header">
+                        <h2>Ritesh</h2>
+                        <p class="role-title">Data Scientist</p>
+                        <p class="bio">Passionate about Statistical Analysis, Machine Learning Models, Data Mining, and Autonomous Swarm Robot Telemetry Monitoring.</p>
+                </header>
+            </article>
+        </section>
+        <section id="skills" class="section-blocks">
+            <h2>Core Technical Skills</h2>
+            <div class="grid-container">
+                <article class="card">
+                    <h3>Python / AI Basics</h3>
+                    <p class="level">Proficiency: <span>Advanced</span></p>
+                    <mark class="domain-tag">Data Analysis & ML</mark>
+                </article>
+                <article class="card">
+                    <h3>SQL & Databases</h3>
+                    <p class="level">Proficiency: <span>Intermediate</span></p>
+                    <mark class="domain-tag">Data Mining & Retrieval</mark>
+                </article>
+                <article class="card">
+                    <h3>R Programming</h3>
+                    <p class="level">Proficiency: <span>Intermediate</span></p>
+                    <mark class="domain-tag">Statistical Computing</mark>
+                </article>
+                <article class="card">
+                    <h3>Swarm Robotics Telemetry</h3>
+                    <p class="level">Proficiency: <span>Intermediate</span></p>
+                    <mark class="domain-tag">Real-Time Systems</mark>
+                </article>
+            </div>
+        </section>
+                <section id="telemetry" class="section-block">
+            <h2>Swarm Robot Live Telemetry</h2>
+            <figure class="table-container">
+                <table class="telemetry-table">
+                    <thead>
+                        <tr>
+                            <th>Node ID</th>
+                            <th>Battery Level</th>
+                            <th>Operating Status</th>
+                            <th>Signal Strength</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Node-01 (Alpha)</td>
+                            <td>94%</td>
+                            <td><span class="live-badge"></span>Active</td>
+                            <td>-42 dBm (Strong)</td>
+                        </tr>
+                        <tr>
+                            <td>Node-02 (Beta)</td>
+                            <td>88%</td>
+                            <td><span class="live-badge"></span>Active</td>
+                            <td>-50 dBm (Strong)</td>
+                        </tr>
+                        <tr>
+                            <td>Node-03 (Gamma)</td>
+                            <td>45%</td>
+                            <td><span class="live-badge"></span>Active</td>
+                            <td>-68 dBm (Moderate)</td>
+                        </tr>
+                        <tr>
+                            <td>Node-04 (Delta)</td>
+                            <td>12%</td>
+                            <td><span class="warning-badge"></span>Charging</td>
+                            <td>-85 dBm (Weak)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </figure>
+        </section>
+        <section id="feedback" class="section-block">
+            <h2>Task & Telemetry Feedback Form</h2>
+            <form action="#" method="POST" class="dashboard-form">
+                
+                <fieldset class="form-fieldset">
+                    <legend>Telemetry Update Details</legend>
+
+                    <p class="form-group">
+                        <label for="task-name">Task Name:</label>
+                        <input type="text" id="task-name" name="taskName" placeholder="Enter task name" required>
+                    </p>
+
+                    <p class="form-group">
+                        <label for="task-status">Status:</label>
+                        <select id="task-status" name="taskStatus" required>
+                            <option value="">-- Select Status --</option>
+                            <option value="Completed">Completed</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Blocked">Blocked</option>
+                        </select>
+                    </p>
+
+                    <p class="form-group">
+                        <label for="log-file">Telemetry Log Upload:</label>
+                        <input type="file" id="log-file" name="logFile">
+                    </p>
+
+                    <p class="form-group">
+                        <label for="comments">Comments / Blockers:</label>
+                        <textarea id="comments" name="comments" rows="4" placeholder="Enter telemetry observations or comments..."></textarea>
+                    </p>
+
+                    <button type="submit" class="submit-btn">Submit Telemetry Update</button>
+                </fieldset>
+
+            </form>
+        </section>
+
+    </main>
+    <footer>
+        <p>&copy; 2026 Team Devdoots Capstone Project. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
+                    

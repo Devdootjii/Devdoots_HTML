@@ -1,0 +1,2621 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 3 — Searching · Hashing · Sorting | Team Devdoots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================= TOKENS ================= */
+:root, [data-theme="dark"] {
+  --bg: #0a1020;
+  --surface: #111a2e;
+  --surface2: #16223a;
+  --surface3: #1d2c48;
+  --border: rgba(255,255,255,0.09);
+  --border2: rgba(255,255,255,0.18);
+  --text: #eef2fa;
+  --dim: #9aa8c4;
+  --faint: #6b7a99;
+  --gold: #e8b44a;
+  --gold-dim: rgba(232,180,74,0.13);
+  --blue: #4fa3d1;
+  --blue-dim: rgba(79,163,209,0.13);
+  --coral: #ff7a6b;
+  --coral-dim: rgba(255,122,107,0.13);
+  --emerald: #3fc9a0;
+  --emerald-dim: rgba(63,201,160,0.13);
+  --shadow: 0 12px 36px rgba(0,0,0,0.45);
+}
+[data-theme="light"] {
+  --bg: #f4f7fc;
+  --surface: #ffffff;
+  --surface2: #f7f9fd;
+  --surface3: #e9eef8;
+  --border: rgba(18,28,48,0.11);
+  --border2: rgba(18,28,48,0.2);
+  --text: #121a2b;
+  --dim: #54637e;
+  --faint: #8494ad;
+  --gold: #a1701a;
+  --gold-dim: rgba(161,112,26,0.12);
+  --blue: #2a6f96;
+  --blue-dim: rgba(42,111,150,0.11);
+  --coral: #c8473a;
+  --coral-dim: rgba(200,71,58,0.11);
+  --emerald: #12886a;
+  --emerald-dim: rgba(18,136,106,0.11);
+  --shadow: 0 12px 30px rgba(20,32,60,0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  font-size: 16px; line-height: 1.72;
+  overflow-wrap: break-word;
+  padding-bottom: 150px;
+  background-image:
+    radial-gradient(ellipse 900px 420px at 75% -90px, var(--gold-dim), transparent 62%),
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: auto, 44px 44px, 44px 44px;
+}
+body.audio-off { padding-bottom: 44px; }
+::selection { background: var(--gold-dim); }
+
+/* ================= LAYOUT ================= */
+.wrap { max-width: 1460px; margin: 0 auto; display: grid; grid-template-columns: 232px minmax(0,1fr); gap: 0 54px; padding: 0 30px; position: relative; z-index: 1; }
+.main { min-width: 0; padding: 26px 0 70px; }
+body.noside .toc { display: none !important; }
+body.noside .wrap { grid-template-columns: minmax(0,1fr); }
+body.noside .main { max-width: 1180px; margin: 0 auto; }
+
+/* ================= TOC ================= */
+.toc { position: sticky; top: 22px; align-self: start; max-height: calc(100dvh - 70px); overflow-y: auto; padding: 22px 0 26px; grid-row: 1 / -1; }
+.toc::-webkit-scrollbar { width: 3px; }
+.toc::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+.toc-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--faint); padding-bottom: 11px; margin-bottom: 9px; border-bottom: 1px solid var(--border); }
+.toc a { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; color: var(--dim); text-decoration: none; padding: 5px 10px; border-radius: 6px; border-left: 2px solid transparent; transition: all .15s; line-height: 1.45; margin-bottom: 1px; }
+.toc a .n { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--faint); }
+.toc a:hover { color: var(--text); background: var(--surface); }
+.toc a.active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-dim); }
+.toc a.active .n { color: var(--gold); }
+
+/* ================= DOCK ================= */
+.dock {
+  position: sticky; top: 10px; z-index: 420;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border2); border-radius: 13px;
+  padding: 8px 12px; margin: 0 0 22px; box-shadow: var(--shadow);
+}
+.dock-timer { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 600; color: var(--gold); min-width: 76px; letter-spacing: 1px; }
+.dock-timer.warn { color: var(--coral); }
+.dock-blk { font-size: 12.5px; color: var(--dim); max-width: 270px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dock-name { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 19px; color: var(--blue); min-width: 74px; letter-spacing: .3px; }
+.dock-name.spinning { opacity: .5; }
+.dbtn { font-family: 'IBM Plex Mono', monospace; font-size: 12px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 7px 11px; transition: all .15s; }
+.dbtn:hover { border-color: var(--gold); color: var(--gold); }
+.dbtn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.dbtn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.dbtn--blue { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+.dbtn--ok { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-dim); }
+.dbtn--bad { border-color: var(--coral); color: var(--coral); background: var(--coral-dim); }
+.dock-sep { width: 1px; height: 24px; background: var(--border2); margin: 0 3px; }
+.dock-spacer { flex: 1 1 16px; min-width: 0; }
+.dock-q { display: none; margin: -12px 0 22px; border: 1px solid var(--blue); border-left: 3px solid var(--blue); border-radius: 0 0 13px 13px; background: color-mix(in srgb, var(--blue-dim) 70%, var(--surface)); padding: 14px 18px; }
+.dock-q.show { display: block; }
+.dock-q .who { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.dock-q .dq { font-size: 15px; font-weight: 600; line-height: 1.55; }
+.dock-q .da { font-size: 13.5px; line-height: 1.65; color: var(--emerald); margin-top: 9px; display: none; }
+.dock-q .da.show { display: block; }
+@media (max-width: 1000px) {
+  .dock { top: 50px; padding: 7px 9px; gap: 6px; }
+  .dock-blk { display: none; }
+  .dock-timer { font-size: 18px; min-width: 64px; }
+  .dock-name { font-size: 16px; min-width: 56px; }
+  .dock-sep { display: none; }
+}
+.timeup-banner { position: fixed; bottom: 118px; left: 50%; transform: translate(-50%, 420%); z-index: 950; background: var(--coral); color: #240b06; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 15px; letter-spacing: .8px; padding: 12px 24px; border-radius: 11px; box-shadow: 0 12px 36px rgba(0,0,0,.45); transition: transform .32s cubic-bezier(.2,.9,.3,1.4); white-space: nowrap; }
+.timeup-banner.show { transform: translate(-50%, 0); }
+@keyframes tuPulse { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+body.timeup::after { content: ''; position: fixed; inset: 0; z-index: 900; pointer-events: none; background: radial-gradient(ellipse at center, rgba(255,122,107,0.28), rgba(255,122,107,0.08) 60%, transparent 80%); animation: tuPulse .5s ease-in-out 7; }
+@keyframes tuShake { 0%,100%{transform:translateX(0)} 15%{transform:translateX(-7px)} 30%{transform:translateX(7px)} 45%{transform:translateX(-5px)} 60%{transform:translateX(5px)} 80%{transform:translateX(-3px)} }
+.dock.timeup { animation: tuShake .55s ease-in-out 4; border-color: var(--coral) !important; }
+@media (max-width: 1000px) { .timeup-banner { bottom: 170px; } }
+
+/* ================= HERO ================= */
+.hero { padding: 30px 0 6px; }
+.hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 12px; border-radius: 5px; border: 1px solid var(--border2); }
+.chip--gold { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+.chip--blue { color: var(--blue); border-color: var(--blue); background: var(--blue-dim); }
+.chip--em { color: var(--emerald); border-color: var(--emerald); background: var(--emerald-dim); }
+h1 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: clamp(38px, 5.2vw, 60px); line-height: 1.02; letter-spacing: -1.4px; }
+h1 em { font-style: normal; color: var(--gold); }
+.hero-sub { font-size: 17px; color: var(--dim); max-width: 62ch; margin-top: 14px; }
+.hero-hr { height: 1px; background: linear-gradient(90deg, var(--gold), transparent 72%); border: none; margin: 28px 0 0; opacity: .5; }
+
+/* ================= SECTION HEAD ================= */
+.sec { scroll-margin-top: 54px; }
+.sec-head { display: flex; align-items: center; gap: 15px; margin: 70px 0 8px; flex-wrap: wrap; }
+.sec-num { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #1b1405; background: var(--gold); border-radius: 6px; padding: 4px 9px; letter-spacing: 1px; flex-shrink: 0; }
+h2 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: clamp(28px, 3.2vw, 38px); line-height: 1.1; letter-spacing: -0.8px; flex: 1; min-width: 200px; }
+.sec-play { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--gold); background: var(--gold-dim); color: var(--gold); font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; }
+.sec-play:hover { background: var(--gold); color: #1b1405; }
+.sec-tag { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 22px; }
+
+/* ================= READING TEXT ================= */
+.rd { font-size: 16.5px; line-height: 1.78; color: var(--text); max-width: 74ch; margin: 18px 0; padding: 4px 14px 4px 16px; border-left: 3px solid transparent; border-radius: 0 8px 8px 0; transition: background .35s, border-color .35s; }
+.rd.speaking { background: var(--gold-dim); border-left-color: var(--gold); }
+.rd b, .rd strong { color: var(--gold); font-weight: 600; }
+.rd i { color: var(--blue); font-style: normal; }
+.rd code { font-family: 'IBM Plex Mono', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 6px; border-radius: 4px; }
+
+/* ================= BOXES ================= */
+.def { background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 11px; padding: 16px 20px 14px; margin: 22px 0; max-width: 78ch; }
+.def-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 7px; }
+.def p { font-size: 15.5px; line-height: 1.66; }
+.def p b { color: var(--gold); }
+.memo { background: linear-gradient(150deg, var(--emerald-dim), var(--surface) 60%); border: 1px solid var(--emerald); border-left: 4px solid var(--emerald); border-radius: 11px; padding: 15px 19px; margin: 22px 0; max-width: 78ch; }
+.memo-label { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--emerald); display: block; margin-bottom: 7px; }
+.memo p, .memo li { font-size: 14.5px; line-height: 1.68; }
+.memo b { color: var(--emerald); }
+.memo ul, .memo ol { padding-left: 1.25em; }
+.callout { border-radius: 11px; padding: 14px 18px; margin: 22px 0; max-width: 78ch; font-size: 15px; line-height: 1.66; border: 1px solid var(--coral); background: var(--coral-dim); }
+.callout b { color: var(--coral); }
+.callout--info { border-color: var(--blue); background: var(--blue-dim); }
+.callout--info b { color: var(--blue); }
+
+/* ================= CARDS ================= */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(252px,1fr)); gap: 14px; margin: 22px 0; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(212px,1fr)); gap: 14px; margin: 22px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 16px 18px; min-width: 0; }
+.card h4 { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 9px; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+.card h4::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.card p, .card li { font-size: 14px; line-height: 1.62; color: var(--dim); }
+.card p b, .card li b { color: var(--text); }
+.card ul { padding-left: 1.2em; }
+.card--blue h4 { color: var(--blue); }
+.card--em h4 { color: var(--emerald); }
+.card--coral h4 { color: var(--coral); }
+
+/* ================= DIAGRAM ================= */
+.diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 22px 20px 18px; margin: 24px 0; overflow-x: auto; }
+.d-cap { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.4px; text-transform: uppercase; color: var(--faint); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.d-cap::before { content: ''; width: 7px; height: 7px; background: var(--gold); border-radius: 50%; }
+.memrow { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+.memcol { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.idx { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--blue); }
+.cell { min-width: 62px; padding: 13px 10px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 7px; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; }
+.cell--hl { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.cell--zero { color: var(--faint); opacity: .55; }
+.addr { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--faint); }
+.d-note { margin-top: 16px; font-size: 13.5px; color: var(--dim); line-height: 1.62; border-top: 1px dashed var(--border2); padding-top: 12px; }
+.d-note b { color: var(--gold); }
+.d-note code { font-family: 'IBM Plex Mono', monospace; color: var(--blue); font-size: .9em; }
+.formula { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; color: var(--gold); overflow-x: auto; line-height: 1.7; max-width: 78ch; }
+.formula small { display: block; color: var(--faint); font-size: 12px; margin-top: 6px; line-height: 1.6; }
+.formula .k { color: var(--blue); }
+
+/* ================= TABLES ================= */
+.table-wrap { border: 1px solid var(--border); border-radius: 13px; overflow: hidden; margin: 22px 0; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.55; }
+.data-table thead { position: sticky; top: 0; z-index: 2; }
+.data-table th { background: var(--surface3); font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.3px; color: var(--dim); text-align: left; padding: 11px 15px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.data-table td { padding: 11px 15px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.data-table tbody tr:nth-child(even) { background: var(--surface2); }
+.data-table tbody tr:hover { background: var(--gold-dim); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table td b { color: var(--gold); }
+.data-table td code { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+.data-table td.num, .data-table th.num { text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+
+/* ================= CODE ================= */
+.code-block { font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.62; background: #0c1424; border: 1px solid var(--border2); border-left: 3px solid var(--gold); border-radius: 10px; padding: 16px 18px; margin: 20px 0; overflow-x: auto; white-space: pre-wrap; word-break: break-word; color: #dfe7f5; max-width: 78ch; }
+[data-theme="light"] .code-block { background: #f3f6fc; color: #1a2436; }
+.code-block .cm { color: #6b7a99; }
+.code-block .kw { color: #6fb3e0; }
+.code-block .st { color: #e8b44a; }
+.code-block .fn { color: #3fc9a0; }
+
+/* ================= COMPARE ================= */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+.cmp-card { border: 1px solid var(--border2); border-radius: 12px; overflow: hidden; min-width: 0; background: var(--surface); }
+.cmp-card h5 { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 18px; }
+.cmp-card--a h5 { background: var(--blue-dim); color: var(--blue); border-bottom: 2px solid var(--blue); }
+.cmp-card--b h5 { background: var(--emerald-dim); color: var(--emerald); border-bottom: 2px solid var(--emerald); }
+.cmp-card ul { list-style: none; padding: 14px 18px; }
+.cmp-card li { font-size: 13.5px; line-height: 1.62; color: var(--dim); padding: 4px 0 4px 16px; position: relative; }
+.cmp-card li::before { content: '›'; position: absolute; left: 0; color: var(--faint); font-weight: 700; }
+.cmp-card li b { color: var(--text); }
+@media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
+
+/* ================= Q&A ================= */
+.qa { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin: 18px 0; overflow: hidden; }
+.qa summary { padding: 16px 20px; cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: 15.5px; font-weight: 600; }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary:hover { background: var(--surface2); }
+.qa summary::after { content: '+'; font-family: 'IBM Plex Mono', monospace; color: var(--gold); margin-left: auto; font-size: 17px; }
+.qa[open] summary::after { content: '−'; }
+.mark { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 5px; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
+.mark--2 { background: var(--blue-dim); color: var(--blue); }
+.mark--5 { background: var(--gold-dim); color: var(--gold); }
+.mark--10 { background: var(--coral-dim); color: var(--coral); }
+.qa-body { padding: 4px 20px 18px; border-top: 1px solid var(--border); }
+.qa-body p { font-size: 14.5px; line-height: 1.72; color: var(--dim); margin: 12px 0; max-width: 78ch; }
+.qa-body p b { color: var(--text); }
+.qa-body code { font-family: 'IBM Plex Mono', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+
+/* ================= SUMMARY / EXAM ================= */
+.one-liners { counter-reset: ol; display: grid; gap: 9px; margin: 22px 0; max-width: 84ch; }
+.one-liners li { list-style: none; counter-increment: ol; position: relative; padding: 9px 14px 9px 46px; font-size: 14.5px; line-height: 1.62; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--dim); }
+.one-liners li::before { content: counter(ol, decimal-leading-zero); position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--gold); }
+.one-liners li b { color: var(--text); }
+.defgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(292px,1fr)); gap: 14px; margin: 24px 0; }
+.defcard { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold); border-radius: 10px; padding: 15px 17px; min-width: 0; }
+.defcard h6 { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
+.defcard p { font-size: 13.5px; line-height: 1.62; color: var(--dim); }
+.defcard p b { color: var(--text); }
+
+/* ================= SIM SHELL ================= */
+.sim { border: 1px solid var(--gold); border-radius: 13px; overflow: hidden; margin: 26px 0; background: linear-gradient(165deg, var(--gold-dim), var(--surface) 42%); }
+.sim-head { padding: 13px 20px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface2); }
+.sim-head b { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold); }
+.sim-head span { font-size: 12.5px; color: var(--faint); }
+.sim-body { padding: 20px; }
+.sim-controls { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+.sim-controls label { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; flex-wrap: wrap; }
+.btn { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; padding: 8px 15px; border-radius: 7px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); transition: all .15s; }
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.btn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.btn--ok { border-color: var(--emerald) !important; background: var(--emerald-dim) !important; color: var(--emerald) !important; }
+.btn--bad { border-color: var(--coral) !important; background: var(--coral-dim) !important; color: var(--coral) !important; }
+.btn--warn { border-color: var(--coral); color: var(--coral); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.sim input, .sim select { font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: var(--surface); border: 1px solid var(--border2); color: var(--text); border-radius: 7px; padding: 8px 10px; width: 92px; }
+.sim select { width: auto; max-width: 100%; }
+.sim input:focus, .sim select:focus { outline: none; border-color: var(--gold); }
+.sim-steps { font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.9; background: var(--surface); border: 1px dashed var(--border2); border-radius: 8px; padding: 14px 18px; margin-top: 16px; color: var(--dim); min-height: 20px; }
+.sim-steps b { color: var(--gold); font-weight: 600; }
+.sim-msg { font-size: 13.5px; margin-top: 12px; color: var(--dim); }
+.sim-msg b { color: var(--gold); }
+
+/* ================= NEW VIZ: SEARCH BEAM ================= */
+.beam-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.beam-cell { min-width: 54px; padding: 13px 6px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; transition: all .22s; position: relative; }
+.beam-cell .tag { display: block; font-size: 9px; font-weight: 500; letter-spacing: 1px; color: var(--faint); margin-top: 4px; }
+.beam-cell.scan { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); box-shadow: 0 0 0 3px var(--blue-dim); }
+.beam-cell.out { opacity: .26; }
+.beam-cell.mid { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.beam-cell.hit { border-color: var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.beam-meter { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--dim); }
+.beam-meter b { color: var(--gold); }
+
+/* ================= NEW VIZ: HASH BUCKETS ================= */
+.buckets { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+.bk-row { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.bk-idx { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--faint); min-width: 46px; text-align: right; }
+.bk-slot { flex: 1; min-width: 0; border: 1px solid var(--border2); border-radius: 7px; padding: 7px 10px; background: var(--surface3); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 13px; transition: all .25s; }
+.bk-slot.new { border-color: var(--gold); background: var(--gold-dim); }
+.bk-slot.coll { border-color: var(--coral); background: var(--coral-dim); }
+.bk-key { border-radius: 5px; padding: 2px 9px; font-size: 12px; border: 1px solid var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.bk-key.probe { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.bk-empty { color: var(--faint); font-size: 12px; }
+.lf-meter { height: 10px; border-radius: 6px; background: var(--surface3); border: 1px solid var(--border2); overflow: hidden; margin-top: 8px; }
+.lf-fill { height: 100%; background: linear-gradient(90deg, var(--emerald), var(--gold)); transition: width .3s; }
+
+/* ================= NEW VIZ: SORT RACE ================= */
+.race { display: flex; flex-direction: column; gap: 14px; }
+.lane { border: 1px solid var(--border2); border-radius: 11px; padding: 12px 14px; background: var(--surface2); }
+.lane.done { border-color: var(--emerald); }
+.lane__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 9px; }
+.lane__name { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--blue); }
+.lane__meta { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--dim); }
+.lane__meta b { color: var(--gold); }
+.lane.done .lane__name { color: var(--emerald); }
+.lane__bars { display: flex; align-items: flex-end; gap: 4px; height: 78px; }
+.lane__bar { flex: 1 1 0; min-width: 6px; background: var(--surface3); border: 1px solid var(--border2); border-radius: 3px 3px 0 0; transition: height .18s ease, background .15s ease; }
+.lane__bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.lane__bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.lane__bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+
+/* ================= NEW VIZ: SORT STEPPER (code sync) ================= */
+.step-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 860px) { .step-grid { grid-template-columns: 1fr; } }
+.step-bars { display: flex; align-items: flex-end; gap: 5px; height: 170px; padding: 22px 2px 0; }
+.step-bar { flex: 1 1 0; max-width: 58px; min-width: 12px; background: var(--surface3); border: 1px solid var(--border2); border-bottom: none; border-radius: 5px 5px 0 0; position: relative; transition: height .2s, background .18s, border-color .18s; }
+.step-bar i { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-style: normal; color: var(--dim); }
+.step-bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.step-bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.step-bar.piv { background: var(--coral-dim); border-color: var(--coral); }
+.step-bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+.step-code { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.8; background: #0c1424; border: 1px solid var(--border2); border-radius: 10px; padding: 12px 14px; overflow-x: auto; }
+[data-theme="light"] .step-code { background: #f3f6fc; }
+.step-code .ln { display: block; padding: 1px 8px; border-radius: 5px; border-left: 3px solid transparent; white-space: pre; color: #93a3bd; }
+[data-theme="light"] .step-code .ln { color: #5a6b86; }
+.step-code .ln.on { background: var(--gold-dim); border-left-color: var(--gold); color: var(--text); }
+.step-code .ln b { color: var(--blue); font-weight: 600; }
+.step-vars { display: flex; gap: 9px; flex-wrap: wrap; margin: 12px 0 0; }
+.step-vars div { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border2); background: var(--surface3); color: var(--dim); }
+.step-vars div b { color: var(--gold); font-size: 14px; }
+.step-vars div.chg { border-color: var(--gold); background: var(--gold-dim); }
+.step-vars div.chg b { color: var(--gold); }
+
+/* ================= CHART ================= */
+.chart-card { border: 1px solid var(--border2); border-radius: 13px; background: var(--surface); padding: 16px 16px 14px; margin: 22px 0; }
+.chart-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.chart-card__head b { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+.chart-card__head .sim-controls { margin: 0; }
+.chart-wrap { position: relative; width: 100%; height: 320px; }
+.chart-wrap canvas { width: 100%; height: 100%; display: block; }
+@media (max-width: 620px) { .chart-wrap { height: 250px; } }
+.chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--dim); }
+.chart-legend span { display: flex; align-items: center; gap: 6px; }
+.chart-legend em { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+.chart-note { font-size: 13px; color: var(--faint); margin-top: 10px; line-height: 1.6; }
+
+/* ================= SCORE ROUND ================= */
+.score-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.score-tbl th { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.score-tbl td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+.score-tbl td b { color: var(--gold); }
+.score-tbl td.num { text-align: right; font-family: 'IBM Plex Mono', monospace; }
+.score-tbl tr.top td { background: var(--gold-dim); }
+.spin-q { border: 1px solid var(--blue); border-radius: 12px; background: var(--surface2); padding: 16px 18px; margin-top: 16px; text-align: left; }
+.spin-q .who { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.spin-q .qtext { font-size: 16px; font-weight: 600; line-height: 1.55; }
+.spin-q .qans { font-size: 14px; line-height: 1.65; color: var(--emerald); margin-top: 10px; display: none; border-top: 1px dashed var(--border2); padding-top: 10px; }
+.spin-q .qans.show { display: block; }
+.picker-name { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 50px; line-height: 1.1; color: var(--blue); min-height: 58px; }
+.picker-name.spinning { opacity: .5; }
+.result-overlay { position: fixed; inset: 0; z-index: 960; background: rgba(6,10,20,.88); backdrop-filter: blur(7px); display: none; align-items: center; justify-content: center; padding: 22px; }
+.result-overlay.show { display: flex; }
+.result-card { background: var(--surface); border: 2px solid var(--gold); border-radius: 16px; padding: 26px 30px; max-width: 660px; width: 100%; max-height: 88vh; overflow: auto; box-shadow: 0 22px 60px rgba(0,0,0,.5); }
+.result-card h3 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 32px; color: var(--gold); margin-bottom: 4px; }
+.result-card .sub { color: var(--dim); font-size: 14px; margin-bottom: 18px; }
+.result-card .win { font-size: 15px; margin: 16px 0; padding: 12px 16px; border-radius: 10px; background: var(--emerald-dim); border: 1px solid var(--emerald); }
+.result-card .win b { color: var(--emerald); }
+.chk { display: flex; gap: 11px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); margin-bottom: 7px; cursor: pointer; }
+.chk input { margin-top: 3px; accent-color: var(--gold); width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
+.chk span { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.chk.on { border-color: var(--gold); background: var(--gold-dim); }
+.chk.on span { color: var(--text); }
+.blk { display: flex; gap: 12px; align-items: flex-start; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; cursor: pointer; transition: all .15s; }
+.blk:hover { border-color: var(--gold); }
+.blk.on { border-color: var(--gold); background: var(--gold-dim); box-shadow: 0 0 0 1px var(--gold); }
+.blk .t { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--blue); min-width: 58px; flex-shrink: 0; }
+.blk .d { font-size: 13.5px; line-height: 1.5; color: var(--dim); min-width: 0; }
+.blk .d b { color: var(--text); display: block; font-size: 14.5px; }
+.timer-big { font-family: 'IBM Plex Mono', monospace; font-size: 58px; font-weight: 600; letter-spacing: 2px; color: var(--gold); line-height: 1; }
+.timer-big.warn { color: var(--coral); }
+
+/* ================= PLAYER (chhupa hua by default) ================= */
+.player {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border2); padding: 10px 18px 12px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  transition: transform .32s ease, opacity .32s ease;
+}
+body.audio-off .player { transform: translateY(115%); opacity: 0; pointer-events: none; }
+body.audio-off .sec-play { display: none; }
+.pbtn { font-family: 'IBM Plex Mono', monospace; font-size: 13px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 8px 12px; transition: all .15s; min-width: 42px; text-align: center; }
+.pbtn:hover { border-color: var(--gold); color: var(--gold); }
+.pbtn--main { width: 52px; height: 52px; border-radius: 50%; font-size: 17px; background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 700; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+.player select { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--surface3); color: var(--text); border: 1px solid var(--border2); border-radius: 7px; padding: 7px 8px; max-width: 100%; }
+.p-meta { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 2px; }
+.p-now { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice .on { color: var(--emerald); }
+.p-voice .off { color: var(--coral); }
+
+/* ================= THEME TOGGLE ================= */
+.theme-toggle { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); cursor: pointer; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+[data-theme="dark"] .tt-sun { display: block; } [data-theme="dark"] .tt-moon { display: none; }
+[data-theme="light"] .tt-sun { display: none; } [data-theme="light"] .tt-moon { display: block; }
+
+/* ================= FOOTER ================= */
+.foot { margin-top: 80px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--faint); font-size: 12.5px; font-family: 'IBM Plex Mono', monospace; letter-spacing: .5px; }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1000px) {
+  .wrap { grid-template-columns: 1fr; padding: 0 18px; }
+  .toc { position: sticky; top: 0; z-index: 300; grid-row: auto; display: flex; gap: 6px; align-items: center; overflow-x: auto; -webkit-overflow-scrolling: touch; background: color-mix(in srgb, var(--bg) 93%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); margin: 0 -18px; padding: 10px 60px 10px 18px; max-height: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc-title { display: none; }
+  .toc a { white-space: nowrap; flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; border-radius: 5px; padding: 6px 11px; font-size: 11.5px; }
+  .toc a.active { border-bottom-color: var(--gold); background: var(--gold-dim); }
+  .main { padding-top: 20px; }
+  .sec-head { margin-top: 54px; }
+  .player { gap: 8px; padding: 10px 14px; }
+  .p-meta { min-width: 100%; order: 5; }
+  body.audio-off .player { transform: translateY(130%); }
+}
+@media (max-width: 480px) {
+  .memrow { gap: 4px; }
+  .cell { min-width: 50px; padding: 11px 6px; font-size: 13px; }
+  .rd { font-size: 15.5px; }
+  .beam-cell { min-width: 46px; font-size: 13px; padding: 10px 4px; }
+  .timer-big { font-size: 42px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } html { scroll-behavior: auto; } }
+
+/* ================= QUESTION PANEL ================= */
+.qpanel { border: 1px solid var(--border2); border-left: 3px solid var(--blue); border-radius: 12px; background: var(--surface); padding: 16px 18px; margin: 26px 0; }
+.qitem { border-top: 1px dashed var(--border2); padding: 12px 0 6px; }
+.qitem:first-of-type { border-top: none; padding-top: 6px; }
+.qpanel details .qitem { border-top: 1px dashed var(--border2); }
+.qpanel summary { list-style: none; }
+.qpanel summary::-webkit-details-marker { display: none; }
+
+/* ================= AMBIENT CANVAS (fixed, content ke peeche) ================= */
+#ambient { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: .62; }
+.wrap { position: relative; z-index: 1; }
+
+/* banner ka hidden state — pixel offset (percentage mobile pe kaafi nahi tha) */
+.timeup-banner { transform: translate(-50%, calc(100% + 260px)); }
+/* bars ko thoda visible karo */
+.lane__bar { background: color-mix(in srgb, var(--blue) 20%, var(--surface3)); }
+.step-bar { background: color-mix(in srgb, var(--blue) 18%, var(--surface3)); }
+
+</style>
+</head>
+<body class="audio-off">
+<canvas id="ambient" aria-hidden="true"></canvas>
+
+<div class="wrap">
+
+<nav class="toc" id="toc">
+  <div class="toc-title">UNIT 3 — CONTENT</div>
+  <a href="#s0"><span class="n">00</span>Searching</a>
+  <a href="#s1"><span class="n">01</span>Hashing</a>
+  <a href="#s2"><span class="n">02</span>Sorting — BSI</a>
+  <a href="#s3"><span class="n">03</span>Merge &amp; Quick</a>
+  <a href="#s4"><span class="n">04</span>Heap &amp; Radix</a>
+  <a href="#s5"><span class="n">05</span>Sorting Lab</a>
+  <a href="#s6"><span class="n">06</span>Comparison</a>
+  <a href="#s7"><span class="n">07</span>Q&amp;A</a>
+  <a href="#s8"><span class="n">08</span>Summary</a>
+  <a href="#s9"><span class="n">09</span>Exam Corner</a>
+  <a href="#s10"><span class="n">10</span>Class Tools</a>
+</nav>
+
+<div class="main">
+
+<div class="dock" id="dock">
+  <span class="dock-timer" id="dkTimer">30:00</span>
+  <button class="dbtn dbtn--go" id="dkStart" title="Timer — ek baar chalao, khud chalta rahega">▶</button>
+  <button class="dbtn" id="dkNext" title="Agla block">⏭</button>
+  <span class="dock-blk" id="dkBlk">Block select karo (Class Tools →)</span>
+  <span class="dock-sep"></span>
+  <button class="dbtn dbtn--blue" id="dkSpin" title="Student + sawaal chuno">🎯 SPIN</button>
+  <span class="dock-name" id="dkName">—</span>
+  <button class="dbtn dbtn--ok" id="dkOk" title="Sahi jawab">✓</button>
+  <button class="dbtn dbtn--bad" id="dkBad" title="Galat jawab">✕</button>
+  <span class="dock-sep"></span>
+  <button class="dbtn" id="dkQ" title="Is topic ka random sawaal">🎲 SAWAAL</button>
+  <span class="dock-spacer"></span>
+  <button class="dbtn" id="dkSide" title="Sidebar chhupao / dikhao">⇤ SIDEBAR</button>
+  <button class="dbtn" id="dkAudio" title="Audio player dikhao / chhupao">🎧 AUDIO</button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Theme toggle" title="Theme badlo"><span class="tt-sun">☀</span><span class="tt-moon">☾</span></button>
+</div>
+
+<div class="dock-q" id="dkQCard">
+  <div class="who" id="dkQWho"></div>
+  <div class="dq" id="dkQText"></div>
+  <div class="da" id="dkQAns"></div>
+  <div class="sim-controls" style="margin-top:12px">
+    <button class="btn btn--go" id="dkQShow">Jawab dekho</button>
+    <button class="btn btn--ok" id="dkQOk">✓ Sahi</button>
+    <button class="btn btn--bad" id="dkQBad">✕ Galat</button>
+    <button class="btn" id="dkQNext">🎲 Agla</button>
+    <button class="btn btn--warn" id="dkQClose">Band</button>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="hero-badges">
+    <span class="chip chip--gold">BCS301 · UNIT 3</span>
+    <span class="chip chip--blue">SEARCHING · HASHING · SORTING</span>
+    <span class="chip chip--em">08 LECTURES · FULL CONTENT</span>
+  </div>
+  <h1>Unit 3 — <em>Dhoondho, Hash karo, Sort karo</em></h1>
+  <p class="hero-sub">Poora Unit 3 ek page me: <b>searching</b> (linear, index sequential, binary), <b>hashing</b> (collision resolution), aur <b>saat sorting algorithms</b> — C programs, dry runs, memory hooks aur naye animations ke saath. Upar wali dock me timer, student spinner aur sawaal — <b>🎧 AUDIO</b> button se hi neeche ka player khulega (padhne ke waqt zaroorat nahi, sunne ke liye kholo).</p>
+  <hr class="hero-hr">
+</header>
+
+<!-- ============================================================ S0 -->
+<section class="sec" id="s0">
+  <div class="sec-head">
+    <span class="sec-num">00</span>
+    <h2>Searching — dhoondhne ke 3 tareeke</h2>
+    <button class="sec-play" data-sec="s0" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Linear · Index Sequential · Binary Search</p>
+
+  <p class="rd" data-dev="सर्चिंग का मतलब है किसी लिस्ट में एक ख़ास एलिमेंट को ढूँढना और बताना कि वह किस इंडेक्स पर मिला। तीन तरीके हैं। लीनियर सर्च सबसे सीधा है — पहले एलिमेंट से शुरू करो और एक-एक करके तुलना करते जाओ। यह किसी भी ऐरे पर चलता है, सॉर्टेड होना ज़रूरी नहीं, लेकिन सबसे बुरे केस में पूरे एन एलिमेंट्स देखने पड़ते हैं।">Searching = list me ek khaas element (key) dhoondhna aur batana ki kis index pe mila. <b>Teen tareeke</b> hain:
+
+- <b>Linear search</b> — ek-ek karke compare (unsorted pe bhi chalta hai, par O(n))
+- <b>Index sequential search</b> — index table + blocks (bade sorted files ke liye)
+- <b>Binary search</b> — aadha-aadha kaat ke (sorted hona zaroori, par O(log n))</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — EXAM ME AISA LIKHO</span>
+    <p><b>Searching:</b> The process of locating a given element (key) in a collection, returning its position or reporting absence. <b>Linear (sequential) search</b> compares the key with each element one by one — works on unsorted data, worst case O(n). <b>Binary search</b> repeatedly halves a <b>sorted</b> array by comparing with the middle element — O(log n).</p>
+  </div>
+
+  <p class="rd" data-dev="लीनियर सर्च का कोड सबसे आसान है — एक लूप, एक शर्त, और मिलने पर इंडेक्स रिटर्न। न मिले तो माइनस वन।">Linear search ka code — ek loop, ek condition, mila toh index warna <b>−1</b>:</p>
+  <pre class="code-block"><span class="cm">/* SEQUENTIAL (LINEAR) SEARCH — C program */</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">linearSearch</span>(<span class="kw">int</span> a[], <span class="kw">int</span> n, <span class="kw">int</span> key) {
+    <span class="kw">int</span> i;
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) {
+        <span class="kw">if</span> (a[i] == key)              <span class="cm">// mil gaya</span>
+            <span class="kw">return</span> i;                 <span class="cm">// index return karo</span>
+    }
+    <span class="kw">return</span> -1;                        <span class="cm">// nahi mila</span>
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> a[100], n, i, key, pos;
+    <span class="fn">printf</span>(<span class="st">"Enter number of elements: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+    <span class="fn">printf</span>(<span class="st">"Enter %d elements: "</span>, n);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;a[i]);
+
+    <span class="fn">printf</span>(<span class="st">"Enter key to search: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;key);
+
+    pos = <span class="fn">linearSearch</span>(a, n, key);
+    <span class="kw">if</span> (pos == -1) <span class="fn">printf</span>(<span class="st">"Element not found\n"</span>);
+    <span class="kw">else</span>           <span class="fn">printf</span>(<span class="st">"Element found at index %d\n"</span>, pos);
+    <span class="kw">return</span> 0;
+}</pre>
+
+  <p class="rd" data-dev="इंडेक्स सीक्वेंशियल सर्च बड़ी सॉर्टेड फाइलों के लिए है। ऐरे को ब्लॉक्स में तोड़ो, हर ब्लॉक का पहला एलिमेंट इंडेक्स टेबल में रखो। पहले टेबल देखो कि की किस ब्लॉक में पड़ेगी, फिर सिर्फ उसी ब्लॉक में खोजो। इससे पूरा ऐरे स्कैन नहीं करना पड़ता।"><b>Index Sequential Search</b> — bade sorted data ke liye: array ko blocks me todo, har block ka pehla element <b>index table</b> me rakho. Pehle table dekho key kaunse block me padegi, phir <b>sirf usi block</b> me linear search. Poora array scan nahi karna padta — complexity ~√n.</p>
+
+  <div class="diagram">
+    <div class="d-cap">INDEX SEQUENTIAL — TABLE + BLOCKS</div>
+    <div class="table-wrap" style="margin:0 0 14px">
+      <div class="table-scroll"><table class="data-table">
+        <thead><tr><th>Index entry</th><th>Block ka pehla value</th><th>Address</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><b>10</b></td><td>addr A</td></tr>
+          <tr><td>2</td><td><b>40</b></td><td>addr B</td></tr>
+          <tr><td>3</td><td><b>70</b></td><td>addr C</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="memrow">
+      <div class="memcol"><div class="cell" style="min-width:42px">10</div><div class="cell" style="min-width:42px">20</div><div class="cell" style="min-width:42px">30</div><span class="addr">block 1</span></div>
+      <div class="memcol"><div class="cell" style="min-width:42px">40</div><div class="cell" style="min-width:42px">50</div><div class="cell" style="min-width:42px">60</div><span class="addr">block 2</span></div>
+      <div class="memcol"><div class="cell" style="min-width:42px">70</div><div class="cell" style="min-width:42px">80</div><div class="cell" style="min-width:42px">90</div><span class="addr">block 3</span></div>
+    </div>
+    <p class="d-note">Key = 50? Table dekho → 40 ≤ 50 &lt; 70 → <b>sirf block 2</b> me search. Poora array nahi chhaana pada!</p>
+  </div>
+
+  <p class="rd" data-dev="बाइनरी सर्च सबसे तेज़ है, लेकिन शर्त है कि ऐरे सॉर्टेड हो। डिक्शनरी में शब्द ढूँढने जैसा — बीच में खोलो, देखो की छोटी है या बड़ी, और आधा हिस्सा हटा दो। हर स्टेप में सर्च एरिया आधा हो जाता है, इसलिए एक हज़ार एलिमेंट्स में सिर्फ दस स्टेप लगते हैं।"><b>Binary Search</b> — dictionary me shabd dhoondhne jaisa: beech me kholo, key chhoti hai ya badi dekho, <b>aadha hissa hata do</b>. Har step me area aadha — isliye 1000 elements me sirf ~10 steps.</p>
+
+  <pre class="code-block"><span class="cm">/* BINARY SEARCH (iterative) — C program. Array SORTED hona chahiye! */</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">binarySearch</span>(<span class="kw">int</span> a[], <span class="kw">int</span> n, <span class="kw">int</span> key) {
+    <span class="kw">int</span> low = 0, high = n - 1, mid;
+
+    <span class="kw">while</span> (low &lt;= high) {
+        mid = (low + high) / 2;        <span class="cm">// beech ka index</span>
+
+        <span class="kw">if</span> (a[mid] == key)
+            <span class="kw">return</span> mid;                <span class="cm">// mil gaya</span>
+        <span class="kw">else if</span> (a[mid] &lt; key)
+            low = mid + 1;             <span class="cm">// right half me dhoondo</span>
+        <span class="kw">else</span>
+            high = mid - 1;            <span class="cm">// left half me dhoondo</span>
+    }
+    <span class="kw">return</span> -1;                        <span class="cm">// nahi mila</span>
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> a[100], n, i, key, pos;
+    <span class="fn">printf</span>(<span class="st">"Enter number of elements: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+    <span class="fn">printf</span>(<span class="st">"Enter %d elements in SORTED order: "</span>, n);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;a[i]);
+
+    <span class="fn">printf</span>(<span class="st">"Enter key to search: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;key);
+
+    pos = <span class="fn">binarySearch</span>(a, n, key);
+    <span class="kw">if</span> (pos == -1) <span class="fn">printf</span>(<span class="st">"Element not found\n"</span>);
+    <span class="kw">else</span>           <span class="fn">printf</span>(<span class="st">"Element found at index %d\n"</span>, pos);
+    <span class="kw">return</span> 0;
+}</pre>
+
+  <div class="formula">T(n) = T(n/2) + 1 &nbsp;⇒&nbsp; <span class="k">O(log₂ n)</span>
+    <small>1000 elements → ~10 comparisons · 10,00,000 elements → ~20 comparisons. Linear search me wahi data → 5,00,000 comparisons!</small>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li><b>Linear = ek-ek kholo</b> (almari ke saare dabbe) · <b>Binary = aadha kaato</b> (dictionary)</li>
+      <li>Binary ke liye <b>SORTED</b> likhna mat bhoolna — exam me yahi check hota hai</li>
+      <li>Formula yaad rakho: <b>mid = (low + high) / 2</b> · mila toh ruk jao, chhota hai toh <b>low = mid + 1</b>, bada hai toh <b>high = mid − 1</b></li>
+    </ul>
+  </div>
+
+  <div class="sim" id="beamSim">
+    <div class="sim-head"><b>⚡ SEARCH BEAM</b><span>— linear vs binary, comparisons ki ginti saath saath</span></div>
+    <div class="sim-body">
+      <div class="beam-row" id="beamRow"></div>
+      <div class="beam-meter">
+        <span>LINEAR: <b id="bmLin">0</b> comparisons</span>
+        <span>BINARY: <b id="bmBin">0</b> comparisons</span>
+        <span id="bmMsg" style="color:var(--gold)">Target daalo aur START dabao.</span>
+      </div>
+      <div class="sim-controls">
+        <label>TARGET <input id="bmKey" type="number" value="47"></label>
+        <button class="btn btn--go" id="bmStart">▶ START</button>
+        <button class="btn" id="bmLinear">LINEAR CHALAO</button>
+        <button class="btn" id="bmBinary">BINARY CHALAO</button>
+        <button class="btn btn--warn" id="bmReset">RESET</button>
+      </div>
+      <div class="sim-steps" id="bmLog">Array: [3, 9, 12, 18, 23, 31, 40, 47, 56, 60] — sorted hai, isliye dono chal sakte hain.</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Algorithm</th><th>Data condition</th><th>Best</th><th>Average</th><th>Worst</th></tr></thead>
+      <tbody>
+        <tr><td><b>Sequential / Linear</b></td><td>Koi bhi (unsorted OK)</td><td>O(1)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td><b>Index Sequential</b></td><td>Sorted + index table</td><td>O(1)</td><td>~√n</td><td>~√n</td></tr>
+        <tr><td><b>Binary</b></td><td><b>Sorted mandatory</b></td><td>O(1)</td><td>O(log n)</td><td>O(log n)</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="qpanel" data-topics="search" id="qp-search"></div>
+</section>
+
+<!-- ============================================================ S1 -->
+<section class="sec" id="s1">
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <h2>Hashing — bina compare, seedha pata</h2>
+    <button class="sec-play" data-sec="s1" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Hash function · collision · chaining · open addressing · load factor</p>
+
+  <p class="rd" data-dev="हैशिंग में हम तुलना नहीं करते — हम एक फॉर्मूला लगाकर सीधे पता कर लेते हैं कि एलिमेंट कहाँ रखा है। जैसे क्लास में हर छात्र की तय सीट होती है। फॉर्मूला है एच ऑफ के बराबर के मॉड एम, यानी की को टेबल साइज़ से भाग दो और शेषफल वही इंडेक्स है। इससे औसत सर्च कॉन्स्टेंट टाइम हो जाती है।">Hashing me hum <b>compare nahi karte</b> — formula lagakar seedha pata kar lete hain ki element kahan hai. Jaise class me har student ki <b>tay seat</b>. Formula: <b>h(k) = k mod m</b> (key ko table size se divide karo, remainder = index). Average search <b>O(1)</b>.</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — EXAM ME AISA LIKHO</span>
+    <p><b>Hashing:</b> A technique of mapping keys to positions in a hash table using a <b>hash function</b> h(k), giving near-constant-time insertion, deletion and search. A <b>collision</b> occurs when two different keys map to the same index — resolved by <b>chaining</b> (linked list per slot) or <b>open addressing</b> (linear/quadratic probing, double hashing). <b>Load factor</b> α = n/m.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>HASH FUNCTION METHODS</h4>
+      <p><b>Division:</b> h(k) = k mod m (sabse common)<br><b>Mid-Square:</b> k² karo, beech ke digits — 23² = 529 → 52<br><b>Folding:</b> tukdon me todo, jodo — 123456 → 12+34+56<br><b>Multiplication:</b> ⌊m × (k×A mod 1)⌋, A ≈ 0.618</p>
+    </div>
+    <div class="card card--coral">
+      <h4>COLLISION — HAMESHA POSSIBLE</h4>
+      <p><b>h(23) = 3</b> aur <b>h(33) = 3</b> — same slot! Keys infinite, table finite — isliye collision rok nahi sakte, sirf <b>resolve</b> karte hain. Do families: chaining aur open addressing.</p>
+    </div>
+  </div>
+
+  <p class="rd" data-dev="चेनिंग में हर स्लॉट में एक लिंक्ड लिस्ट रहती है। जो भी की उस स्लॉट पर आए, लिस्ट में जुड़ जाती है। टेबल कभी फुल नहीं होता और डिलीशन आसान है, लेकिन पॉइंटर की एक्स्ट्रा मेमोरी लगती है। ओपन एड्रेसिंग में टेबल के बाहर कुछ नहीं बनाते — अंदर ही अगली खाली जगह ढूँढते हैं। लीनियर प्रोबिंग में अगला स्लॉट, क्वाड्रेटिक में एक चार नौ का स्टेप, और डबल हैशिंग में दूसरे फंक्शन से स्टेप — वही सबसे अच्छा है।"><b>Chaining</b> — har slot me linked list; colliding keys us list me chali jaati hain (table kabhi full nahi hota, par pointers ki extra memory). <b>Open addressing</b> — table ke andar hi agli khaali jagah dhoondho: <b>linear probing</b> (h + i), <b>quadratic probing</b> (h + i²), <b>double hashing</b> (h + i·h₂) — sabse best, clustering lagbhag khatam. Deletion me <b>tombstone marker</b> zaroori hai warna probe chain toot jayegi.</p>
+
+  <div class="sim" id="hashSim">
+    <div class="sim-head"><b>⚡ HASH BUCKETS</b><span>— insert hote hue dekho, collision flash ke saath</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <label>KEYS <input id="hkKeys" style="width:180px" value="23,12,45,33,9,67,3"></label>
+        <label>m <input id="hkM" type="number" value="10" min="3" max="17"></label>
+        <label>METHOD <select id="hkMethod">
+          <option value="chain">Chaining</option>
+          <option value="linear" selected>Linear Probing</option>
+          <option value="quad">Quadratic Probing</option>
+          <option value="double">Double Hashing</option>
+        </select></label>
+        <button class="btn btn--go" id="hkGo">▶ INSERT</button>
+        <button class="btn" id="hkStep">STEP →</button>
+      </div>
+      <div class="buckets" id="hkTable"></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim)">LOAD FACTOR α = <b id="hkLF" style="color:var(--gold)">0.00</b></div>
+      <div class="lf-meter"><div class="lf-fill" id="hkLFFill" style="width:0%"></div></div>
+      <div class="sim-steps" id="hkLog">Keys daalo aur INSERT dabao — collision wale slots coral ho jayenge.</div>
+    </div>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li><b>h(k) = k mod m</b> — bas yeh ek line yaad rakho, poora hashing isi pe khada hai</li>
+      <li><b>Chaining = list per slot</b> · <b>Open addressing = andar hi adjust</b></li>
+      <li>Load factor <b>α = n/m</b>, ideal <b>0.5–0.75</b> · α &gt; 1 ho gaya toh <b>rehashing</b></li>
+      <li>Average <b>O(1)</b>, worst <b>O(n)</b> (jab sab keys ek hi slot pe)</li>
+    </ul>
+  </div>
+
+  <div class="qpanel" data-topics="hash" id="qp-hash"></div>
+</section>
+<!-- ============================================================ S2 -->
+<section class="sec" id="s2">
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <h2>Sorting — BSI family (O(n²))</h2>
+    <button class="sec-play" data-sec="s2" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Bubble · Selection · Insertion — C program + dry run dono</p>
+
+  <p class="rd" data-dev="सॉर्टिंग का मतलब है एलिमेंट्स को बढ़ते या घटते क्रम में लगाना। तीन आसान एल्गोरिद्म हैं — बबल, सिलेक्शन और इंसर्शन। इन तीनों की टाइम कॉम्प्लेक्सिटी एन स्क्वायर होती है, इसलिए ये छोटे डेटा के लिए ठीक हैं। इन्हें मिलाकर बी एस आई कह सकते हैं।">Sorting = elements ko order me lagana. Teen simple algorithms — <b>Bubble, Selection, Insertion</b> (yaad rakho: <b>B-S-I</b>). Teeno <b>O(n²)</b> hain, par seekhne ke liye aur exam ke liye sabse zaroori.</p>
+
+  <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;margin:32px 0 6px">Bubble Sort 🫧</h3>
+  <p class="rd" data-dev="बबल सॉर्ट में आस-पास वाले एलिमेंट्स की तुलना करो और ग़लत क्रम में हों तो स्वैप कर दो। हर पास में सबसे बड़ा एलिमेंट बबल की तरह उठकर आख़िर में पहुँच जाता है।">Adjacent elements compare karo, galat order me ho toh <b>swap</b>. Har pass me sabse bada element <b>bubble</b> karke end me pahunch jata hai.</p>
+  <pre class="code-block"><span class="cm">/* BUBBLE SORT — C program */</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> a[100], n, i, j, temp;
+    <span class="fn">printf</span>(<span class="st">"Enter number of elements: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+    <span class="fn">printf</span>(<span class="st">"Enter %d elements: "</span>, n);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;a[i]);
+
+    <span class="kw">for</span> (i = 0; i &lt; n - 1; i++) {          <span class="cm">// n-1 passes</span>
+        <span class="kw">for</span> (j = 0; j &lt; n - 1 - i; j++) {  <span class="cm">// last i elements sorted hain</span>
+            <span class="kw">if</span> (a[j] &gt; a[j + 1]) {          <span class="cm">// galat order</span>
+                temp = a[j];                <span class="cm">// swap</span>
+                a[j] = a[j + 1];
+                a[j + 1] = temp;
+            }
+        }
+    }
+    <span class="fn">printf</span>(<span class="st">"Sorted array: "</span>);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">printf</span>(<span class="st">"%d "</span>, a[i]);
+    <span class="kw">return</span> 0;
+}</pre>
+  <div class="diagram">
+    <div class="d-cap">DRY RUN — [5, 1, 4, 2, 8]</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:2;color:var(--dim);overflow-x:auto;white-space:pre;min-width:420px">pass 1:  1  4  2  5  <span style="color:var(--emerald)">8</span>   ← 8 settle
+pass 2:  1  2  4  <span style="color:var(--emerald)">5  8</span>
+pass 3:  1  2  <span style="color:var(--emerald)">4  5  8</span>
+pass 4:  <span style="color:var(--emerald)">1  2  4  5  8</span>   ✔ sorted</div>
+    <p class="d-note">Best <b>O(n)</b> (sorted + flag ho toh), average/worst <b>O(n²)</b> · space O(1) · <b>stable</b> ✔</p>
+  </div>
+
+  <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;margin:32px 0 6px">Selection Sort 🎯</h3>
+  <p class="rd" data-dev="सिलेक्शन सॉर्ट में हर पास में पूरे अनसॉर्टेड हिस्से से सबसे छोटा एलिमेंट ढूँढा जाता है और उसे उस पास की पहली पोज़िशन पर स्वैप कर दिया जाता है। इसकी ख़ास बात यह है कि इसमें सबसे कम स्वैप होते हैं।">Har pass me unsorted hisse se <b>sabse chhota</b> element dhoondho aur us pass ki pehli position pe swap kar do. Khaas baat: <b>minimum swaps (n−1)</b>.</p>
+  <pre class="code-block"><span class="cm">/* SELECTION SORT — C program */</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> a[100], n, i, j, min, temp;
+    <span class="fn">printf</span>(<span class="st">"Enter number of elements: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+    <span class="fn">printf</span>(<span class="st">"Enter %d elements: "</span>, n);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;a[i]);
+
+    <span class="kw">for</span> (i = 0; i &lt; n - 1; i++) {
+        min = i;                        <span class="cm">// maan lo yahi minimum hai</span>
+        <span class="kw">for</span> (j = i + 1; j &lt; n; j++) {
+            <span class="kw">if</span> (a[j] &lt; a[min])          <span class="cm">// chhota mila</span>
+                min = j;                <span class="cm">// uska index yaad rakho</span>
+        }
+        <span class="kw">if</span> (min != i) {                <span class="cm">// minimum ko aage bhejo</span>
+            temp = a[i]; a[i] = a[min]; a[min] = temp;
+        }
+    }
+    <span class="fn">printf</span>(<span class="st">"Sorted array: "</span>);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">printf</span>(<span class="st">"%d "</span>, a[i]);
+    <span class="kw">return</span> 0;
+}</pre>
+  <div class="diagram">
+    <div class="d-cap">DRY RUN — [64, 25, 12, 22, 11]</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:2;color:var(--dim);overflow-x:auto;white-space:pre;min-width:420px">start:  <span style="color:var(--coral)">64</span>  25  12  22  <span style="color:var(--gold)">11</span>   min = 11
+pass1:  <span style="color:var(--emerald)">11</span>  25  12  22  64
+pass2:  11  <span style="color:var(--emerald)">12</span>  25  22  64
+pass3:  11  12  <span style="color:var(--emerald)">22</span>  25  64   ✔</div>
+    <p class="d-note">Har case me <b>O(n²)</b> (best me bhi poora scan) · space O(1) · <b>unstable</b> ✕ · swaps minimum</p>
+  </div>
+
+  <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;margin:32px 0 6px">Insertion Sort 🃏</h3>
+  <p class="rd" data-dev="इंसर्शन सॉर्ट ताश के पत्ते सॉर्ट करने जैसा है। हर नया कार्ड उठाओ और उसे बाईं तरफ़ के सॉर्टेड हिस्से में सही जगह पर इंसर्ट कर दो। अगर डेटा पहले से लगभग सॉर्टेड है तो यह बहुत तेज़ है।">Taash ke patte jaisa: har naya card uthao aur <b>sahi jagah pe insert</b> kar do (bade cards ek-ek shift karke). Nearly-sorted data pe <b>best case O(n)</b>.</p>
+  <pre class="code-block"><span class="cm">/* INSERTION SORT — C program */</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> a[100], n, i, j, key;
+    <span class="fn">printf</span>(<span class="st">"Enter number of elements: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+    <span class="fn">printf</span>(<span class="st">"Enter %d elements: "</span>, n);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;a[i]);
+
+    <span class="kw">for</span> (i = 1; i &lt; n; i++) {
+        key = a[i];                     <span class="cm">// yeh card uthaya</span>
+        j = i - 1;
+        <span class="kw">while</span> (j &gt;= 0 &amp;&amp; a[j] &gt; key) {  <span class="cm">// bade elements aage shift</span>
+            a[j + 1] = a[j];
+            j--;
+        }
+        a[j + 1] = key;                 <span class="cm">// key sahi jagah pe</span>
+    }
+    <span class="fn">printf</span>(<span class="st">"Sorted array: "</span>);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">printf</span>(<span class="st">"%d "</span>, a[i]);
+    <span class="kw">return</span> 0;
+}</pre>
+  <div class="diagram">
+    <div class="d-cap">DRY RUN — [12, 11, 13, 5, 6]</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:2;color:var(--dim);overflow-x:auto;white-space:pre;min-width:460px">i=1 key=11 → <span style="color:var(--emerald)">11 12</span> 13 5 6
+i=2 key=13 → 11 12 <span style="color:var(--emerald)">13</span> 5 6
+i=3 key=5  → <span style="color:var(--emerald)">5 11 12 13</span> 6
+i=4 key=6  → <span style="color:var(--emerald)">5 6 11 12 13</span>  ✔</div>
+    <p class="d-note">Best <b>O(n)</b> (sorted data) · average/worst O(n²) · space O(1) · <b>stable</b> ✔ · real libraries isse chhote arrays pe use karti hain</p>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li><b>Bubble</b> = paani ke bulbule (bada upar/end me) · <b>Selection</b> = "sabse chhota chuno" · <b>Insertion</b> = taash ke patte</li>
+      <li>Teeno <b>O(n²)</b>, teeno <b>in-place (O(1) space)</b></li>
+      <li><b>Stable:</b> Bubble ✔, Insertion ✔ · <b>Unstable:</b> Selection ✕</li>
+      <li>Exam me "pass-by-pass table" banane se full marks — sirf program se aadhe milte hain</li>
+    </ul>
+  </div>
+
+  <div class="qpanel" data-topics="bsi" id="qp-bsi"></div>
+</section>
+
+<!-- ============================================================ S3 -->
+<section class="sec" id="s3">
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <h2>Merge &amp; Quick Sort — O(n log n)</h2>
+    <button class="sec-play" data-sec="s3" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Divide &amp; conquer · recursion ka asli use</p>
+
+  <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;margin:10px 0 6px">Merge Sort 🔀</h3>
+  <p class="rd" data-dev="मर्ज सॉर्ट डिवाइड एंड कॉन्कर पर चलता है। ऐरे को आधा-आधा तोड़ते जाओ जब तक एक-एक एलिमेंट न बचे, और फिर दो सॉर्टेड हिस्सों को मर्ज करते जाओ। यह हर केस में एन लॉग एन लेता है, इसलिए जब गारंटी चाहिए तब यह बेहतरीन है।"><b>Divide & Conquer</b>: array ko aadha-aadha todo (jab tak 1 element bache), phir <b>do sorted halves merge</b> karo. Har case me <b>O(n log n)</b> — guarantee. Isliye jab predictable performance chahiye, merge sort.</p>
+  <pre class="code-block"><span class="cm">/* MERGE SORT — C program */</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="cm">/* do sorted halves [l..m] aur [m+1..r] ko merge karta hai */</span>
+<span class="kw">void</span> <span class="fn">merge</span>(<span class="kw">int</span> a[], <span class="kw">int</span> l, <span class="kw">int</span> m, <span class="kw">int</span> r) {
+    <span class="kw">int</span> n1 = m - l + 1, n2 = r - m;
+    <span class="kw">int</span> L[n1], R[n2], i, j, k;
+
+    <span class="kw">for</span> (i = 0; i &lt; n1; i++) L[i] = a[l + i];      <span class="cm">// left half copy</span>
+    <span class="kw">for</span> (j = 0; j &lt; n2; j++) R[j] = a[m + 1 + j];  <span class="cm">// right half copy</span>
+
+    i = 0; j = 0; k = l;
+    <span class="kw">while</span> (i &lt; n1 &amp;&amp; j &lt; n2) {                     <span class="cm">// dono me se chhota lo</span>
+        <span class="kw">if</span> (L[i] &lt;= R[j]) a[k++] = L[i++];
+        <span class="kw">else</span>              a[k++] = R[j++];
+    }
+    <span class="kw">while</span> (i &lt; n1) a[k++] = L[i++];                 <span class="cm">// bacha hua left</span>
+    <span class="kw">while</span> (j &lt; n2) a[k++] = R[j++];                 <span class="cm">// bacha hua right</span>
+}
+
+<span class="kw">void</span> <span class="fn">mergeSort</span>(<span class="kw">int</span> a[], <span class="kw">int</span> l, <span class="kw">int</span> r) {
+    <span class="kw">if</span> (l &lt; r) {                                    <span class="cm">// base case</span>
+        <span class="kw">int</span> m = l + (r - l) / 2;
+        <span class="fn">mergeSort</span>(a, l, m);                         <span class="cm">// left sort</span>
+        <span class="fn">mergeSort</span>(a, m + 1, r);                     <span class="cm">// right sort</span>
+        <span class="fn">merge</span>(a, l, m, r);                          <span class="cm">// dono jodo</span>
+    }
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> a[100], n, i;
+    <span class="fn">printf</span>(<span class="st">"Enter number of elements: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+    <span class="fn">printf</span>(<span class="st">"Enter %d elements: "</span>, n);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;a[i]);
+
+    <span class="fn">mergeSort</span>(a, 0, n - 1);
+
+    <span class="fn">printf</span>(<span class="st">"Sorted array: "</span>);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">printf</span>(<span class="st">"%d "</span>, a[i]);
+    <span class="kw">return</span> 0;
+}</pre>
+  <div class="diagram">
+    <div class="d-cap">MERGE SORT — TODTE JAO, PHIR JODTE JAO</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:2;color:var(--dim);overflow-x:auto;white-space:pre;min-width:540px"><span style="color:var(--blue)">DIVIDE:</span>
+  [38, 27, 43, 3, 9, 82, 10]
+  [38, 27, 43, 3]      [9, 82, 10]
+  [38, 27]  [43, 3]    [9, 82]  [10]
+  [38][27]  [43][3]    [9][82]  [10]
+
+<span style="color:var(--emerald)">MERGE:</span>
+  [27, 38]  [3, 43]    [9, 82]  [10]
+  [3, 27, 38, 43]      [9, 10, 82]
+  [3, 9, 10, 27, 38, 43, 82]   <span style="color:var(--emerald)">✔</span></div>
+    <p class="d-note">Levels = log₂n, har level pe n elements merge → <b>O(n log n)</b> · space <b>O(n)</b> (extra array) · <b>stable</b> ✔ · linked list ke liye perfect</p>
+  </div>
+
+  <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;margin:32px 0 6px">Quick Sort ⚡</h3>
+  <p class="rd" data-dev="क्विक सॉर्ट में एक पिवट चुनो, ऐरे को बाँटो कि छोटे बाईं तरफ़ और बड़े दाईं तरफ़ आ जाएँ — पिवट अपनी सही जगह पर पहुँच जाता है। फिर दोनों तरफ़ यही दोहराओ। प्रैक्टिस में सबसे तेज़, लेकिन सबसे बुरे केस में एन स्क्वायर।"><b>Pivot</b> chuno (last element), <b>partition</b> karo — pivot se chhote left, bade right; pivot apni <b>final jagah</b> pe. Phir dono taraf recursion. Practically <b>sabse fast</b>, par worst case <b>O(n²)</b> (jab array already sorted ho aur pivot last ho).</p>
+  <pre class="code-block"><span class="cm">/* QUICK SORT — C program (pivot = last element) */</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">partition</span>(<span class="kw">int</span> a[], <span class="kw">int</span> low, <span class="kw">int</span> high) {
+    <span class="kw">int</span> pivot = a[high];          <span class="cm">// last element pivot</span>
+    <span class="kw">int</span> i = low - 1, j, temp;
+
+    <span class="kw">for</span> (j = low; j &lt; high; j++) {
+        <span class="kw">if</span> (a[j] &lt;= pivot) {      <span class="cm">// pivot se chhota mila</span>
+            i++;
+            temp = a[i]; a[i] = a[j]; a[j] = temp;   <span class="cm">// left me bhejo</span>
+        }
+    }
+    temp = a[i + 1]; a[i + 1] = a[high]; a[high] = temp; <span class="cm">// pivot sahi jagah</span>
+    <span class="kw">return</span> i + 1;                  <span class="cm">// pivot ka index</span>
+}
+
+<span class="kw">void</span> <span class="fn">quickSort</span>(<span class="kw">int</span> a[], <span class="kw">int</span> low, <span class="kw">int</span> high) {
+    <span class="kw">if</span> (low &lt; high) {
+        <span class="kw">int</span> pi = <span class="fn">partition</span>(a, low, high);
+        <span class="fn">quickSort</span>(a, low, pi - 1);   <span class="cm">// left side</span>
+        <span class="fn">quickSort</span>(a, pi + 1, high);  <span class="cm">// right side</span>
+    }
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> a[100], n, i;
+    <span class="fn">printf</span>(<span class="st">"Enter number of elements: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+    <span class="fn">printf</span>(<span class="st">"Enter %d elements: "</span>, n);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;a[i]);
+
+    <span class="fn">quickSort</span>(a, 0, n - 1);
+
+    <span class="fn">printf</span>(<span class="st">"Sorted array: "</span>);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">printf</span>(<span class="st">"%d "</span>, a[i]);
+    <span class="kw">return</span> 0;
+}</pre>
+  <div class="diagram">
+    <div class="d-cap">QUICK SORT — PARTITION KE BAAD PIVOT FINAL JAGAH PE</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:2;color:var(--dim);overflow-x:auto;white-space:pre;min-width:520px">start:      [10, 7, 8, 9, 1, <span style="color:var(--coral)">5</span>]   pivot = 5
+partition:  1 ≤ 5 mila → 10 ↔ 1 swap
+            [1, 7, 8, 9, 10, <span style="color:var(--coral)">5</span>]
+            pivot ko index 1 pe rakha
+            [1, <span style="color:var(--emerald)">5</span>, 8, 9, 10, 7]   ← 5 FINAL jagah pe ✔
+final:      [1, 5, 7, 8, 9, 10]  <span style="color:var(--emerald)">✔</span></div>
+    <p class="d-note">Best/average <b>O(n log n)</b> · worst <b>O(n²)</b> · space O(log n) · <b>unstable</b> ✕ · <code>qsort()</code> isi pe based hai</p>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li><b>Merge = todo phir jodo</b> (predictable, O(n) extra memory) · <b>Quick = pivot se baanto</b> (fast, in-place)</li>
+      <li>Worst case ka <b>fix</b>: random pivot ya median-of-three — exam me likhne se extra marks</li>
+      <li>Dono <b>recursion</b> use karte hain — isliye recursion pehle clear karna zaroori tha</li>
+    </ul>
+  </div>
+
+  <div class="qpanel" data-topics="fast" id="qp-fast"></div>
+</section>
+
+<!-- ============================================================ S4 -->
+<section class="sec" id="s4">
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <h2>Heap &amp; Radix Sort</h2>
+    <button class="sec-play" data-sec="s4" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">In-place guarantee · non-comparison sorting</p>
+
+  <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;margin:10px 0 6px">Heap Sort 🏔️</h3>
+  <p class="rd" data-dev="हीप सॉर्ट ऐरे को मैक्स हीप में बदल देता है, जिसमें हर पैरेंट अपने चिल्ड्रन से बड़ा होता है, इसलिए सबसे बड़ा एलिमेंट रूट पर आ जाता है। फिर रूट को आख़िर में भेजो, हीप का साइज़ घटाओ और दोबारा हीपिफाई करो। यह इन-प्लेस है और हर केस में एन लॉग एन देता है।">Array ko <b>max-heap</b> banao (parent ≥ children → sabse bada root pe). Root ko end me bhejo, heap size ghatao, <b>heapify</b> karo — repeat. Do faayde ek saath: <b>in-place (O(1) space)</b> aur <b>har case me O(n log n)</b>.</p>
+  <pre class="code-block"><span class="cm">/* HEAP SORT — C program */</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="cm">/* node i ko uske subtree me max-heap banao */</span>
+<span class="kw">void</span> <span class="fn">heapify</span>(<span class="kw">int</span> a[], <span class="kw">int</span> n, <span class="kw">int</span> i) {
+    <span class="kw">int</span> largest = i;
+    <span class="kw">int</span> l = 2 * i + 1;               <span class="cm">// left child</span>
+    <span class="kw">int</span> r = 2 * i + 2;               <span class="cm">// right child</span>
+    <span class="kw">int</span> temp;
+
+    <span class="kw">if</span> (l &lt; n &amp;&amp; a[l] &gt; a[largest]) largest = l;
+    <span class="kw">if</span> (r &lt; n &amp;&amp; a[r] &gt; a[largest]) largest = r;
+
+    <span class="kw">if</span> (largest != i) {              <span class="cm">// child bada nikla</span>
+        temp = a[i]; a[i] = a[largest]; a[largest] = temp;
+        <span class="fn">heapify</span>(a, n, largest);      <span class="cm">// neeche bhi theek karo</span>
+    }
+}
+
+<span class="kw">void</span> <span class="fn">heapSort</span>(<span class="kw">int</span> a[], <span class="kw">int</span> n) {
+    <span class="kw">int</span> i, temp;
+    <span class="kw">for</span> (i = n / 2 - 1; i &gt;= 0; i--)   <span class="cm">// step 1: max-heap banao</span>
+        <span class="fn">heapify</span>(a, n, i);
+
+    <span class="kw">for</span> (i = n - 1; i &gt; 0; i--) {
+        temp = a[0]; a[0] = a[i]; a[i] = temp;  <span class="cm">// max → end</span>
+        <span class="fn">heapify</span>(a, i, 0);                      <span class="cm">// bache hue ka heap</span>
+    }
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> a[100], n, i;
+    <span class="fn">printf</span>(<span class="st">"Enter number of elements: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+    <span class="fn">printf</span>(<span class="st">"Enter %d elements: "</span>, n);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;a[i]);
+
+    <span class="fn">heapSort</span>(a, n);
+
+    <span class="fn">printf</span>(<span class="st">"Sorted array: "</span>);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">printf</span>(<span class="st">"%d "</span>, a[i]);
+    <span class="kw">return</span> 0;
+}</pre>
+  <div class="diagram">
+    <div class="d-cap">HEAP SORT — [4, 10, 3, 5, 1] · array me tree: children 2i+1, 2i+2</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:2;color:var(--dim);overflow-x:auto;white-space:pre;min-width:480px">max-heap build:  [10, 5, 3, 4, 1]
+10 → end:        [1, 5, 3, 4, <span style="color:var(--emerald)">10</span>]  → heapify → [5, 4, 3, 1, <span style="color:var(--emerald)">10</span>]
+5 → end:         [1, 4, 3, <span style="color:var(--emerald)">5</span>, 10]  → heapify → [4, 1, 3, <span style="color:var(--emerald)">5</span>, 10]
+final:           [1, 3, 4, 5, 10]  <span style="color:var(--emerald)">✔</span></div>
+    <p class="d-note">Har case <b>O(n log n)</b> · space <b>O(1)</b> · <b>unstable</b> ✕ · priority queue bhi isi heap se banta hai</p>
+  </div>
+
+  <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;margin:32px 0 6px">Radix Sort 🔢</h3>
+  <p class="rd" data-dev="रेडिक्स सॉर्ट तुलना ही नहीं करता। यह नंबरों को डिजिट के हिसाब से सॉर्ट करता है — पहले इकाई, फिर दहाई, फिर सैकड़ा। हर पास में काउंटिंग सॉर्ट इस्तेमाल होता है और वह स्टेबल होना ज़रूरी है।"><b>Comparison karta hi nahi!</b> Digit-wise sort: pehle units (LSD), phir tens, phir hundreds. Har pass me <b>stable counting sort</b>. Complexity <b>O(d(n+k))</b>, space O(n+k), <b>stable</b> ✔.</p>
+  <pre class="code-block"><span class="cm">/* RADIX SORT — C program (LSD, base 10) */</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="cm">/* exp ke digit pe stable counting sort */</span>
+<span class="kw">void</span> <span class="fn">countingSort</span>(<span class="kw">int</span> a[], <span class="kw">int</span> n, <span class="kw">int</span> exp) {
+    <span class="kw">int</span> output[n], count[10] = {0}, i;
+
+    <span class="kw">for</span> (i = 0; i &lt; n; i++)                     <span class="cm">// digit frequency</span>
+        count[(a[i] / exp) % 10]++;
+
+    <span class="kw">for</span> (i = 1; i &lt; 10; i++)                    <span class="cm">// cumulative count</span>
+        count[i] += count[i - 1];
+
+    <span class="kw">for</span> (i = n - 1; i &gt;= 0; i--) {              <span class="cm">// peeche se → stable</span>
+        output[count[(a[i] / exp) % 10] - 1] = a[i];
+        count[(a[i] / exp) % 10]--;
+    }
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) a[i] = output[i];
+}
+
+<span class="kw">void</span> <span class="fn">radixSort</span>(<span class="kw">int</span> a[], <span class="kw">int</span> n) {
+    <span class="kw">int</span> max = a[0], i, exp;
+    <span class="kw">for</span> (i = 1; i &lt; n; i++)                     <span class="cm">// max nikaalo</span>
+        <span class="kw">if</span> (a[i] &gt; max) max = a[i];
+
+    <span class="kw">for</span> (exp = 1; max / exp &gt; 0; exp *= 10)     <span class="cm">// units, tens, ...</span>
+        <span class="fn">countingSort</span>(a, n, exp);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> a[100], n, i;
+    <span class="fn">printf</span>(<span class="st">"Enter number of elements: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;n);
+    <span class="fn">printf</span>(<span class="st">"Enter %d elements: "</span>, n);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;a[i]);
+
+    <span class="fn">radixSort</span>(a, n);
+
+    <span class="fn">printf</span>(<span class="st">"Sorted array: "</span>);
+    <span class="kw">for</span> (i = 0; i &lt; n; i++) <span class="fn">printf</span>(<span class="st">"%d "</span>, a[i]);
+    <span class="kw">return</span> 0;
+}</pre>
+  <div class="diagram">
+    <div class="d-cap">RADIX DRY RUN — [170, 45, 75, 90, 802, 24, 2, 66]</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:2;color:var(--dim);overflow-x:auto;white-space:pre;min-width:560px">input:     170  45  75  90  802  24  2  66
+
+units:     170  90  802  2  24  45  75  66      <span style="color:var(--blue)">← 0,0,2,2,4,5,5,6</span>
+tens:      802  2  24  45  66  170  75  90      <span style="color:var(--blue)">← 0,0,2,4,6,7,7,9</span>
+hundreds:  2  24  45  66  75  90  170  802      <span style="color:var(--emerald)">✔ sorted</span></div>
+    <p class="d-note">Har pass <b>stable</b> hai — isliye pichle digit ka order bana rehta hai. Numbers/strings ke liye best, floating point pe seedha nahi chalta.</p>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li><b>Heap = tree jaisa dher</b> (bada upar) · <b>Radix = digit ke hisaab se buckets</b></li>
+      <li>Heap hi ek aisa sort hai jo <b>O(1) space + har case O(n log n)</b> dono deta hai</li>
+      <li>Radix ke liye yaad rakho: <b>LSD pehle</b> (units → tens → hundreds), aur <b>stable hona zaroori</b></li>
+    </ul>
+  </div>
+
+  <div class="qpanel" data-topics="heapradix" id="qp-heapradix"></div>
+</section>
+<!-- ============================================================ S5 -->
+<section class="sec" id="s5">
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <h2>Sorting Lab — race aur step-by-step</h2>
+    <button class="sec-play" data-sec="s5" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Do algorithms ki race + code ke saath step-by-step</p>
+
+  <p class="rd" data-dev="अब मज़ेदार हिस्सा। पहले रेस — दो एल्गोरिद्म एक ही ऐरे पर साथ-साथ चलेंगे और देखेंगे कौन पहले ख़त्म करता है और कितनी तुलनाएँ करता है। फिर स्टेपर, जिसमें हर स्टेप पर कोड की वह लाइन भी हाइलाइट होती है जो चल रही है।">Ab mazedaar hissa. <b>Race</b> — do algorithms ek hi array pe saath-saath chalte hain; dekho kaun pehle khatam karta hai aur kitni comparisons/swaps leta hai. <b>Stepper</b> — har step pe <b>code ki line bhi highlight</b> hoti hai, isliye samajhna aasaan.</p>
+
+  <div class="sim" id="raceSim">
+    <div class="sim-head"><b>⚡ SORT RACE</b><span>— Bubble vs Merge vs Quick, live counters</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <label>LANE 1 <select id="rcA"><option value="bubble">Bubble</option><option value="selection">Selection</option><option value="insertion" selected>Insertion</option></select></label>
+        <label>LANE 2 <select id="rcB"><option value="bubble">Bubble</option><option value="merge" selected>Merge</option><option value="quick">Quick</option><option value="heap">Heap</option></select></label>
+        <label>LANE 3 <select id="rcC"><option value="none">— koi nahi —</option><option value="bubble">Bubble</option><option value="quick" selected>Quick</option><option value="merge">Merge</option><option value="heap">Heap</option></select></label>
+        <label>SPEED <select id="rcSpeed"><option value="420">1×</option><option value="200">2×</option><option value="90">4×</option></select></label>
+        <button class="btn btn--go" id="rcPlay">▶ RACE</button>
+        <button class="btn" id="rcStep">STEP →</button>
+        <button class="btn" id="rcNew">NEW ARRAY</button>
+        <button class="btn btn--warn" id="rcReset">RESET</button>
+      </div>
+      <div class="race" id="rcLanes" style="margin-top:16px"></div>
+      <div class="sim-steps" id="rcLog">RACE dabao — teeno lanes ek saath chalengi. Jo pehle sorted karega wo jeetega.</div>
+    </div>
+  </div>
+
+  <div class="sim" id="stepSim">
+    <div class="sim-head"><b>⚡ SORT STEPPER</b><span>— bars + code line highlight + variable values</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <label>ALGORITHM <select id="stAlgo">
+          <option value="bubble" selected>Bubble Sort</option>
+          <option value="selection">Selection Sort</option>
+          <option value="insertion">Insertion Sort</option>
+          <option value="quick">Quick Sort</option>
+          <option value="merge">Merge Sort</option>
+          <option value="heap">Heap Sort</option>
+          <option value="radix">Radix Sort</option>
+        </select></label>
+        <button class="btn btn--go" id="stPlay">▶ PLAY</button>
+        <button class="btn" id="stStep">STEP →</button>
+        <button class="btn" id="stNew">NEW ARRAY</button>
+        <button class="btn btn--warn" id="stReset">RESET</button>
+      </div>
+      <div class="step-grid" style="margin-top:16px">
+        <div>
+          <div class="step-bars" id="stBars"></div>
+          <div class="step-vars" id="stVars"></div>
+        </div>
+        <div class="step-code" id="stCode"></div>
+      </div>
+      <div class="sim-steps" id="stLog">PLAY dabao — har step pe bars, code line aur variables ek saath badlenge.</div>
+    </div>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li>Race me dekho: <b>O(n²) wale (bubble/selection/insertion) peeche chhoot jaate hain</b> jab n bada ho</li>
+      <li>Stepper me dhyan do — <b>kaunsi line baar-baar chal rahi hai</b>, wahi uska asli kaam hai</li>
+      <li>Merge ki recursion aur Quick ka partition — dono ko stepper me chalake dekho, phir bhoolna mushkil hai</li>
+    </ul>
+  </div>
+
+  <div class="qpanel" data-topics="complexity" id="qp-complexity"></div>
+</section>
+
+<!-- ============================================================ S6 -->
+<section class="sec" id="s6">
+  <div class="sec-head">
+    <span class="sec-num">06</span>
+    <h2>Comparison — kaun, kab, kitna</h2>
+    <button class="sec-play" data-sec="s6" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Master table + graphs + decision guide</p>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable</th><th>Idea</th></tr></thead>
+      <tbody>
+        <tr><td><b>Bubble</b></td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td style="color:var(--emerald)">✔</td><td>Adjacent swap</td></tr>
+        <tr><td><b>Selection</b></td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td style="color:var(--coral)">✕</td><td>Min dhoondho, swap (min swaps)</td></tr>
+        <tr><td><b>Insertion</b></td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td style="color:var(--emerald)">✔</td><td>Card insert — nearly sorted pe best</td></tr>
+        <tr><td><b>Merge</b></td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td style="color:var(--emerald)">✔</td><td>Divide &amp; conquer + merge</td></tr>
+        <tr><td><b>Quick</b></td><td>O(n log n)</td><td>O(n log n)</td><td style="color:var(--coral)">O(n²)</td><td>O(log n)</td><td style="color:var(--coral)">✕</td><td>Pivot partition — practically fastest</td></tr>
+        <tr><td><b>Heap</b></td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(1)</td><td style="color:var(--coral)">✕</td><td>Binary max-heap, in-place</td></tr>
+        <tr><td><b>Radix</b></td><td>O(d(n+k))</td><td>O(d(n+k))</td><td>O(d(n+k))</td><td>O(n+k)</td><td style="color:var(--emerald)">✔</td><td>Non-comparison, digit-wise</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card__head">
+      <b>📈 Big-O Growth — saari curves</b>
+      <span class="sim-controls">
+        <label>n = <b id="chN" style="color:var(--gold)">100</b></label>
+        <input type="range" id="chSlider" min="10" max="1000" step="10" value="100" style="width:140px">
+        <label>SCALE <select id="chScale"><option value="log">Log</option><option value="lin">Linear</option></select></label>
+      </span>
+    </div>
+    <div class="chart-wrap"><canvas id="chBigO"></canvas></div>
+    <div class="chart-legend">
+      <span><em style="background:#e8b44a"></em> O(1)</span>
+      <span><em style="background:#3fc9a0"></em> O(log n)</span>
+      <span><em style="background:#4fa3d1"></em> O(n)</span>
+      <span><em style="background:#ff7a6b"></em> O(n log n)</span>
+      <span><em style="background:#9aa8c4"></em> O(n²)</span>
+    </div>
+    <div class="chart-note" id="chNote"></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card__head">
+      <b>📊 Sorting — n = <span id="schN">1000</span> pe operations</b>
+      <input type="range" id="schSlider" min="100" max="10000" step="100" value="1000" style="width:140px">
+    </div>
+    <div class="chart-wrap" style="height:300px"><canvas id="chSort"></canvas></div>
+    <div class="chart-note">Bubble/Selection (O(n²)) 500k operations pe pahunch jaate hain jabki Merge/Quick/Heap (O(n log n)) sirf 10k me kaam kar lete hain — <b>50 guna fark</b>. Slider ghumao aur dekho.</div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Situation</th><th>Best choice</th><th>Kyun</th></tr></thead>
+      <tbody>
+        <tr><td>Chhota data (n &lt; 50)</td><td>Insertion</td><td>Simple, low overhead, nearly-sorted pe O(n)</td></tr>
+        <tr><td>Almost sorted data</td><td>Insertion / Bubble</td><td>Best case O(n)</td></tr>
+        <tr><td>Swaps mehngi hain</td><td>Selection</td><td>Minimum swaps (n−1)</td></tr>
+        <tr><td>General purpose speed</td><td>Quick</td><td>In-place, cache-friendly, practically fastest</td></tr>
+        <tr><td>Guarantee + stable chahiye</td><td>Merge</td><td>Always O(n log n), stable</td></tr>
+        <tr><td>Memory tight + guarantee</td><td>Heap</td><td>O(1) space, always O(n log n)</td></tr>
+        <tr><td>Numbers/strings, digits kam</td><td>Radix</td><td>Non-comparison, O(d(n+k))</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka — ek line me</span>
+    <p><b>"Chhota/nearly-sorted → Insertion · Speed → Quick · Guarantee+stable → Merge · Memory-tight → Heap · Numbers → Radix"</b></p>
+    <p>Stable wale: <b>BIMR</b> (Bubble, Insertion, Merge, Radix). Unstable: <b>Selection, Quick, Heap</b>.</p>
+  </div>
+</section>
+<!-- ============================================================ S7 -->
+<section class="sec" id="s7">
+  <div class="sec-head">
+    <span class="sec-num">07</span>
+    <h2>Q&amp;A — expected exam questions</h2>
+    <button class="sec-play" data-sec="s7" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Question kholo, khud likho, phir model answer se milao</p>
+
+  <details class="qa" open>
+    <summary>Differentiate linear search and binary search. Condition likho. <span class="mark mark--2">2 MARKS</span></summary>
+    <div class="qa-body">
+      <p><b>Linear:</b> ek-ek karke compare, kisi bhi (unsorted) array pe chalta hai, O(n). <b>Binary:</b> beech se compare karke aadha hissa hata deta hai, <b>sorted array mandatory</b>, O(log n).</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>What is hashing? What is a collision and how is it resolved? <span class="mark mark--5">5 MARKS</span></summary>
+    <div class="qa-body">
+      <p>Hashing key ko h(k) se table index pe map karta hai → average O(1) search. <b>Collision</b> jab do keys ka same hash value aaye (h(23) = h(33) = 3, m = 10).</p>
+      <p><b>Resolution:</b> (1) <b>Chaining</b> — har slot me linked list. (2) <b>Open addressing</b> — table ke andar probing: linear (h+i), quadratic (h+i²), double hashing (h + i·h₂) — best. Deletion me tombstone marker.</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>Sort 5, 1, 4, 2, 8 using bubble sort — show each pass + write C program. <span class="mark mark--5">5 MARKS</span></summary>
+    <div class="qa-body">
+      <p><b>Passes:</b> 1 → 1, 4, 2, 5, 8 · 2 → 1, 2, 4, 5, 8 · 3 → 1, 2, 4, 5, 8 (no swap) · 4 → sorted.</p>
+      <p>Program section 02 ka bubble sort code (n−1 passes, adjacent swap). Complexity: best O(n), avg/worst O(n²), space O(1), stable.</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>Explain merge sort — algorithm, C program, complexity. Linked list ke liye kyun better? <span class="mark mark--10">10 MARKS</span></summary>
+    <div class="qa-body">
+      <p><b>Idea:</b> divide &amp; conquer — array ko aadha todo jab tak 1 element bache, phir do sorted halves merge karo (do pointers se chhota pehle uthao). <b>Recurrence:</b> T(n) = 2T(n/2) + O(n) ⇒ <b>O(n log n)</b> har case. Space O(n), stable.</p>
+      <p><b>Linked list ke liye:</b> merge wahan O(1) extra space me ho jata hai (pointers rewire) aur random access (a[mid]) ki zaroorat nahi padti — jo linked list me O(n) hota hai.</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>Explain quick sort with partition. Worst case O(n²) kab hota hai? <span class="mark mark--10">10 MARKS</span></summary>
+    <div class="qa-body">
+      <p>Pivot chuno (last), partition karo — chhote left, bade right; pivot final jagah pe. Phir dono taraf recursion.</p>
+      <p><b>Worst case:</b> jab pivot har baar smallest/largest ho — partition 0 aur n−1 me bant jaye (T(n) = T(n−1) + O(n)). Yeh hota hai jab <b>array already sorted</b> ho aur pivot last chuna jaye. <b>Fix:</b> random pivot / median-of-three. Average O(n log n), space O(log n), unstable.</p>
+    </div>
+  </details>
+  <details class="qa">
+    <summary>Compare all sorting algorithms (time, space, stability). Best kaunsa, kab? <span class="mark mark--10">10 MARKS</span></summary>
+    <div class="qa-body">
+      <p>Section 06 ka master table poora likho. Stable: bubble, insertion, merge, radix (BIMR).</p>
+      <p><b>"Best" situation pe depend karta hai:</b> chhota/nearly-sorted → insertion; general speed → quick; guarantee + stable → merge; memory tight → heap; numbers with few digits → radix. Yeh decision table likhne se answer complete hota hai.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ S8 -->
+<section class="sec" id="s8">
+  <div class="sec-head">
+    <span class="sec-num">08</span>
+    <h2>Summary — 10 line ka nichod</h2>
+    <button class="sec-play" data-sec="s8" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Ek nazar me poora Unit 3</p>
+  <ol class="one-liners">
+    <li><b>Linear search</b> O(n) kisi bhi array pe · <b>binary search</b> O(log n) sirf sorted array pe.</li>
+    <li><b>Index sequential</b> = index table + blocks — bade sorted files me ~√n.</li>
+    <li>Binary search: <b>mid = (low+high)/2</b>, har step me area aadha — 1000 elements me ~10 steps.</li>
+    <li><b>Hashing</b> = h(k) = k mod m — average <b>O(1)</b>, worst O(n).</li>
+    <li><b>Collision</b> = same index do keys ka · chaining ya open addressing se resolve · deletion me tombstone.</li>
+    <li><b>Load factor α = n/m</b>, ideal 0.5–0.75 · α &gt; 1 pe rehashing.</li>
+    <li><b>O(n²) family (BSI):</b> bubble, selection, insertion — in-place; insertion nearly-sorted pe O(n).</li>
+    <li><b>O(n log n) family:</b> merge (stable, O(n) space), quick (fast, worst O(n²)), heap (in-place + guarantee).</li>
+    <li><b>Radix</b> = non-comparison, digit-wise (LSD), stable, O(d(n+k)).</li>
+    <li><b>Stable sorts: Bubble, Insertion, Merge, Radix (BIMR)</b> · baaki teen unstable.</li>
+  </ol>
+</section>
+
+<!-- ============================================================ S9 -->
+<section class="sec" id="s9">
+  <div class="sec-head">
+    <span class="sec-num">09</span>
+    <h2>Exam Corner</h2>
+    <button class="sec-play" data-sec="s9" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Verbatim definitions + last-minute 15 one-liners</p>
+
+  <div class="defgrid">
+    <div class="defcard"><h6>SEARCHING</h6><p>Locating a given element (key) in a collection, returning its position or reporting absence.</p></div>
+    <div class="defcard"><h6>LINEAR SEARCH</h6><p>Sequential search comparing the key with each element from the beginning; works on unsorted data; worst case O(n).</p></div>
+    <div class="defcard"><h6>BINARY SEARCH</h6><p>Search on a <b>sorted</b> array that compares the key with the middle element and discards half the remaining elements each step; O(log n).</p></div>
+    <div class="defcard"><h6>HASHING</h6><p>Mapping keys to positions of a hash table using a hash function h(k), giving near-constant-time insertion, deletion and search.</p></div>
+    <div class="defcard"><h6>COLLISION</h6><p>When two different keys produce the same hash value (same table index). Resolved by chaining or open addressing.</p></div>
+    <div class="defcard"><h6>CHAINING (OPEN HASHING)</h6><p>Collision resolution where each table slot maintains a linked list of all keys hashing to that slot; table never becomes full.</p></div>
+    <div class="defcard"><h6>OPEN ADDRESSING</h6><p>Collision resolution storing keys within the table itself by probing alternate slots — linear (h+i), quadratic (h+i²), double hashing (h + i·h₂).</p></div>
+    <div class="defcard"><h6>LOAD FACTOR</h6><p>Ratio α = n/m of stored elements to table size; kept 0.5–0.75 for efficiency. Exceeding 1 requires rehashing.</p></div>
+    <div class="defcard"><h6>SORTING</h6><p>Arranging elements in a particular order (ascending/descending) so they can be searched and processed efficiently.</p></div>
+    <div class="defcard"><h6>STABLE SORT</h6><p>A sorting algorithm that preserves the relative order of equal elements. Bubble, Insertion, Merge, Radix are stable.</p></div>
+    <div class="defcard"><h6>IN-PLACE SORT</h6><p>Uses O(1) extra memory apart from the input — bubble, selection, insertion, heap sort.</p></div>
+    <div class="defcard"><h6>DIVIDE &amp; CONQUER</h6><p>Divide the problem into sub-problems, solve recursively, combine results — used by merge sort and quick sort.</p></div>
+  </div>
+
+  <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;margin:32px 0 6px">Last-minute 15 one-liners 🎯</h3>
+  <ol class="one-liners">
+    <li>Binary search ke liye array <b>sorted</b> hona chahiye — warna linear chalao.</li>
+    <li>mid = (low + high) / 2 · chhota hai toh low = mid+1, bada hai toh high = mid−1.</li>
+    <li>Hashing: h(k) = k mod m · average O(1), worst O(n).</li>
+    <li>h(23) = h(33) = 3 → collision (m = 10).</li>
+    <li>Chaining = list per slot · open addressing = table ke andar probing.</li>
+    <li>Linear probing me primary clustering · double hashing sabse best.</li>
+    <li>Load factor α = n/m, 0.5–0.75 ideal.</li>
+    <li>Bubble sort me har pass me ek bada element end me settle hota hai.</li>
+    <li>Selection sort minimum swaps (n−1) karta hai, par har case O(n²).</li>
+    <li>Insertion sort nearly-sorted pe O(n) — best case.</li>
+    <li>Merge sort always O(n log n), stable, space O(n).</li>
+    <li>Quick sort average O(n log n), worst O(n²) (sorted + last pivot).</li>
+    <li>Heap sort O(1) space + always O(n log n) — dono ek saath sirf isi me.</li>
+    <li>Radix sort comparison nahi karta — O(d(n+k)), stable.</li>
+    <li>Stable sorts yaad rakho: <b>BIMR</b>.</li>
+  </ol>
+
+  <p class="rd" data-dev="अब आप यूनिट थ्री के लिए तैयार हैं। एग्ज़ाम से पहले ये पंद्रह वन-लाइनर्स, डेफिनिशन कार्ड, और सॉर्टिंग की तुलना वाली टेबल दोहरा लीजिए। साथ ही किसी दो सॉर्ट का प्रोग्राम और ड्राई रन हाथ से लिख कर देख लीजिए।">Ab tum Unit 3 ke liye ready ho — exam se pehle yeh 15 one-liners, definition cards aur sorting table dobara padh lo, aur <b>kisi bhi do sorting algorithms ka C program + dry run haath se likh ke dekho</b>. All the best! 🚩</p>
+</section>
+
+<!-- ============================================================ S10 : CLASS TOOLS -->
+<section class="sec" id="s10">
+  <div class="sec-head">
+    <span class="sec-num">10</span>
+    <h2>Class Tools — timer, score round</h2>
+    <button class="sec-play" data-sec="s10" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Dock upar hamesha saamne rehta hai — yahan poora setup</p>
+
+  <div class="sim">
+    <div class="sim-head"><b>⚡ AGENDA + TIMER</b><span>— block pe click karo, phir START (khud chalta rahega)</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0;margin-bottom:16px">
+        <label>SESSION <select id="tkSession">
+          <option value="1">Session 1 — Searching + Hashing</option>
+          <option value="2">Session 2 — Sorting (BSI + fast)</option>
+          <option value="3">Session 3 — Revision + race lab</option>
+        </select></label>
+        <span class="sim-msg" id="tkHint">Block pe click karo, phir START.</span>
+      </div>
+      <div class="grid2" style="align-items:start">
+        <div id="tkBlocks"></div>
+        <div>
+          <div style="text-align:center;border:1px solid var(--border2);border-radius:14px;background:linear-gradient(160deg,var(--gold-dim),var(--surface) 55%);padding:20px 16px">
+            <div class="timer-big" id="tkTimer">30:00</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:2px;color:var(--faint);margin-top:8px">BAACHA HUA TIME</div>
+            <div style="font-size:14px;font-weight:600;margin-top:10px;min-height:20px" id="tkBlkName">Block select karo →</div>
+            <div class="sim-controls" style="justify-content:center;margin-top:16px">
+              <button class="btn btn--go" id="tkStart">▶ START</button>
+              <button class="btn" id="tkNext">⏭ NEXT</button>
+              <button class="btn btn--warn" id="tkReset">■ RESET</button>
+            </div>
+            <div class="sim-msg" id="tkNote" style="margin-top:12px;font-size:12.5px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim" style="border-color:var(--blue);background:linear-gradient(165deg,var(--blue-dim),var(--surface) 45%)">
+    <div class="sim-head" style="background:transparent;border-color:var(--border)"><b style="color:var(--blue)">🎯 SCORE ROUND — spin, sawaal, ✓ ya ✕</b></div>
+    <div class="sim-body">
+      <div style="text-align:center">
+        <div class="picker-name" id="pkName">—</div>
+        <div class="sim-controls" style="justify-content:center;margin-top:14px">
+          <button class="btn btn--go" id="pkSpin" style="font-size:14px;padding:11px 26px">🎯 SPIN — naam + sawaal</button>
+          <button class="btn btn--ok" id="pkOk">✓ Sahi</button>
+          <button class="btn btn--bad" id="pkBad">✕ Galat</button>
+          <button class="btn btn--warn" id="pkSkip">↻ Skip</button>
+        </div>
+        <div class="spin-q" id="pkQCard" style="display:none">
+          <div class="who" id="pkWho"></div>
+          <div class="qtext" id="pkQText"></div>
+          <div class="qans" id="pkQAns"></div>
+          <div class="sim-controls" style="margin-top:12px"><button class="btn btn--go" id="pkShow">Jawab dekho</button></div>
+        </div>
+      </div>
+      <div class="sim-controls">
+        <label>NAAM LIST <input id="pkNames" style="width:220px" value="Harsh, Aryan, Khusi"></label>
+        <button class="btn" id="pkSave">SAVE</button>
+        <button class="btn btn--go" id="pkResult">🏆 RESULT DIKHAO</button>
+        <button class="btn btn--warn" id="pkReset">SCORE RESET</button>
+        <span class="sim-msg" id="pkMsg">SPIN dabao — naam aur sawaal dono aayenge.</span>
+      </div>
+      <div class="table-wrap" style="margin:18px 0 0">
+        <div class="table-scroll"><table class="score-tbl">
+          <thead><tr><th>Student</th><th>Poocha gaya</th><th>Sahi</th><th>Score</th></tr></thead>
+          <tbody id="pkBoard"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Audio chahiye?</b> Upar dock me <b>🎧 AUDIO</b> button dabao — neeche player aa jayega, aur har section ke paas ▶ button bhi dikhne lagega. Padhne ke waqt band rakho, sunne ke liye kholo.
+  </div>
+
+  <div class="sim">
+    <div class="sim-head"><b>⚡ QUICK-FIRE</b><span>— 30 second per sawaal, class ke aakhir ke liye</span></div>
+    <div class="sim-body">
+      <div style="border:1px solid var(--blue);border-radius:12px;padding:18px 20px;background:var(--surface2)">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+          <span class="chip chip--blue" id="rpCount">SAWAAL 1</span>
+          <span class="timer-big" id="rpTimer" style="font-size:34px">30</span>
+        </div>
+        <div id="rpQ" style="font-size:17px;font-weight:600;line-height:1.55;min-height:52px">START dabao — pehla sawaal aayega.</div>
+        <div id="rpA" style="font-size:14px;color:var(--emerald);border-top:1px dashed var(--border2);padding-top:12px;margin-top:12px;display:none"></div>
+      </div>
+      <div class="sim-controls">
+        <button class="btn btn--go" id="rpStart">▶ START / NEXT</button>
+        <button class="btn" id="rpShow">JAWAB DEKHO</button>
+        <button class="btn btn--warn" id="rpStop">■ RUKO</button>
+        <span class="sim-msg" id="rpMsg"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<p class="foot">TEAM DEVDoots · BCS301 · UNIT 3 — SEARCHING · HASHING · SORTING</p>
+
+</div><!-- /main -->
+</div><!-- /wrap -->
+
+<!-- ============================================================ PLAYER (chhupa hua) -->
+<div class="player" id="player">
+  <button class="pbtn pbtn--main" id="btnPlay" title="Play / Pause">▶</button>
+  <button class="pbtn" id="btnStop" title="Stop">■</button>
+  <button class="pbtn" id="btnPrev" title="Pichla section">⏮</button>
+  <button class="pbtn" id="btnNext" title="Agla section">⏭</button>
+  <select id="rateSel" title="Speed">
+    <option value="0.75">0.75×</option>
+    <option value="1" selected>1×</option>
+    <option value="1.25">1.25×</option>
+    <option value="1.5">1.5×</option>
+  </select>
+  <select id="voiceSel" title="Voice"><option>Loading voices…</option></select>
+  <div class="p-meta">
+    <div class="p-now" id="pNow">Player ready — section ke ▶ button ya Play dabao</div>
+    <div class="p-voice" id="pVoice">Voices check kar rahe hain…</div>
+  </div>
+</div>
+
+<div class="timeup-banner" id="tuBanner">⏰ TIME UP — agla block!</div>
+
+<div class="result-overlay" id="resOverlay">
+  <div class="result-card">
+    <h3>🏆 Team Devdoots — Score</h3>
+    <div class="sub" id="resSub">Aaj ke class ke sawaalon ka hisaab</div>
+    <div id="resBody"></div>
+    <div class="win" id="resWin"></div>
+    <div class="sim-controls">
+      <button class="btn btn--go" id="resClose">Band karo</button>
+      <button class="btn btn--warn" id="resReset">SCORE RESET</button>
+    </div>
+  </div>
+</div>
+<script>
+/* ================= UNIT 3 — ENGINE ================= */
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+
+/* ---------- THEME ---------- */
+var root = document.documentElement;
+try { var sv = localStorage.getItem('u3-theme'); if (sv === 'light' || sv === 'dark') root.setAttribute('data-theme', sv); } catch (e) {}
+if ($('themeToggle')) $('themeToggle').addEventListener('click', function () {
+  var nx = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', nx);
+  try { localStorage.setItem('u3-theme', nx); } catch (e) {}
+  setTimeout(drawCharts, 60);
+});
+
+/* ---------- SIDEBAR + AUDIO TOGGLE ---------- */
+var sideOff = false, audioOn = false;
+try { sideOff = localStorage.getItem('u3-side') === '1'; } catch (e) {}
+function applySide() {
+  document.body.classList.toggle('noside', sideOff);
+  if ($('dkSide')) $('dkSide').textContent = sideOff ? '⇥ SIDEBAR' : '⇤ SIDEBAR';
+}
+if ($('dkSide')) $('dkSide').addEventListener('click', function () {
+  sideOff = !sideOff; try { localStorage.setItem('u3-side', sideOff ? '1' : '0'); } catch (e) {} applySide();
+});
+applySide();
+function applyAudio() {
+  document.body.classList.toggle('audio-off', !audioOn);
+  if ($('dkAudio')) $('dkAudio').textContent = audioOn ? '🎧 AUDIO ON' : '🎧 AUDIO';
+}
+if ($('dkAudio')) $('dkAudio').addEventListener('click', function () { audioOn = !audioOn; applyAudio(); });
+applyAudio();
+
+/* ---------- SCROLL SPY ---------- */
+(function () {
+  var toc = $('toc'); if (!toc) return;
+  var links = toc.querySelectorAll('a'), secs = [];
+  links.forEach(function (l) { var el = $(l.getAttribute('href').slice(1)); if (el) secs.push({ el: el, link: l }); });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        links.forEach(function (l) { l.classList.remove('active'); });
+        var m = secs.find(function (s) { return s.el === en.target; });
+        if (m) { m.link.classList.add('active'); if (window.innerWidth <= 1000) m.link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  secs.forEach(function (s) { obs.observe(s.el); });
+})();
+
+/* ================= AUDIO ENGINE ================= */
+var synth = window.speechSynthesis;
+var SEC_IDS = ['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10'];
+var SEC_NAMES = { s0: 'Searching', s1: 'Hashing', s2: 'Sorting BSI', s3: 'Merge & Quick', s4: 'Heap & Radix', s5: 'Sorting Lab', s6: 'Comparison', s7: 'Q&A', s8: 'Summary', s9: 'Exam Corner', s10: 'Class Tools' };
+var units = [], cur = -1, endSec = null, stopFlag = false, keepAlive = null, activeSection = 's0';
+var btnPlay = $('btnPlay'), btnStop = $('btnStop'), btnPrev = $('btnPrev'), btnNext = $('btnNext');
+var rateSel = $('rateSel'), voiceSel = $('voiceSel'), pNow = $('pNow'), pVoice = $('pVoice');
+var allVoices = [], hindiVoice = null;
+SEC_IDS.forEach(function (sid) {
+  var sec = $(sid); if (!sec) return;
+  var n = 0;
+  sec.querySelectorAll('.rd').forEach(function (el) { units.push({ el: el, sec: sid, inSec: n++ }); });
+});
+function firstIndexOfSection(sid) { for (var k = 0; k < units.length; k++) if (units[k].sec === sid) return k; return -1; }
+function isHindi(v) { if (!v) return false; var l = (v.lang || '').toLowerCase(); return l.indexOf('hi') === 0 || /hindi|swara|hemant|kalpana|madhur|lekha|prabhat/i.test(v.name || ''); }
+function refreshVoices() {
+  if (!synth) return;
+  var vs = synth.getVoices() || []; if (!vs.length) return;
+  allVoices = vs; hindiVoice = null;
+  var hindi = [], others = [];
+  vs.forEach(function (v) { (isHindi(v) ? hindi : others).push(v); });
+  hindiVoice = hindi[0] || null;
+  var opts = '';
+  hindi.forEach(function (v) { opts += '<option value="' + encodeURIComponent(v.voiceURI) + '">★ ' + v.name + ' (' + v.lang + ')</option>'; });
+  if (hindi.length && others.length) opts += '<option disabled>— — —</option>';
+  others.forEach(function (v) { opts += '<option value="' + encodeURIComponent(v.voiceURI) + '">' + v.name + ' (' + v.lang + ')</option>'; });
+  voiceSel.innerHTML = opts;
+  voiceSel.value = encodeURIComponent((hindiVoice || others[0]).voiceURI);
+  updateVoiceStatus();
+}
+function updateVoiceStatus() {
+  if (!allVoices.length) { pVoice.innerHTML = '<span class="off">Voices load nahi hui — Chrome / Edge try karo</span>'; return; }
+  var v = getSelVoice();
+  pVoice.innerHTML = isHindi(v) ? '<span class="on">★ ' + v.name + ' — Hindi voice active</span>' : '<span class="off">⚠ Hindi voice nahi mili</span> · using ' + v.name;
+}
+function getSelVoice() {
+  var uri = decodeURIComponent(voiceSel.value || '');
+  for (var k = 0; k < allVoices.length; k++) if (allVoices[k].voiceURI === uri) return allVoices[k];
+  return null;
+}
+if (synth) { refreshVoices(); synth.onvoiceschanged = refreshVoices; setTimeout(refreshVoices, 700); }
+else { btnPlay.disabled = btnStop.disabled = btnPrev.disabled = btnNext.disabled = true; }
+voiceSel.addEventListener('change', updateVoiceStatus);
+function clearHi() { document.querySelectorAll('.rd.speaking').forEach(function (e) { e.classList.remove('speaking'); }); }
+function highlight(u) { clearHi(); u.el.classList.add('speaking'); try { u.el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }
+function snippet(el, len) { var t = (el.innerText || '').replace(/\s+/g, ' ').trim(); return t.length > len ? t.slice(0, len) + '…' : t; }
+function updateNow(u) {
+  if (!u) { pNow.textContent = 'Player ready — section ke ▶ button ya Play dabao'; return; }
+  var per = units.filter(function (x) { return x.sec === u.sec; }).length;
+  pNow.textContent = '▶ ' + SEC_NAMES[u.sec] + ' — para ' + (u.inSec + 1) + '/' + per + ' · ' + snippet(u.el, 54);
+}
+function updateSecButtons(sid) {
+  document.querySelectorAll('.sec-play').forEach(function (b) { b.textContent = (sid !== null && b.getAttribute('data-sec') === sid) ? '■' : '▶'; });
+}
+function speakUnit(i) {
+  if (stopFlag) return;
+  if (i >= units.length) { finishAll(); return; }
+  var u = units[i];
+  if (endSec !== null && u.sec !== endSec) { finishAll(); return; }
+  cur = i;
+  var v = getSelVoice();
+  var text = isHindi(v) ? (u.el.getAttribute('data-dev') || u.el.innerText) : u.el.innerText;
+  var utt = new SpeechSynthesisUtterance(text);
+  if (v) { utt.voice = v; utt.lang = v.lang; } else { utt.lang = 'hi-IN'; }
+  utt.rate = parseFloat(rateSel.value) || 1;
+  utt.onstart = function () { highlight(u); updateNow(u); updateSecButtons(u.sec); btnPlay.textContent = '❚❚'; };
+  utt.onend = function () { if (!stopFlag) speakUnit(cur + 1); };
+  utt.onerror = function (ev) { if (ev && (ev.error === 'interrupted' || ev.error === 'canceled')) return; if (!stopFlag) setTimeout(function () { if (!stopFlag) speakUnit(cur + 1); }, 400); };
+  synth.speak(utt);
+}
+function startKeepAlive() {
+  if (keepAlive) return;
+  var ua = navigator.userAgent || '';
+  if (/Chrome/.test(ua) && !/Edg|Android|iPhone|iPad/.test(ua)) keepAlive = setInterval(function () { if (synth.speaking && !synth.paused) { synth.pause(); synth.resume(); } }, 12000);
+}
+function stopKeepAlive() { if (keepAlive) { clearInterval(keepAlive); keepAlive = null; } }
+function finishAll() { stopKeepAlive(); clearHi(); btnPlay.textContent = '▶'; updateSecButtons(null); pNow.textContent = 'Khatam ✓'; endSec = null; cur = -1; }
+function hardStop() { stopFlag = true; try { synth.cancel(); } catch (e) {} stopKeepAlive(); clearHi(); btnPlay.textContent = '▶'; updateSecButtons(null); setTimeout(function () { stopFlag = false; }, 60); }
+function startFrom(sid, only) {
+  if (!synth) return;
+  hardStop();
+  setTimeout(function () {
+    var idx = firstIndexOfSection(sid);
+    if (idx < 0) { finishAll(); return; }
+    endSec = only ? sid : null; cur = idx - 1; startKeepAlive(); speakUnit(idx);
+  }, 80);
+}
+btnPlay.addEventListener('click', function () {
+  if (!synth) return;
+  if (synth.speaking && !synth.paused) { synth.pause(); btnPlay.textContent = '▶'; return; }
+  if (synth.speaking && synth.paused) { synth.resume(); btnPlay.textContent = '❚❚'; return; }
+  startFrom(activeSection, false);
+});
+btnStop.addEventListener('click', function () { hardStop(); cur = -1; updateNow(null); pNow.textContent = 'Stopped'; });
+function curSection() { return (cur >= 0 && units[cur]) ? units[cur].sec : activeSection; }
+btnPrev.addEventListener('click', function () { var i = SEC_IDS.indexOf(curSection()); startFrom(SEC_IDS[Math.max(0, i - 1)], false); });
+btnNext.addEventListener('click', function () { var i = SEC_IDS.indexOf(curSection()); startFrom(SEC_IDS[Math.min(SEC_IDS.length - 1, i + 1)], false); });
+document.querySelectorAll('.sec-play').forEach(function (b) {
+  b.addEventListener('click', function () {
+    if (b.textContent === '■') { hardStop(); return; }
+    startFrom(b.getAttribute('data-sec'), true);
+  });
+});
+(function () {
+  var obs = new IntersectionObserver(function (entries) { entries.forEach(function (en) { if (en.isIntersecting) activeSection = en.target.id; }); }, { rootMargin: '-15% 0px -75% 0px' });
+  SEC_IDS.forEach(function (sid) { var el = $(sid); if (el) obs.observe(el); });
+})();
+
+/* ================= QUESTION BANK ================= */
+var TOPICS = { search: 'Searching', hash: 'Hashing', bsi: 'Sorting BSI', fast: 'Merge & Quick', heapradix: 'Heap & Radix', complexity: 'Complexity' };
+var Q = [
+  { t: 'search', keep: 1, q: 'Binary search ke liye array kaisa hona chahiye?', a: '<b>Sorted</b> — warna aadha hissa hataana galat sabit hoga.', w: 'Section 00 me binary se pehle' },
+  { t: 'search', keep: 1, q: '1000 elements me binary search ~kitne steps leta hai?', a: '<b>~10</b> (log₂1000 ≈ 10). Linear me average 500.', w: 'Beam animation ke baad' },
+  { t: 'search', keep: 1, q: 'mid kaise nikalte hain, aur comparison ke baad low/high kaise badalte hain?', a: 'mid = (low+high)/2 · chhota hai toh <b>low = mid+1</b>, bada hai toh <b>high = mid−1</b>.', w: 'Beam ke dry run me' },
+  { t: 'search', q: 'Unsorted array me kaun si search chalegi?', a: '<b>Linear</b> — binary nahi chal sakti.', w: 'Comparison table pe' },
+  { t: 'search', q: 'Index sequential search ka faayda kya hai?', a: 'Index table se block pata kar lete hain → <b>sirf usi block</b> me search, poora array nahi — ~√n.', w: 'Index table diagram pe' },
+  { t: 'hash', keep: 1, q: 'Hashing ka formula kya hai aur average complexity?', a: '<b>h(k) = k mod m</b> · average <b>O(1)</b>, worst O(n).', w: 'Hashing section ke shuru me' },
+  { t: 'hash', keep: 1, q: 'Collision kya hai? Ek example do.', a: 'Do alag keys ka same hash value — <b>h(23) = h(33) = 3</b> (m = 10).', w: 'Buckets animation se pehle' },
+  { t: 'hash', keep: 1, q: 'Chaining aur open addressing me fark?', a: '<b>Chaining</b> = har slot me linked list (table kabhi full nahi) · <b>Open addressing</b> = table ke andar probing (linear/quadratic/double).', w: 'Method select karke dikhao' },
+  { t: 'hash', q: 'Load factor α kitna ideal hota hai?', a: '<b>0.5–0.75</b>. α &gt; 1 hone pe rehashing karni padti hai.', w: 'Load factor meter dikhane pe' },
+  { t: 'hash', q: 'Open addressing me deletion ke liye kya chahiye?', a: '<b>Tombstone marker</b> — warna probe chain toot jayegi.', w: 'Section ke end me' },
+  { t: 'bsi', keep: 1, q: 'Bubble sort ke ek pass ke baad kya guarantee hoti hai?', a: 'Sabse bada element apni <b>final jagah (end)</b> pe pahunch jata hai.', w: 'Bubble dry run ke baad' },
+  { t: 'bsi', keep: 1, q: 'Kaunsa sort minimum swaps karta hai?', a: '<b>Selection sort</b> — sirf n−1 swaps, par har case O(n²).', w: 'Selection ke baad' },
+  { t: 'bsi', keep: 1, q: 'Insertion sort ka best case kab O(n) hota hai?', a: 'Jab data <b>already sorted</b> ho — sirf comparisons, koi shift nahi.', w: 'Insertion ke baad' },
+  { t: 'bsi', q: 'Teeno (bubble/selection/insertion) me se kaun stable hain?', a: '<b>Bubble aur Insertion stable</b> · Selection <b>unstable</b>.', w: 'Section ke end me' },
+  { t: 'bsi', q: 'Swap ke liye temp kyun chahiye?', a: 'Warna pehli value kho jayegi: temp = a; a = b; b = temp.', w: 'Kisi bhi sort ke swap pe' },
+  { t: 'fast', keep: 1, q: 'Merge sort ki complexity har case me kya hai, aur kyun?', a: '<b>O(n log n)</b> — log n levels, har level pe n elements merge.', w: 'Merge dry run ke baad' },
+  { t: 'fast', keep: 1, q: 'Quick sort ka worst case O(n²) kab hota hai?', a: 'Jab array <b>already sorted</b> ho aur pivot last ho — partition 0 aur n−1 me bant jata hai.', w: 'Quick dry run ke baad' },
+  { t: 'fast', keep: 1, q: 'Merge sort linked list ke liye kyun better hai?', a: 'Merge wahan O(1) extra space me hota hai, aur <b>random access (a[mid]) ki zaroorat nahi</b>.', w: 'Merge ke baad' },
+  { t: 'fast', q: 'Dono me kaun stable hai aur kaun in-place?', a: 'Merge <b>stable</b> (space O(n)) · Quick <b>in-place</b> (space O(log n)) par <b>unstable</b>.', w: 'Comparison card pe' },
+  { t: 'fast', q: 'Quick sort me pivot apni final jagah pe kab pahunchta hai?', a: 'Partition ke turant baad — isliye use dobara chhune ki zaroorat nahi.', w: 'Stepper me partition dikhate waqt' },
+  { t: 'heapradix', keep: 1, q: 'Kaunsa sort O(1) space aur har case O(n log n) dono deta hai?', a: '<b>Heap sort</b> — in-place + guaranteed.', w: 'Heap ke baad' },
+  { t: 'heapradix', keep: 1, q: 'Radix sort comparison karta hai kya?', a: '<b>Nahi</b> — digit-wise (LSD) sort karta hai, har pass me stable counting sort.', w: 'Radix dry run se pehle' },
+  { t: 'heapradix', keep: 1, q: 'Radix me kaunse digit se shuru karte hain aur kyun?', a: '<b>Units (LSD) se</b> — phir tens, hundreds. Har pass stable hona zaroori hai.', w: 'Radix dry run me' },
+  { t: 'heapradix', q: 'Array me heap ke children kaise nikalte hain?', a: 'Node i ke children <b>2i+1</b> aur <b>2i+2</b>.', w: 'Heap diagram pe' },
+  { t: 'heapradix', q: 'Heap sort stable hai ya nahi?', a: '<b>Unstable</b> — heapify swap karta hai jo order badal deta hai.', w: 'Heap ke baad' },
+  { t: 'complexity', keep: 1, q: 'O(n²) me input 10 guna badha toh kaam kitna badhega?', a: '<b>100 guna</b> — isliye bubble/selection/insertion bade data pe slow.', w: 'Graph dikhane ke baad' },
+  { t: 'complexity', keep: 1, q: 'Stable sorts kaunse hain?', a: '<b>BIMR</b> — Bubble, Insertion, Merge, Radix.', w: 'Master table ke baad' },
+  { t: 'complexity', keep: 1, q: 'Kaunse sorts in-place hain?', a: 'Bubble, Selection, Insertion, <b>Heap</b> (O(1)) · Quick O(log n) recursion stack.', w: 'Master table pe' },
+  { t: 'complexity', q: 'Kaunse O(n log n) hain?', a: 'Merge, Quick (average), Heap. Radix alag: O(d(n+k)).', w: 'Table ke baad' }
+];
+var RAPID = [
+  { q: 'Binary search unsorted array pe chalti hai — sahi ya galat?', a: 'Galat — sorted chahiye.' },
+  { q: 'Hashing ka average O(1) hota hai — sahi ya galat?', a: 'Sahi.' },
+  { q: 'h(k) = k mod m — sahi ya galat?', a: 'Sahi — division method.' },
+  { q: 'Selection sort stable hai — sahi ya galat?', a: 'Galat — unstable.' },
+  { q: 'Merge sort ki worst case O(n log n) hai — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Quick sort in-place hai — sahi ya galat?', a: 'Sahi (O(log n) stack).' },
+  { q: 'Radix sort comparisons karta hai — sahi ya galat?', a: 'Galat — digit-wise.' },
+  { q: 'Load factor α = n/m — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Heap sort O(1) space leta hai — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Bubble sort stable hai — sahi ya galat?', a: 'Sahi.' }
+];
+var SEC_TOPICS = { s0: ['search'], s1: ['hash'], s2: ['bsi'], s3: ['fast'], s4: ['heapradix'], s5: ['complexity'], s6: ['complexity'], s7: ['search', 'hash', 'bsi', 'fast', 'heapradix'], s8: ['complexity'], s9: ['complexity'], s10: ['search', 'hash', 'bsi', 'fast', 'heapradix', 'complexity'] };
+function qsFor(sec) {
+  var keys = SEC_TOPICS[sec] || ['search'];
+  var l = Q.filter(function (q) { return keys.indexOf(q.t) > -1; });
+  return l.length ? l : Q;
+}
+
+/* ---------- INLINE QUESTION PANELS ---------- */
+document.querySelectorAll('.qpanel').forEach(function (panel) {
+  var keys = (panel.getAttribute('data-topics') || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  var all = Q.map(function (q, i) { return { q: q, i: i }; }).filter(function (o) { return keys.indexOf(o.q.t) > -1; });
+  var main = all.filter(function (o) { return o.q.keep; });
+  var extra = all.filter(function (o) { return !o.q.keep; });
+  var names = keys.map(function (k) { return TOPICS[k]; }).join(' · ');
+  function card(o, k) {
+    return '<div class="qitem" data-i="' + o.i + '"><div class="qq" style="font-size:14.5px;font-weight:600;line-height:1.6">' + o.q.q + '</div>' +
+      '<div class="qw" style="font-family:\'IBM Plex Mono\',monospace;font-size:10.5px;color:var(--faint);margin-top:5px">⏱ KAB: ' + o.q.w + '</div>' +
+      '<div class="qa" id="pa' + panel.id + '-' + k + '" style="font-size:13.5px;line-height:1.65;color:var(--emerald);margin-top:9px;display:none">' + o.q.a + '</div>' +
+      '<div style="margin-top:9px"><button class="btn" data-pa="pa' + panel.id + '-' + k + '">Jawab dekho</button></div></div>';
+  }
+  var html = '<div class="qpanel__head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px"><b style="font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--blue)">🎯 Class me poochho — ' + names + '</b><span class="chip chip--blue">' + all.length + '</span><button class="btn" id="rand-' + panel.id + '">🎲 Random</button></div>';
+  main.forEach(function (o, k) { html += card(o, k); });
+  if (extra.length) {
+    html += '<details style="margin-top:12px"><summary style="cursor:pointer;font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);padding:8px 0">+ ' + extra.length + ' extra sawaal (backup)</summary>';
+    extra.forEach(function (o, k) { html += card(o, 100 + k); });
+    html += '</details>';
+  }
+  panel.innerHTML = html;
+  panel.querySelectorAll('[data-pa]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var el = $(b.getAttribute('data-pa'));
+      var on = el.style.display === 'block';
+      el.style.display = on ? 'none' : 'block';
+      b.textContent = on ? 'Jawab dekho' : 'Jawab chhupao';
+    });
+  });
+  var rb = panel.querySelector('.qpanel__head .btn');
+  if (rb) rb.addEventListener('click', function () {
+    var items = panel.querySelectorAll('.qitem');
+    var it = items[Math.floor(Math.random() * items.length)];
+    it.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    it.style.outline = '2px solid var(--gold)';
+    setTimeout(function () { it.style.outline = 'none'; }, 2200);
+  });
+});
+
+/* ================= TIMER ================= */
+var SESSIONS = {
+  '1': [
+    { m: 3, t: 'Hook + plan', d: '"List me se cheez dhoondhne ka tez tareeka?" — plan board pe.', n: 'Warm-up sawaal (spin)' },
+    { m: 6, t: 'Searching — 3 tareeke', d: 'Linear vs index vs binary. Beam animation chalao.', n: 'Search sawaal 1-2' },
+    { m: 5, t: 'Binary search dry run', d: 'Board pe low/mid/high likho, haath se kaato.', n: 'Search sawaal 3' },
+    { m: 7, t: 'Hashing + collision', d: 'Buckets animation — chaining vs probing switch karo.', n: 'Hash sawaal 1-3' },
+    { m: 6, t: 'Load factor + Q&A', d: 'α = n/m, rehashing, tombstone.', n: 'Hash sawaal 4' },
+    { m: 2, t: 'Quick-fire', d: '5 rapid sawaal (neeche Class Tools me)', n: 'Energy wapas' },
+    { m: 1, t: 'Homework + result', d: 'Searching/hashing ke programs likho. Score dikhao.', n: '🏆 RESULT' }
+  ],
+  '2': [
+    { m: 3, t: 'Recall + hook', d: '"Sorted data me kya faayda?" — pichli class se jodo.', n: 'Spin se poochho' },
+    { m: 8, t: 'Bubble + Selection', d: 'Dry run board pe, phir stepper me code line dikhao.', n: 'BSI sawaal 1-2' },
+    { m: 6, t: 'Insertion + swap', d: 'Card wala example. Stepper se insert dikhao.', n: 'BSI sawaal 3' },
+    { m: 8, t: 'Merge + Quick', d: 'Merge ka todo-jodo diagram, phir Quick ka pivot.', n: 'Fast sawaal 1-2' },
+    { m: 3, t: 'Heap + Radix (quick view)', d: 'Heap = tree, Radix = digit buckets.', n: 'Heap/Radix sawaal' },
+    { m: 1, t: 'Race + homework', d: 'Race dikhao, homework do, result dikhao.', n: '🏆 RESULT' }
+  ],
+  '3': [
+    { m: 2, t: 'Recall', d: 'Spin se poochho: "stable sorts kaunse hain?"', n: 'Complexity sawaal' },
+    { m: 8, t: 'SORT RACE', d: 'Insertion vs Merge vs Quick — race chalao, counters dikhao.', n: '"Kaun jeeta, kyun?"' },
+    { m: 10, t: 'Stepper — merge & quick', d: 'Dono ko step-by-step chalao, code line pe ruk ke samjhao.', n: 'Fast sawaal 3' },
+    { m: 6, t: 'Graphs + master table', d: 'Big-O graph pe n badhao, sorting chart dikhao.', n: 'Complexity sawaal 1-3' },
+    { m: 3, t: 'Quick-fire + result', d: '5 sawaal, phir scoreboard.', n: '🏆 RESULT' },
+    { m: 1, t: 'Homework', d: 'Do algorithms ke program + dry run khud likho.', n: 'Aaj ka takeaway' }
+  ]
+};
+var tcur = -1, left = 0, ticker = null, sess = '1';
+function fmt(s) { var m = Math.floor(s / 60), x = s % 60; return (m < 10 ? '0' : '') + m + ':' + (x < 10 ? '0' : '') + x; }
+function paintTimer() {
+  var t = fmt(left), warn = left <= 30 && tcur >= 0;
+  ['dkTimer', 'tkTimer'].forEach(function (id) { var e = $(id); if (e) { e.textContent = t; e.classList.toggle('warn', warn); } });
+}
+function paintBlocks() {
+  if (!$('tkBlocks')) return;
+  var list = SESSIONS[sess], html = '';
+  list.forEach(function (b, i) {
+    html += '<div class="blk' + (i === tcur ? ' on' : '') + '" data-i="' + i + '"><span class="t">' + b.m + ' min</span><span class="d"><b>' + b.t + '</b>' + b.d + '</span></div>';
+  });
+  $('tkBlocks').innerHTML = html;
+  $('tkBlocks').querySelectorAll('.blk').forEach(function (el) { el.addEventListener('click', function () { selectBlock(+el.getAttribute('data-i')); }); });
+}
+function selectBlock(i) {
+  tcur = i;
+  var b = SESSIONS[sess][i];
+  left = b.m * 60; paintTimer();
+  var label = 'Block ' + (i + 1) + '/' + SESSIONS[sess].length + ' — ' + b.t;
+  if ($('tkBlkName')) $('tkBlkName').textContent = label;
+  if ($('dkBlk')) $('dkBlk').textContent = label;
+  if ($('tkNote')) $('tkNote').innerHTML = '<b style="color:var(--blue)">' + b.n + '</b>';
+  if ($('tkHint')) $('tkHint').textContent = 'Ready — START dabao.';
+  paintBlocks();
+}
+function beep() {
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    var ac = new AC(), o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination); o.type = 'sine'; o.frequency.value = 900; g.gain.value = 0.1;
+    o.start(); setTimeout(function () { o.frequency.value = 640; }, 190); setTimeout(function () { o.stop(); try { ac.close(); } catch (e) {} }, 430);
+  } catch (e) {}
+}
+function timeUpAlert(msg) {
+  document.body.classList.add('timeup');
+  if ($('dock')) $('dock').classList.add('timeup');
+  var b = $('tuBanner'); if (b) { b.textContent = msg; b.classList.add('show'); }
+  beep();
+  setTimeout(function () { document.body.classList.remove('timeup'); if ($('dock')) $('dock').classList.remove('timeup'); if (b) b.classList.remove('show'); }, 3600);
+}
+function tickFn() {
+  left--;
+  if (left <= 0) {
+    left = 0; paintTimer();
+    var nx = tcur + 1;
+    if (nx < SESSIONS[sess].length) { timeUpAlert('⏰ Block khatam — ab: ' + SESSIONS[sess][nx].t); selectBlock(nx); }
+    else { timeUpAlert('⏰ Session poora! 🎉'); stopTimer(); if ($('tkHint')) $('tkHint').innerHTML = '<b style="color:var(--emerald)">Session poora! 🎉</b>'; }
+    return;
+  }
+  paintTimer();
+}
+function startTimer() {
+  if (ticker) { stopTimer(); return; }
+  if (tcur < 0) selectBlock(0);
+  ticker = setInterval(tickFn, 1000);
+  if ($('dkStart')) $('dkStart').textContent = '⏸';
+  if ($('tkStart')) $('tkStart').textContent = '⏸ PAUSE';
+  if ($('tkHint')) $('tkHint').textContent = 'Chal raha hai… (agla block apne aap)';
+}
+function stopTimer() {
+  if (ticker) { clearInterval(ticker); ticker = null; }
+  if ($('dkStart')) $('dkStart').textContent = '▶';
+  if ($('tkStart')) $('tkStart').textContent = '▶ START';
+}
+function nextBlock() {
+  var i = (tcur < 0 ? 0 : tcur + 1);
+  if (i >= SESSIONS[sess].length) { stopTimer(); return; }
+  selectBlock(i);
+}
+if ($('dkStart')) $('dkStart').addEventListener('click', startTimer);
+if ($('dkNext')) $('dkNext').addEventListener('click', nextBlock);
+if ($('tkStart')) $('tkStart').addEventListener('click', startTimer);
+if ($('tkNext')) $('tkNext').addEventListener('click', nextBlock);
+if ($('tkReset')) $('tkReset').addEventListener('click', function () {
+  stopTimer(); tcur = -1; left = 0; paintTimer();
+  if ($('tkBlkName')) $('tkBlkName').textContent = 'Block select karo →';
+  if ($('dkBlk')) $('dkBlk').textContent = 'Block select karo (Class Tools →)';
+  if ($('tkNote')) $('tkNote').innerHTML = '';
+  paintBlocks();
+});
+if ($('tkSession')) $('tkSession').addEventListener('change', function () { sess = $('tkSession').value; if ($('tkReset')) $('tkReset').click(); });
+paintBlocks();
+window.__u3 = { setSeconds: function (v) { left = v; paintTimer(); }, timeUp: function (m) { timeUpAlert(m || '⏰ TIME UP — test'); }, state: function () { return { cur: tcur, left: left, sess: sess, running: !!ticker }; } };
+
+/* ================= SCORE ROUND ================= */
+var names = ['Harsh', 'Aryan', 'Khusi'], scores = {}, current = null, curQ = null, spinTimer = null;
+try { var sn = localStorage.getItem('u3-names'); if (sn) names = JSON.parse(sn); } catch (e) {}
+try { var sc = localStorage.getItem('u3-scores'); if (sc) scores = JSON.parse(sc); } catch (e) {}
+names.forEach(function (n) { if (!scores[n]) scores[n] = { a: 0, c: 0 }; });
+function saveScore() { try { localStorage.setItem('u3-names', JSON.stringify(names)); localStorage.setItem('u3-scores', JSON.stringify(scores)); } catch (e) {} }
+function pct(o) { return o.a ? Math.round(o.c * 100 / o.a) : 0; }
+function paintBoard() {
+  if (!$('pkBoard')) return;
+  var minA = Math.min.apply(null, names.map(function (n) { return scores[n].a; }));
+  var best = -1;
+  names.forEach(function (n) { if (scores[n].a && pct(scores[n]) > best) best = pct(scores[n]); });
+  var rows = names.map(function (n) { return { n: n, o: scores[n] }; }).sort(function (x, y) { var d = pct(y.o) - pct(x.o); return d ? d : y.o.c - x.o.c; });
+  var html = '';
+  rows.forEach(function (r) {
+    var cls = (r.o.a && pct(r.o) === best) ? 'top' : '';
+    var least = (r.o.a === minA) ? ' <span style="color:var(--gold);font-size:11px">· kam poocha</span>' : '';
+    html += '<tr class="' + cls + '"><td><b>' + r.n + '</b>' + least + '</td><td class="num">' + r.o.a + '</td><td class="num">' + r.o.c + '</td><td class="num">' + pct(r.o) + '%</td></tr>';
+  });
+  $('pkBoard').innerHTML = html;
+}
+function showQ(where) {
+  if (!curQ) return;
+  var q = curQ, nm = current || '—';
+  if (where === 'dock' || where === 'both') {
+    if ($('dkQWho')) $('dkQWho').textContent = current ? '🎯 ' + nm + ' — jawab do' : '🎲 Random sawaal — ' + (TOPICS[q.t] || '');
+    if ($('dkQText')) $('dkQText').innerHTML = q.q;
+    if ($('dkQAns')) { $('dkQAns').innerHTML = q.a; $('dkQAns').classList.remove('show'); }
+    if ($('dkQShow')) $('dkQShow').textContent = 'Jawab dekho';
+    if ($('dkQCard')) $('dkQCard').classList.add('show');
+  }
+  if (where === 'tool' || where === 'both') {
+    if ($('pkQCard')) $('pkQCard').style.display = 'block';
+    if ($('pkWho')) $('pkWho').textContent = current ? '🎯 ' + nm + ' — jawab do' : '🎲 Random sawaal';
+    if ($('pkQText')) $('pkQText').innerHTML = q.q;
+    if ($('pkQAns')) { $('pkQAns').innerHTML = q.a; $('pkQAns').classList.remove('show'); }
+    if ($('pkShow')) $('pkShow').textContent = 'Jawab dekho';
+  }
+}
+function doSpin() {
+  if (spinTimer) return;
+  var minA = Math.min.apply(null, names.map(function (n) { return scores[n].a; }));
+  var pool = names.filter(function (n) { return scores[n].a === minA; });
+  var chosen = pool[Math.floor(Math.random() * pool.length)];
+  var list = qsFor(activeSection);
+  curQ = list[Math.floor(Math.random() * list.length)];
+  var targets = [$('dkName'), $('pkName')].filter(Boolean);
+  var i = 0;
+  targets.forEach(function (t) { t.classList.add('spinning'); });
+  spinTimer = setInterval(function () { targets.forEach(function (t) { t.textContent = names[i % names.length]; }); i++; }, 80);
+  setTimeout(function () {
+    clearInterval(spinTimer); spinTimer = null;
+    current = chosen;
+    targets.forEach(function (t) { t.classList.remove('spinning'); t.textContent = current; });
+    showQ('both');
+    if ($('pkMsg')) $('pkMsg').innerHTML = '<b>' + current + '</b> — sawaal dikh raha hai. Jawab suno, phir ✓ ya ✕ dabao.';
+  }, 1300);
+}
+function mark(ok) {
+  if (!current) { if ($('pkMsg')) $('pkMsg').textContent = 'Pehle SPIN karo.'; return; }
+  scores[current].a++; if (ok) scores[current].c++;
+  saveScore(); paintBoard();
+  if ($('pkMsg')) $('pkMsg').innerHTML = '<b>' + current + '</b> → ' + (ok ? '✓ sahi (+1)' : '✕ galat') + ' · ab agla SPIN.';
+  current = null; curQ = null;
+  [$('dkName'), $('pkName')].filter(Boolean).forEach(function (t) { t.textContent = '—'; });
+  if ($('dkQCard')) $('dkQCard').classList.remove('show');
+  if ($('pkQCard')) $('pkQCard').style.display = 'none';
+}
+if ($('dkSpin')) $('dkSpin').addEventListener('click', doSpin);
+if ($('pkSpin')) $('pkSpin').addEventListener('click', doSpin);
+[['dkOk', true], ['pkOk', true], ['dkQOk', true], ['dkBad', false], ['pkBad', false], ['dkQBad', false]].forEach(function (p) {
+  if ($(p[0])) $(p[0]).addEventListener('click', function () { mark(p[1]); });
+});
+if ($('pkSkip')) $('pkSkip').addEventListener('click', function () {
+  [$('dkName'), $('pkName')].filter(Boolean).forEach(function (t) { t.textContent = '—'; });
+  current = null; curQ = null;
+  if ($('dkQCard')) $('dkQCard').classList.remove('show');
+  if ($('pkQCard')) $('pkQCard').style.display = 'none';
+  if ($('pkMsg')) $('pkMsg').textContent = 'Skip — dobara SPIN karo.';
+});
+function reveal(btn, el) { var on = el.classList.toggle('show'); if (btn) btn.textContent = on ? 'Jawab chhupao' : 'Jawab dekho'; }
+if ($('dkQShow')) $('dkQShow').addEventListener('click', function () { reveal($('dkQShow'), $('dkQAns')); });
+if ($('pkShow')) $('pkShow').addEventListener('click', function () { var el = $('pkQAns'); var on = el.style.display === 'block'; el.style.display = on ? 'none' : 'block'; $('pkShow').textContent = on ? 'Jawab dekho' : 'Jawab chhupao'; });
+function dockRand() {
+  var list = qsFor(activeSection);
+  curQ = list[Math.floor(Math.random() * list.length)];
+  current = null; showQ('dock');
+}
+if ($('dkQ')) $('dkQ').addEventListener('click', dockRand);
+if ($('dkQNext')) $('dkQNext').addEventListener('click', dockRand);
+if ($('dkQClose')) $('dkQClose').addEventListener('click', function () { $('dkQCard').classList.remove('show'); });
+if ($('pkSave')) $('pkSave').addEventListener('click', function () {
+  var arr = $('pkNames').value.split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s.length; });
+  if (!arr.length) { $('pkMsg').textContent = 'Kam se kam ek naam likho.'; return; }
+  names = arr; names.forEach(function (n) { if (!scores[n]) scores[n] = { a: 0, c: 0 }; });
+  saveScore(); paintBoard();
+  $('pkMsg').innerHTML = 'List save: <b>' + names.join(', ') + '</b>';
+});
+if ($('pkReset')) $('pkReset').addEventListener('click', function () { names.forEach(function (n) { scores[n] = { a: 0, c: 0 }; }); saveScore(); paintBoard(); $('pkMsg').textContent = 'Score reset.'; });
+function showResult() {
+  var rows = names.map(function (n) { return { n: n, o: scores[n] }; });
+  var asked = rows.reduce(function (s, r) { return s + r.o.a; }, 0);
+  rows.sort(function (x, y) { var d = pct(y.o) - pct(x.o); return d ? d : y.o.c - x.o.c; });
+  var html = '<table class="score-tbl"><thead><tr><th>#</th><th>Student</th><th>Poocha gaya</th><th>Sahi</th><th>Score</th></tr></thead><tbody>';
+  var best = null;
+  rows.forEach(function (r, i) {
+    if (i === 0 && r.o.a > 0) best = r;
+    html += '<tr class="' + ((i === 0 && r.o.a > 0) ? 'top' : '') + '"><td class="num">' + (i + 1) + '</td><td><b>' + r.n + '</b></td><td class="num">' + r.o.a + '</td><td class="num">' + r.o.c + '</td><td class="num">' + pct(r.o) + '%</td></tr>';
+  });
+  html += '</tbody></table>';
+  if ($('resBody')) $('resBody').innerHTML = html;
+  if ($('resSub')) $('resSub').innerHTML = 'Aaj kul <b>' + asked + '</b> sawaal poochhe gaye';
+  if ($('resWin')) {
+    if (best && asked) {
+      var msg = pct(best.o) >= 75 ? 'Shandaar kaam! 🚩' : pct(best.o) >= 50 ? 'Achha kiya — thoda aur practice.' : 'Practice chahiye — concepts dobara dekh lo.';
+      $('resWin').innerHTML = '🏆 Sabse achha: <b>' + best.n + '</b> — ' + best.o.c + '/' + best.o.a + ' sahi (' + pct(best.o) + '%). ' + msg;
+    } else $('resWin').innerHTML = 'Abhi koi sawaal nahi poochha gaya — SPIN karke shuru karo.';
+  }
+  if ($('resOverlay')) $('resOverlay').classList.add('show');
+}
+if ($('pkResult')) $('pkResult').addEventListener('click', showResult);
+if ($('resClose')) $('resClose').addEventListener('click', function () { $('resOverlay').classList.remove('show'); });
+if ($('resReset')) $('resReset').addEventListener('click', function () { names.forEach(function (n) { scores[n] = { a: 0, c: 0 }; }); saveScore(); paintBoard(); showResult(); });
+if ($('pkNames')) $('pkNames').value = names.join(', ');
+paintBoard();
+
+/* ---------- QUICK-FIRE ---------- */
+var ridx = -1, rt = 30, rTimer = null;
+function rpShow() {
+  if (ridx < 0) ridx = 0;
+  var q = RAPID[ridx % RAPID.length];
+  if ($('rpQ')) $('rpQ').textContent = q.q;
+  if ($('rpA')) { $('rpA').textContent = q.a; $('rpA').style.display = 'none'; }
+  if ($('rpCount')) $('rpCount').textContent = 'SAWAAL ' + ((ridx % RAPID.length) + 1) + '/' + RAPID.length;
+  rt = 30; if ($('rpTimer')) { $('rpTimer').textContent = '30'; $('rpTimer').classList.remove('warn'); }
+  clearInterval(rTimer);
+  rTimer = setInterval(function () {
+    rt--;
+    if ($('rpTimer')) { $('rpTimer').textContent = (rt < 10 ? '0' : '') + Math.max(0, rt); if (rt <= 5) $('rpTimer').classList.add('warn'); }
+    if (rt <= 0) { clearInterval(rTimer); rTimer = null; beep(); if ($('rpMsg')) $('rpMsg').innerHTML = '<b style="color:var(--coral)">Time up! Jawab dekho, agla sawaal.</b>'; }
+  }, 1000);
+  if ($('rpMsg')) $('rpMsg').textContent = 'Chalo — jaldi jawab do!';
+}
+if ($('rpStart')) $('rpStart').addEventListener('click', function () { ridx++; rpShow(); });
+if ($('rpShow')) $('rpShow').addEventListener('click', function () { var el = $('rpA'); if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block'; });
+if ($('rpStop')) $('rpStop').addEventListener('click', function () { clearInterval(rTimer); rTimer = null; if ($('rpMsg')) $('rpMsg').textContent = 'Ruk gaya.'; });
+
+/* ================= SEARCH BEAM ================= */
+(function () {
+  var ARR = [3, 9, 12, 18, 23, 31, 40, 47, 56, 60];
+  var timers = {}, state = {};
+  function render() {
+    var html = '';
+    ARR.forEach(function (v, k) {
+      var cls = 'beam-cell', tag = '[' + k + ']';
+      var s = state;
+      if (s.range && (k < s.range[0] || k > s.range[1])) cls += ' out';
+      if (s.scan === k) { cls += ' scan'; tag = 'SCAN'; }
+      if (s.mid === k) { cls += ' mid'; tag = 'MID'; }
+      if (s.hit === k) { cls += ' hit'; tag = 'MILA ✔'; }
+      html += '<div class="' + cls + '">' + v + '<span class="tag">' + tag + '</span></div>';
+    });
+    if ($('beamRow')) $('beamRow').innerHTML = html;
+  }
+  function reset() {
+    Object.keys(timers).forEach(function (k) { clearInterval(timers[k]); });
+    timers = {}; state = {};
+    if ($('bmLin')) $('bmLin').textContent = '0';
+    if ($('bmBin')) $('bmBin').textContent = '0';
+    render();
+  }
+  function linear() {
+    reset();
+    var key = +$('bmKey').value, i = 0, c = 0;
+    if ($('bmMsg')) $('bmMsg').textContent = 'LINEAR chal raha hai — ek-ek cell…';
+    timers.l = setInterval(function () {
+      if (i >= ARR.length) {
+        clearInterval(timers.l);
+        if ($('bmMsg')) $('bmMsg').innerHTML = '<b style="color:var(--coral)">Linear: ' + c + ' comparisons — nahi mila!</b>';
+        return;
+      }
+      c++; state.scan = i; render();
+      if ($('bmLin')) $('bmLin').textContent = c;
+      if (ARR[i] === key) {
+        clearInterval(timers.l); state.hit = i;
+        if ($('bmMsg')) $('bmMsg').innerHTML = '<b style="color:var(--emerald)">Linear: ' + c + ' comparisons me mila (index ' + i + ')</b>';
+      }
+      i++;
+    }, 260);
+  }
+  function binary() {
+    var key = +$('bmKey').value;
+    if ($('bmLin')) $('bmLin').textContent = $('bmLin').textContent;
+    var low = 0, high = ARR.length - 1, c = 0;
+    state = { range: [low, high] };
+    if ($('bmMsg')) $('bmMsg').textContent = 'BINARY chal raha hai — aadha-aadha…';
+    timers.b = setInterval(function () {
+      if (low > high) {
+        clearInterval(timers.b); state = {};
+        if ($('bmMsg')) $('bmMsg').innerHTML = '<b style="color:var(--coral)">Binary: ' + c + ' comparisons — nahi mila!</b>';
+        render(); return;
+      }
+      var mid = Math.floor((low + high) / 2);
+      c++; state.mid = mid; state.range = [low, high]; render();
+      if ($('bmBin')) $('bmBin').textContent = c;
+      if (ARR[mid] === key) { clearInterval(timers.b); state.hit = mid; render(); if ($('bmMsg')) $('bmMsg').innerHTML = '<b style="color:var(--emerald)">Binary: sirf ' + c + ' comparisons me mila!</b>'; return; }
+      if (ARR[mid] < key) low = mid + 1; else high = mid - 1;
+      state.range = [low, high]; render();
+    }, 620);
+  }
+  if ($('bmStart')) $('bmStart').addEventListener('click', function () { reset(); linear(); setTimeout(binary, 300); });
+  if ($('bmLinear')) $('bmLinear').addEventListener('click', linear);
+  if ($('bmBinary')) $('bmBinary').addEventListener('click', binary);
+  if ($('bmReset')) $('bmReset').addEventListener('click', function () { reset(); if ($('bmMsg')) $('bmMsg').textContent = 'Reset — dobara chalao.'; });
+  render();
+})();
+
+/* ================= HASH BUCKETS ================= */
+(function () {
+  var slots = [], m = 10, method = 'linear', order = [], stepI = 0, steps = [];
+  function build() {
+    var keys = ($('hkKeys') ? $('hkKeys').value : '').split(/[,\s]+/).map(function (s) { return parseInt(s, 10); }).filter(function (x) { return !isNaN(x); });
+    m = Math.max(3, Math.min(17, parseInt($('hkM').value, 10) || 10));
+    if ($('hkM')) $('hkM').value = m;
+    method = $('hkMethod').value;
+    slots = []; for (var i = 0; i < m; i++) slots.push(method === 'chain' ? [] : null);
+    steps = []; order = [];
+    var collisions = 0, probes = 0;
+    keys.forEach(function (k) {
+      var h = ((k % m) + m) % m;
+      if (method === 'chain') {
+        var coll = slots[h].length > 0;
+        if (coll) collisions++;
+        slots[h].push(k);
+        steps.push({ k: k, h: h, pos: h, coll: coll, msg: 'h(' + k + ') = ' + k + ' mod ' + m + ' = <b>' + h + '</b>' + (coll ? ' — slot bhara tha → <span style="color:var(--coral)">collision</span>, list me add' : ' — khaali slot, seedha rakh diya') });
+      } else {
+        var pos = h, tries = 0, placed = false, coll = false;
+        while (tries < m) {
+          if (slots[pos] === null) { placed = true; break; }
+          if (tries === 0) { coll = true; collisions++; }
+          tries++; probes++;
+          var step = 1;
+          if (method === 'quad') step = tries * tries;
+          else if (method === 'double') { var h2 = 7 - (((k % 7) + 7) % 7); if (h2 === 0) h2 = 1; step = tries * h2; }
+          pos = (h + step) % m;
+        }
+        if (placed) {
+          slots[pos] = k;
+          steps.push({ k: k, h: h, pos: pos, coll: coll, msg: 'h(' + k + ') = <b>' + h + '</b>' + (coll ? ' — bhara tha → <span style="color:var(--coral)">collision</span>, probe karke index <b>' + pos + '</b> pe' : ' — khaali slot') });
+        } else {
+          steps.push({ k: k, h: h, pos: -1, coll: true, msg: '<span style="color:var(--coral)">Table FULL — ' + k + ' insert nahi hua!</span>' });
+        }
+      }
+    });
+    var n = keys.length;
+    var alpha = (n / m);
+    if ($('hkLF')) $('hkLF').textContent = alpha.toFixed(2);
+    if ($('hkLFFill')) $('hkLFFill').style.width = Math.min(100, alpha * 100) + '%';
+    if ($('hkLog')) $('hkLog').innerHTML = 'Total collisions: <b>' + collisions + '</b>' + (method !== 'chain' ? ' · probes: <b>' + probes + '</b>' : '') + ' · load factor α = <b>' + alpha.toFixed(2) + '</b>' + (alpha > 0.75 ? ' — <span style="color:var(--coral)">0.75 se zyada, rehashing soch lo</span>' : '');
+    stepI = 0;
+    render(true);
+  }
+  function render(all) {
+    var html = '';
+    for (var i = 0; i < m; i++) {
+      if (method === 'chain') {
+        var inner = slots[i].length ? slots[i].map(function (v, idx) { return '<span class="bk-key' + (idx > 0 ? ' probe' : '') + '">' + v + '</span>'; }).join('<span style="color:var(--faint)">→</span>') + '<span style="color:var(--faint)">→ NULL</span>' : '<span class="bk-empty">NULL</span>';
+        var show = all || true;
+        html += '<div class="bk-row"><span class="bk-idx">[' + i + ']</span><div class="bk-slot">' + (show ? inner : '<span class="bk-empty">…</span>') + '</div></div>';
+      } else {
+        html += '<div class="bk-row"><span class="bk-idx">[' + i + ']</span><div class="bk-slot">' + (slots[i] !== null ? '<span class="bk-key' + ((((slots[i] % m) + m) % m) !== i ? ' probe' : '') + '">' + slots[i] + '</span>' + ((((slots[i] % m) + m) % m) !== i ? '<span style="color:var(--faint)">← probe</span>' : '') : '<span class="bk-empty">— khaali —</span>') + '</div></div>';
+      }
+    }
+    if ($('hkTable')) $('hkTable').innerHTML = html;
+  }
+  if ($('hkGo')) $('hkGo').addEventListener('click', build);
+  if ($('hkMethod')) $('hkMethod').addEventListener('change', build);
+  build();
+})();
+
+/* ================= SORT ENGINE (shared frame generator) ================= */
+var CODES = {
+  bubble: ['for (i = 0; i < n-1; i++) {', '    for (j = 0; j < n-1-i; j++) {', '        if (a[j] > a[j+1]) {', '            temp = a[j];', '            a[j] = a[j+1];', '            a[j+1] = temp;', '        }', '    }', '}'],
+  selection: ['for (i = 0; i < n-1; i++) {', '    min = i;', '    for (j = i+1; j < n; j++) {', '        if (a[j] < a[min])', '            min = j;', '    }', '    if (min != i) swap(a[i], a[min]);', '}'],
+  insertion: ['for (i = 1; i < n; i++) {', '    key = a[i];', '    j = i - 1;', '    while (j >= 0 && a[j] > key) {', '        a[j+1] = a[j];   // shift', '        j--;', '    }', '    a[j+1] = key;   // insert', '}'],
+  quick: ['partition(a, low, high) {', '    pivot = a[high];', '    i = low - 1;', '    for (j = low; j < high; j++) {', '        if (a[j] <= pivot) {', '            i++; swap(a[i], a[j]);', '        }', '    }', '    swap(a[i+1], a[high]);', '    return i+1;  // pivot final jagah', '}'],
+  merge: ['mergeSort(a, l, r) {', '    if (l >= r) return;', '    m = (l + r) / 2;', '    mergeSort(a, l, m);', '    mergeSort(a, m+1, r);', '    merge(a, l, m, r);', '}', 'merge(a, l, m, r) {', '    // dono halves se chhota pehle uthao', '}'],
+  heap: ['heapify(a, n, i) {', '    largest = i;', '    l = 2*i+1;  r = 2*i+2;', '    if (l < n && a[l] > a[largest]) largest = l;', '    if (r < n && a[r] > a[largest]) largest = r;', '    if (largest != i) { swap(i, largest);', '        heapify(a, n, largest); }', '}', 'build max-heap: for i = n/2-1 .. 0 heapify', 'for i = n-1 .. 1: swap(a[0], a[i]); heapify(i, 0)'],
+  radix: ['max = max(a[]);', 'for (exp = 1; max/exp > 0; exp *= 10)', '    countingSort(a, n, exp);', 'countingSort: digit = (a[i] / exp) % 10', '    count[10] banao, cumulative karo', '    output[] me peeche se rakho  // stable']
+};
+function genFrames(algo, base) {
+  var a = base.slice(), n = a.length, out = [], done = new Array(n).fill(false);
+  function snap(msg, o) {
+    o = o || {};
+    out.push({ arr: a.slice(), done: done.slice(), cmp: o.cmp || [], swp: o.swp || [], piv: o.piv || [], line: (o.line === undefined ? -1 : o.line), vars: o.vars || {}, msg: msg });
+  }
+  if (algo === 'bubble') {
+    for (var i = 0; i < n - 1; i++) {
+      var sw = false;
+      for (var j = 0; j < n - 1 - i; j++) {
+        snap('compare a[' + j + ']=' + a[j] + ' aur a[' + (j + 1) + ']=' + a[j + 1], { cmp: [j, j + 1], line: 2, vars: { i: i, j: j } });
+        if (a[j] > a[j + 1]) { var t = a[j]; a[j] = a[j + 1]; a[j + 1] = t; sw = true; snap('swap → ' + a[j] + ' aur ' + a[j + 1], { swp: [j, j + 1], line: 3, vars: { i: i, j: j } }); }
+      }
+      done[n - 1 - i] = true;
+      snap('pass ' + (i + 1) + ' complete — index ' + (n - 1 - i) + ' final', { line: 7, vars: { i: i } });
+      if (!sw) { for (var q = 0; q < n; q++) done[q] = true; snap('koi swap nahi hua — already sorted! (best case O(n))', { line: 0 }); break; }
+    }
+  } else if (algo === 'selection') {
+    for (var i2 = 0; i2 < n - 1; i2++) {
+      var min = i2;
+      snap('min = i = ' + i2, { line: 1, vars: { i: i2, min: min } });
+      for (var j2 = i2 + 1; j2 < n; j2++) {
+        snap('compare a[' + j2 + ']=' + a[j2] + ' vs min a[' + min + ']=' + a[min], { cmp: [j2, min], line: 3, vars: { i: i2, j: j2, min: min } });
+        if (a[j2] < a[min]) { min = j2; snap('naya min = ' + a[min] + ' (index ' + min + ')', { cmp: [min], line: 4, vars: { i: i2, j: j2, min: min } }); }
+      }
+      if (min !== i2) { var t2 = a[i2]; a[i2] = a[min]; a[min] = t2; snap('swap a[' + i2 + '] ↔ a[' + min + ']', { swp: [i2, min], line: 6, vars: { i: i2, min: min } }); }
+      done[i2] = true;
+      snap('index ' + i2 + ' final — ' + a[i2], { line: 6, vars: { i: i2 } });
+    }
+  } else if (algo === 'insertion') {
+    done[0] = true;
+    for (var i3 = 1; i3 < n; i3++) {
+      var key = a[i3];
+      snap('key = a[' + i3 + '] = ' + key, { line: 1, vars: { i: i3, key: key } });
+      var j3 = i3 - 1;
+      while (j3 >= 0 && a[j3] > key) {
+        snap('a[' + j3 + ']=' + a[j3] + ' > key ' + key + ' → shift right', { cmp: [j3], line: 4, vars: { i: i3, j: j3, key: key } });
+        a[j3 + 1] = a[j3]; j3--;
+      }
+      a[j3 + 1] = key;
+      snap('key ' + key + ' ko index ' + (j3 + 1) + ' pe insert', { swp: [j3 + 1], line: 7, vars: { i: i3, j: j3, key: key } });
+      for (var k3 = 0; k3 <= i3; k3++) done[k3] = true;
+      snap('pehle ' + (i3 + 1) + ' elements sorted', { line: 7, vars: { i: i3 } });
+    }
+  } else if (algo === 'quick') {
+    (function qs(low, high) {
+      if (low >= high) { if (low === high) done[low] = true; return; }
+      var pivot = a[high];
+      snap('partition [' + low + '..' + high + '], pivot = ' + pivot, { piv: [high], line: 1, vars: { low: low, high: high, pivot: pivot } });
+      var i4 = low - 1;
+      for (var j4 = low; j4 < high; j4++) {
+        snap('a[' + j4 + ']=' + a[j4] + ' ≤ pivot ' + pivot + '?', { cmp: [j4], piv: [high], line: 4, vars: { low: low, high: high, j: j4, i: i4 } });
+        if (a[j4] <= pivot) { i4++; if (i4 !== j4) { var t4 = a[i4]; a[i4] = a[j4]; a[j4] = t4; snap('swap → chhota left me', { swp: [i4, j4], piv: [high], line: 5, vars: { i: i4, j: j4 } }); } }
+      }
+      var t5 = a[i4 + 1]; a[i4 + 1] = a[high]; a[high] = t5;
+      var pi = i4 + 1; done[pi] = true;
+      snap('pivot ' + a[pi] + ' FINAL position ' + pi + ' pe ✔', { swp: [pi], line: 8, vars: { pi: pi } });
+      qs(low, pi - 1); qs(pi + 1, high);
+    })(0, n - 1);
+  } else if (algo === 'merge') {
+    (function ms(l, r) {
+      if (l >= r) return;
+      var mid = Math.floor((l + r) / 2);
+      snap('mergeSort [' + l + '..' + r + '] → m = ' + mid, { line: 2, vars: { l: l, r: r, m: mid } });
+      ms(l, mid); ms(mid + 1, r);
+      var L = a.slice(l, mid + 1), R = a.slice(mid + 1, r + 1);
+      snap('merge karo [' + l + '..' + mid + '] aur [' + (mid + 1) + '..' + r + ']', { line: 8, vars: { l: l, r: r } });
+      var i5 = 0, j5 = 0, k5 = l;
+      while (i5 < L.length && j5 < R.length) {
+        snap('compare ' + L[i5] + ' vs ' + R[j5] + ' → chhota pehle', { cmp: [k5], line: 8, vars: { left: L[i5], right: R[j5] } });
+        a[k5++] = (L[i5] <= R[j5]) ? L[i5++] : R[j5++];
+        snap('index ' + (k5 - 1) + ' pe ' + a[k5 - 1] + ' rakha', { swp: [k5 - 1], line: 8 });
+      }
+      while (i5 < L.length) { a[k5++] = L[i5++]; snap('bacha hua left ' + a[k5 - 1], { swp: [k5 - 1], line: 8 }); }
+      while (j5 < R.length) { a[k5++] = R[j5++]; snap('bacha hua right ' + a[k5 - 1], { swp: [k5 - 1], line: 8 }); }
+    })(0, n - 1);
+  } else if (algo === 'heap') {
+    var heapify = function (nn, i6) {
+      var largest = i6, l = 2 * i6 + 1, r = 2 * i6 + 2;
+      snap('heapify node ' + i6 + ' (value ' + a[i6] + ')', { line: 1, vars: { i: i6 } });
+      if (l < nn) { snap('left child a[' + l + ']=' + a[l] + ' vs parent ' + a[largest], { cmp: [l, largest], line: 3, vars: { i: i6, l: l } }); if (a[l] > a[largest]) largest = l; }
+      if (r < nn) { snap('right child a[' + r + ']=' + a[r] + ' vs largest ' + a[largest], { cmp: [r, largest], line: 4, vars: { i: i6, r: r } }); if (a[r] > a[largest]) largest = r; }
+      if (largest !== i6) { var t6 = a[i6]; a[i6] = a[largest]; a[largest] = t6; snap('swap parent ↔ child', { swp: [i6, largest], line: 5, vars: { i: i6, largest: largest } }); heapify(nn, largest); }
+    };
+    snap('step 1: max-heap banao (n/2-1 se 0 tak heapify)', { line: 8 });
+    for (var i7 = Math.floor(n / 2) - 1; i7 >= 0; i7--) heapify(n, i7);
+    snap('max-heap ready — root pe ' + a[0], { line: 8 });
+    for (var i8 = n - 1; i8 > 0; i8--) {
+      var t8 = a[0]; a[0] = a[i8]; a[i8] = t8; done[i8] = true;
+      snap('max ' + a[i8] + ' ko end me bheja (index ' + i8 + ' final)', { swp: [i8], line: 9, vars: { i: i8 } });
+      heapify(i8, 0);
+    }
+  } else if (algo === 'radix') {
+    var mx = Math.max.apply(null, a);
+    for (var exp = 1; Math.floor(mx / exp) > 0; exp *= 10) {
+      var nm = exp === 1 ? 'units (LSD)' : exp === 10 ? 'tens' : exp === 100 ? 'hundreds' : exp + ' place';
+      snap(nm + ' digit ke hisaab se buckets me baanto', { line: 1 });
+      var cnt = new Array(10).fill(0), outp = new Array(n);
+      for (var p1 = 0; p1 < n; p1++) cnt[Math.floor(a[p1] / exp) % 10]++;
+      for (var p2 = 1; p2 < 10; p2++) cnt[p2] += cnt[p2 - 1];
+      for (var p3 = n - 1; p3 >= 0; p3--) { var dg = Math.floor(a[p3] / exp) % 10; outp[cnt[dg] - 1] = a[p3]; cnt[dg]--; }
+      for (var p4 = 0; p4 < n; p4++) a[p4] = outp[p4];
+      snap('pass ke baad: [' + a.join(', ') + ']', { line: 5 });
+    }
+  }
+  for (var z = 0; z < n; z++) done[z] = true;
+  snap('SORTED! 🎉 — ' + a.join(', '), { line: -1 });
+  return out;
+}
+function countFrames(frames) {
+  var c = 0, s = 0;
+  frames.forEach(function (f) { if (f.cmp.length) c++; if (f.swp.length) s++; });
+  return { cmp: c, swp: s };
+}
+
+/* ================= SORT RACE ================= */
+(function () {
+  if (!$('rcLanes')) return;
+  var base = [], lanes = [], racer = null;
+  function newArr() {
+    base = []; for (var i = 0; i < 8; i++) base.push(5 + Math.floor(Math.random() * 45));
+  }
+  function laneHtml(l, idx) {
+    var mx = Math.max.apply(null, base), bars = '';
+    l.cur.arr.forEach(function (v, k) {
+      var cls = 'lane__bar';
+      if (l.cur.swp.indexOf(k) > -1) cls += ' swp';
+      else if (l.cur.cmp.indexOf(k) > -1) cls += ' cmp';
+      if (l.cur.done[k]) cls += ' fix';
+      bars += '<div class="' + cls + '" style="height:' + Math.max(12, Math.round(v / mx * 100)) + '%"></div>';
+    });
+    return '<div class="lane' + (l.finished ? ' done' : '') + '" data-l="' + idx + '">' +
+      '<div class="lane__top"><span class="lane__name">' + l.name + (l.finished ? ' ✓ DONE' : '') + '</span>' +
+      '<span class="lane__meta">step <b>' + (l.i + 1) + '/' + l.frames.length + '</b> · comparisons <b>' + l.cmp + '</b> · swaps <b>' + l.swp + '</b></span></div>' +
+      '<div class="lane__bars">' + bars + '</div></div>';
+  }
+  function paint() {
+    var html = '';
+    lanes.forEach(function (l, i) { html += laneHtml(l, i); });
+    $('rcLanes').innerHTML = html;
+  }
+  function setup() {
+    stop();
+    newArr();
+    var picks = [['rcA', 'Insertion'], ['rcB', 'Merge'], ['rcC', 'Quick']];
+    lanes = [];
+    picks.forEach(function (p) {
+      var val = $(p[0]) ? $(p[0]).value : 'none';
+      if (val === 'none') return;
+      var fr = genFrames(val, base);
+      lanes.push({ name: val.charAt(0).toUpperCase() + val.slice(1) + ' Sort', frames: fr, i: 0, cur: fr[0], cmp: 0, swp: 0, finished: false });
+    });
+    lanes.forEach(function (l) { var c = countFrames([l.cur]); });
+    paint();
+    if ($('rcLog')) $('rcLog').innerHTML = 'Array: [' + base.join(', ') + '] — RACE dabao.';
+  }
+  function stepAll() {
+    var doneCount = 0;
+    lanes.forEach(function (l) {
+      if (l.finished) { doneCount++; return; }
+      if (l.i < l.frames.length - 1) {
+        l.i++;
+        l.cur = l.frames[l.i];
+        if (l.cur.cmp.length) l.cmp++;
+        if (l.cur.swp.length) l.swp++;
+      } else {
+        l.finished = true; doneCount++;
+      }
+    });
+    paint();
+    if (doneCount === lanes.length) {
+      stop();
+      var winner = lanes.slice().sort(function (x, y) { return (x.i + 1) - (y.i + 1); })[0];
+      if ($('rcLog')) $('rcLog').innerHTML = '<b>Race khatam!</b> ' + lanes.map(function (l) { return l.name + ': ' + l.cmp + ' comparisons, ' + l.swp + ' moves'; }).join(' · ') + '<br><b style="color:var(--emerald)">' + winner.name + ' sabse pehle (kam steps)</b> — dekha, O(n²) wale kaise peeche chhoot jaate hain!';
+    }
+  }
+  function stop() { if (racer) { clearInterval(racer); racer = null; } if ($('rcPlay')) $('rcPlay').textContent = '▶ RACE'; }
+  if ($('rcPlay')) $('rcPlay').addEventListener('click', function () {
+    if (racer) { stop(); return; }
+    if (!lanes.length || lanes.every(function (l) { return l.finished; })) setup();
+    $('rcPlay').textContent = '⏸ PAUSE';
+    racer = setInterval(function () { stepAll(); if (lanes.every(function (l) { return l.finished; })) stop(); }, parseInt($('rcSpeed').value, 10));
+  });
+  if ($('rcStep')) $('rcStep').addEventListener('click', function () { stop(); if (!lanes.length) setup(); stepAll(); });
+  if ($('rcNew')) $('rcNew').addEventListener('click', setup);
+  if ($('rcReset')) $('rcReset').addEventListener('click', setup);
+  ['rcA', 'rcB', 'rcC'].forEach(function (id) { if ($(id)) $(id).addEventListener('change', setup); });
+  setup();
+})();
+
+/* ================= SORT STEPPER (code sync) ================= */
+(function () {
+  if (!$('stBars')) return;
+  var base = [], frames = [], fi = 0, timer = null, algo = 'bubble';
+  function newArr() { base = []; for (var i = 0; i < 8; i++) base.push(5 + Math.floor(Math.random() * 45)); }
+  function paint() {
+    var f = frames[fi]; if (!f) return;
+    var mx = Math.max.apply(null, base), html = '';
+    f.arr.forEach(function (v, k) {
+      var cls = 'step-bar';
+      if (f.swp.indexOf(k) > -1) cls += ' swp';
+      else if (f.piv.indexOf(k) > -1) cls += ' piv';
+      else if (f.cmp.indexOf(k) > -1) cls += ' cmp';
+      if (f.done[k]) cls += ' fix';
+      html += '<div class="' + cls + '" style="height:' + Math.max(10, Math.round(v / mx * 100)) + '%"><i>' + v + '</i></div>';
+    });
+    $('stBars').innerHTML = html;
+    var code = CODES[algo] || [], ch = '';
+    code.forEach(function (ln, k) {
+      var esc = ln.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      ch += '<span class="ln' + (k === f.line ? ' on' : '') + '">' + esc + '</span>';
+    });
+    $('stCode').innerHTML = ch;
+    var vh = '';
+    Object.keys(f.vars).forEach(function (k) { vh += '<div class="chg">' + k + ' = <b>' + f.vars[k] + '</b></div>'; });
+    if (!vh) vh = '<div>vars: —</div>';
+    $('stVars').innerHTML = vh;
+    $('stLog').innerHTML = '<b>Step ' + (fi + 1) + '/' + frames.length + '</b> · ' + f.msg;
+  }
+  function rebuild() {
+    stop();
+    algo = $('stAlgo').value;
+    frames = genFrames(algo, base);
+    fi = 0; paint();
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } if ($('stPlay')) $('stPlay').textContent = '▶ PLAY'; }
+  function step() {
+    if (fi < frames.length - 1) { fi++; paint(); }
+    else { stop(); $('stLog').innerHTML = '<b style="color:var(--emerald)">Sorted ho gaya! 🎉</b> NEW ARRAY ya ALGORITHM badal ke dobara dekho.'; }
+  }
+  if ($('stPlay')) $('stPlay').addEventListener('click', function () {
+    if (timer) { stop(); return; }
+    if (fi >= frames.length - 1) { fi = 0; paint(); }
+    $('stPlay').textContent = '⏸ PAUSE';
+    timer = setInterval(function () { step(); if (fi >= frames.length - 1) stop(); }, 480);
+  });
+  if ($('stStep')) $('stStep').addEventListener('click', function () { stop(); step(); });
+  if ($('stNew')) $('stNew').addEventListener('click', function () { newArr(); rebuild(); });
+  if ($('stReset')) $('stReset').addEventListener('click', function () { stop(); fi = 0; paint(); });
+  if ($('stAlgo')) $('stAlgo').addEventListener('change', rebuild);
+  newArr(); rebuild();
+})();
+
+/* ================= CHARTS ================= */
+var CHARTS = { n: 100, scale: 'log', sortN: 1000 };
+function cssVar(nm) { return getComputedStyle(document.documentElement).getPropertyValue(nm).trim() || '#888'; }
+function fitCanvas(cv) {
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  var W = cv.clientWidth || 600, H = cv.clientHeight || 300;
+  cv.width = Math.floor(W * dpr); cv.height = Math.floor(H * dpr);
+  var ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx: ctx, W: W, H: H };
+}
+function drawBigO() {
+  var cv = $('chBigO'); if (!cv) return;
+  var o = fitCanvas(cv), ctx = o.ctx, W = o.W, H = o.H;
+  var pad = { l: 54, r: 18, t: 16, b: 34 };
+  var gw = W - pad.l - pad.r, gh = H - pad.t - pad.b, maxN = 1000;
+  var curves = [
+    { l: 'O(1)', f: function () { return 1; }, c: cssVar('--gold') },
+    { l: 'O(log n)', f: function (x) { return Math.log2(x + 1); }, c: cssVar('--emerald') },
+    { l: 'O(n)', f: function (x) { return x; }, c: cssVar('--blue') },
+    { l: 'O(n log n)', f: function (x) { return x * Math.log2(x + 1); }, c: cssVar('--coral') },
+    { l: 'O(n²)', f: function (x) { return x * x; }, c: cssVar('--dim') }
+  ];
+  var topVal = curves[4].f(maxN);
+  function yOf(v) { if (CHARTS.scale === 'lin') return pad.t + gh - (v / topVal) * gh; var lg = Math.log10(topVal + 1); return pad.t + gh - (Math.log10(v + 1) / lg) * gh; }
+  function xOf(n) { return pad.l + (n / maxN) * gw; }
+  ctx.clearRect(0, 0, W, H);
+  ctx.font = '11px "IBM Plex Mono", monospace'; ctx.textBaseline = 'middle';
+  for (var g = 0; g <= 4; g++) {
+    var yy = pad.t + gh - (g / 4) * gh;
+    ctx.strokeStyle = cssVar('--border2'); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, yy); ctx.lineTo(pad.l + gw, yy); ctx.stroke();
+    var val = CHARTS.scale === 'lin' ? (topVal * g / 4) : (Math.pow(10, Math.log10(topVal + 1) * g / 4) - 1);
+    ctx.fillStyle = cssVar('--faint'); ctx.textAlign = 'right';
+    ctx.fillText(val >= 1000 ? Math.round(val / 1000) + 'k' : Math.round(val), pad.l - 8, yy);
+  }
+  ctx.textAlign = 'center';
+  for (var xt = 0; xt <= 4; xt++) { ctx.fillStyle = cssVar('--faint'); ctx.fillText(String(Math.round(maxN / 4 * xt)), xOf(maxN / 4 * xt), H - pad.b / 2 + 2); }
+  ctx.fillStyle = cssVar('--dim'); ctx.textAlign = 'right'; ctx.fillText('n →', W - pad.r, H - 5);
+  curves.forEach(function (cu) {
+    ctx.strokeStyle = cu.c; ctx.lineWidth = 2; ctx.beginPath();
+    for (var s = 0; s <= 100; s++) { var nn = maxN / 100 * s, yy2 = yOf(cu.f(nn)); if (s === 0) ctx.moveTo(xOf(nn), yy2); else ctx.lineTo(xOf(nn), yy2); }
+    ctx.stroke();
+  });
+  var mx = xOf(CHARTS.n);
+  ctx.strokeStyle = cssVar('--border2'); ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(mx, pad.t); ctx.lineTo(mx, pad.t + gh); ctx.stroke(); ctx.setLineDash([]);
+  curves.forEach(function (cu) { ctx.fillStyle = cu.c; ctx.beginPath(); ctx.arc(mx, yOf(cu.f(CHARTS.n)), 4, 0, Math.PI * 2); ctx.fill(); });
+  if ($('chNote')) {
+    var f = function (x) { return x >= 1e6 ? (x / 1e6).toFixed(1) + 'M' : x >= 1000 ? Math.round(x / 1000) + 'k' : Math.round(x); };
+    $('chNote').innerHTML = '<b>n = ' + CHARTS.n + '</b> → O(1) = 1 · O(log n) ≈ ' + Math.round(Math.log2(CHARTS.n + 1)) + ' · O(n) = ' + CHARTS.n +
+      ' · O(n log n) ≈ ' + f(CHARTS.n * Math.log2(CHARTS.n + 1)) + ' · <b style="color:var(--coral)">O(n²) = ' + f(CHARTS.n * CHARTS.n) + '</b>' +
+      (CHARTS.scale === 'log' ? ' — log scale, isliye sab curves dikh rahi hain.' : ' — linear scale: n² ne jagah bhar di!');
+  }
+}
+function drawSort() {
+  var cv = $('chSort'); if (!cv) return;
+  var o = fitCanvas(cv), ctx = o.ctx, W = o.W, H = o.H;
+  var n = CHARTS.sortN;
+  var items = [
+    { l: 'Bubble', v: n * n / 2, c: cssVar('--coral') },
+    { l: 'Selection', v: n * n / 2, c: cssVar('--coral') },
+    { l: 'Insertion', v: n * n / 4, c: cssVar('--gold') },
+    { l: 'Merge', v: n * Math.log2(n), c: cssVar('--emerald') },
+    { l: 'Quick', v: n * Math.log2(n), c: cssVar('--emerald') },
+    { l: 'Heap', v: n * Math.log2(n), c: cssVar('--blue') },
+    { l: 'Radix', v: 4 * n, c: cssVar('--gold') }
+  ];
+  var pad = { l: 84, r: 96, t: 14, b: 26 };
+  var gw = W - pad.l - pad.r, gh = H - pad.t - pad.b;
+  var maxV = Math.max.apply(null, items.map(function (i) { return i.v; }));
+  ctx.clearRect(0, 0, W, H);
+  var rowH = gh / items.length;
+  ctx.font = '11.5px "IBM Plex Mono", monospace'; ctx.textBaseline = 'middle';
+  items.forEach(function (it, i) {
+    var y = pad.t + i * rowH + rowH / 2, bw = Math.max(2, it.v / maxV * gw);
+    ctx.fillStyle = it.c; ctx.globalAlpha = .8;
+    ctx.fillRect(pad.l, y - rowH * 0.3, bw, rowH * 0.6);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = cssVar('--dim'); ctx.textAlign = 'right'; ctx.fillText(it.l, pad.l - 10, y);
+    ctx.fillStyle = cssVar('--text'); ctx.textAlign = 'left';
+    var val = it.v >= 1e6 ? (it.v / 1e6).toFixed(1) + 'M' : it.v >= 1000 ? Math.round(it.v / 1000) + 'k' : Math.round(it.v);
+    ctx.fillText(String(val), Math.min(W - 6, pad.l + bw + 8), y);
+  });
+  if ($('schN')) $('schN').textContent = n.toLocaleString('en-IN');
+}
+function drawCharts() { drawBigO(); drawSort(); }
+if ($('chSlider')) $('chSlider').addEventListener('input', function () { CHARTS.n = +this.value; if ($('chN')) $('chN').textContent = CHARTS.n; drawBigO(); });
+if ($('chScale')) $('chScale').addEventListener('change', function () { CHARTS.scale = this.value; drawBigO(); });
+if ($('schSlider')) $('schSlider').addEventListener('input', function () { CHARTS.sortN = +this.value; drawSort(); });
+window.addEventListener('resize', function () { clearTimeout(window.__chT); window.__chT = setTimeout(drawCharts, 150); });
+setTimeout(drawCharts, 150); setTimeout(drawCharts, 900);
+
+/* ================= AMBIENT: NODE CONSTELLATION ================= */
+(function () {
+  var cv = document.getElementById('ambient');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
+  var N = 46, nodes = [], t = 0;
+  function seed() {
+    nodes = [];
+    for (var i = 0; i < N; i++) nodes.push({ x: Math.random(), y: Math.random(), vx: (Math.random() - .5) * 0.00055, vy: (Math.random() - .5) * 0.00055, r: 1.4 + Math.random() * 2.2, hot: Math.random() < 0.14 });
+  }
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.floor(W * dpr); cv.height = Math.floor(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    var px = [], py = [];
+    for (var i = 0; i < N; i++) { px.push(nodes[i].x * W); py.push(nodes[i].y * H); }
+    ctx.lineWidth = 1;
+    for (var a = 0; a < N; a++) {
+      for (var b = a + 1; b < N; b++) {
+        var dx = px[a] - px[b], dy = py[a] - py[b], d2 = dx * dx + dy * dy;
+        var lim = Math.min(W, H) * 0.19;
+        if (d2 < lim * lim) {
+          var al = (1 - Math.sqrt(d2) / lim) * 0.20;
+          ctx.strokeStyle = 'rgba(232,180,74,' + al.toFixed(3) + ')';
+          ctx.beginPath(); ctx.moveTo(px[a], py[a]); ctx.lineTo(px[b], py[b]); ctx.stroke();
+        }
+      }
+    }
+    for (var k = 0; k < N; k++) {
+      var pulse = 0.75 + 0.25 * Math.sin(t * 0.02 + k);
+      ctx.fillStyle = nodes[k].hot ? 'rgba(232,180,74,' + (0.55 * pulse).toFixed(3) + ')' : 'rgba(79,163,209,0.30)';
+      ctx.beginPath(); ctx.arc(px[k], py[k], nodes[k].r * pulse, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  function step() {
+    t++;
+    for (var i = 0; i < N; i++) {
+      var n = nodes[i];
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0.02 || n.x > 0.98) n.vx *= -1;
+      if (n.y < 0.02 || n.y > 0.98) n.vy *= -1;
+    }
+    draw();
+  }
+  seed(); resize();
+  window.addEventListener('resize', resize);
+  if (reduce) { draw(); return; }
+  setInterval(function () { if (!document.hidden) step(); }, 60);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) draw(); });
+})();
+
+})();
+</script>
+
+<div class="dsnav" role="navigation" aria-label="Page navigation">
+  <a class="dsnav-b" href="../unit4/DS_Unit4_Session4.html" title="Pichla page (←)">←</a>
+  <a class="dsnav-b" href="../index.html" title="Sab pages (Home)">⌂</a>
+  <a class="dsnav-b" href="DS_Foundation.html" title="Agla page (→)">→</a>
+</div>
+<style>
+/* ===== DS page nav (auto-injected) ===== */
+.dsnav{position:fixed;right:14px;bottom:78px;z-index:650;display:flex;gap:6px;align-items:center;
+  background:rgba(10,14,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:6px 8px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);opacity:.6;transition:opacity .2s ease, transform .2s ease;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.dsnav:hover{opacity:1;transform:translateY(-2px)}
+.dsnav-b{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:15px;line-height:1;
+  transition:background .15s ease,color .15s ease}
+.dsnav-b:hover{background:#ff9f45;color:#101820}
+.dsnav-b.dsnav-off{opacity:.25;pointer-events:none}
+.dsnav-tip{font-size:10px;letter-spacing:.8px;color:rgba(255,255,255,.45);padding:0 4px;white-space:nowrap}
+@media (max-width:640px){.dsnav-tip{display:none}.dsnav{right:10px;bottom:70px;padding:5px 6px}.dsnav-b{width:30px;height:30px;font-size:14px}}
+@media print{.dsnav{display:none!important}}
+</style>
+<script>
+(function(){
+  var PREV="../unit4/DS_Unit4_Session4.html", NEXT="DS_Foundation.html";
+  document.addEventListener('keydown', function(e){
+    var t=e.target||{};
+    if(/INPUT|TEXTAREA|SELECT/.test(t.tagName||'')) return;
+    if(e.key==='ArrowRight' && NEXT) window.location.href=NEXT;
+    else if(e.key==='ArrowLeft' && PREV) window.location.href=PREV;
+    else if(e.key==='Home') window.location.href='../index.html';
+  });
+})();
+</script>
+
+</body>
+</html>

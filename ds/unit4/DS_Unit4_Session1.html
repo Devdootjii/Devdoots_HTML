@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 4 · Session 1 — Trees: basics + traversals | Team Devdoots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ================= TOKENS ================= */
+:root, [data-theme="dark"] {
+  --bg: #0e0e10;
+  --surface: #17171b;
+  --surface2: #1e1e24;
+  --surface3: #27272f;
+  --border: rgba(255,245,250,0.10);
+  --border2: rgba(255,245,250,0.20);
+  --text: #f4f4f7;
+  --dim: #a8a8b8;
+  --faint: #75758a;
+  --gold: #ff7eb6;
+  --gold-dim: rgba(255,126,182,0.14);
+  --blue: #5eead4;
+  --blue-dim: rgba(94,234,212,0.14);
+  --coral: #ff8f6b;
+  --coral-dim: rgba(255,143,107,0.14);
+  --emerald: #ffd166;
+  --emerald-dim: rgba(255,209,102,0.14);
+  --shadow: 0 12px 36px rgba(0,0,0,0.55);
+  --pen: #d4ff3f;
+}
+[data-theme="light"] {
+  --bg: #fbf7f9;
+  --surface: #ffffff;
+  --surface2: #fdf9fb;
+  --surface3: #f4ecf1;
+  --border: rgba(40,15,30,0.12);
+  --border2: rgba(40,15,30,0.22);
+  --text: #1a1a22;
+  --dim: #5f5f72;
+  --faint: #8f8fa3;
+  --gold: #c2337a;
+  --gold-dim: rgba(194,51,122,0.12);
+  --blue: #0f8a76;
+  --blue-dim: rgba(15,138,118,0.12);
+  --coral: #c04a22;
+  --coral-dim: rgba(192,74,34,0.12);
+  --emerald: #9a6c10;
+  --emerald-dim: rgba(154,108,16,0.14);
+  --shadow: 0 12px 30px rgba(60,20,45,0.14);
+  --pen: #4b8b00;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  font-size: 16px; line-height: 1.72;
+  overflow-wrap: break-word;
+  padding-bottom: 150px;
+  background-image:
+    radial-gradient(ellipse 900px 420px at 75% -90px, var(--gold-dim), transparent 62%),
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: auto, 44px 44px, 44px 44px;
+}
+body.audio-off { padding-bottom: 44px; }
+::selection { background: var(--gold-dim); }
+
+/* ================= LAYOUT ================= */
+.wrap { max-width: 1460px; margin: 0 auto; display: grid; grid-template-columns: 232px minmax(0,1fr); gap: 0 54px; padding: 0 30px; position: relative; z-index: 1; }
+.main { min-width: 0; padding: 26px 0 70px; }
+body.noside .toc { display: none !important; }
+body.noside .wrap { grid-template-columns: minmax(0,1fr); }
+body.noside .main { max-width: 1180px; margin: 0 auto; }
+
+/* ================= TOC ================= */
+.toc { position: sticky; top: 22px; align-self: start; max-height: calc(100dvh - 70px); overflow-y: auto; padding: 22px 0 26px; grid-row: 1 / -1; }
+.toc::-webkit-scrollbar { width: 3px; }
+.toc::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+.toc-title { font-family: 'Fira Code', monospace; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--faint); padding-bottom: 11px; margin-bottom: 9px; border-bottom: 1px solid var(--border); }
+.toc a { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; color: var(--dim); text-decoration: none; padding: 5px 10px; border-radius: 6px; border-left: 2px solid transparent; transition: all .15s; line-height: 1.45; margin-bottom: 1px; }
+.toc a .n { font-family: 'Fira Code', monospace; font-size: 10px; color: var(--faint); }
+.toc a:hover { color: var(--text); background: var(--surface); }
+.toc a.active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-dim); }
+.toc a.active .n { color: var(--gold); }
+
+/* ================= DOCK ================= */
+.dock {
+  position: sticky; top: 10px; z-index: 420;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border2); border-radius: 13px;
+  padding: 8px 12px; margin: 0 0 22px; box-shadow: var(--shadow);
+}
+.dock-timer { font-family: 'Fira Code', monospace; font-size: 22px; font-weight: 600; color: var(--gold); min-width: 76px; letter-spacing: 1px; }
+.dock-timer.warn { color: var(--coral); }
+.dock-blk { font-size: 12.5px; color: var(--dim); max-width: 270px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dock-name { font-family: 'Outfit', system-ui, sans-serif; font-weight: 800; font-size: 19px; color: var(--blue); min-width: 74px; letter-spacing: .3px; }
+.dock-name.spinning { opacity: .5; }
+.dbtn { font-family: 'Fira Code', monospace; font-size: 12px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 7px 11px; transition: all .15s; }
+.dbtn:hover { border-color: var(--gold); color: var(--gold); }
+.dbtn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.dbtn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.dbtn--blue { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+.dbtn--ok { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-dim); }
+.dbtn--bad { border-color: var(--coral); color: var(--coral); background: var(--coral-dim); }
+.dock-sep { width: 1px; height: 24px; background: var(--border2); margin: 0 3px; }
+.dock-spacer { flex: 1 1 16px; min-width: 0; }
+.dock-q { display: none; margin: -12px 0 22px; border: 1px solid var(--blue); border-left: 3px solid var(--blue); border-radius: 0 0 13px 13px; background: color-mix(in srgb, var(--blue-dim) 70%, var(--surface)); padding: 14px 18px; }
+.dock-q.show { display: block; }
+.dock-q .who { font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.dock-q .dq { font-size: 15px; font-weight: 600; line-height: 1.55; }
+.dock-q .da { font-size: 13.5px; line-height: 1.65; color: var(--emerald); margin-top: 9px; display: none; }
+.dock-q .da.show { display: block; }
+@media (max-width: 1000px) {
+  .dock { top: 50px; padding: 7px 9px; gap: 6px; }
+  .dock-blk { display: none; }
+  .dock-timer { font-size: 18px; min-width: 64px; }
+  .dock-name { font-size: 16px; min-width: 56px; }
+  .dock-sep { display: none; }
+}
+.timeup-banner { position: fixed; bottom: 118px; left: 50%; transform: translate(-50%, 420%); z-index: 950; background: var(--coral); color: #240b06; font-family: 'Fira Code', monospace; font-weight: 600; font-size: 15px; letter-spacing: .8px; padding: 12px 24px; border-radius: 11px; box-shadow: 0 12px 36px rgba(0,0,0,.45); transition: transform .32s cubic-bezier(.2,.9,.3,1.4); white-space: nowrap; }
+.timeup-banner.show { transform: translate(-50%, 0); }
+@keyframes tuPulse { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+body.timeup::after { content: ''; position: fixed; inset: 0; z-index: 900; pointer-events: none; background: radial-gradient(ellipse at center, rgba(255,122,107,0.28), rgba(255,122,107,0.08) 60%, transparent 80%); animation: tuPulse .5s ease-in-out 7; }
+@keyframes tuShake { 0%,100%{transform:translateX(0)} 15%{transform:translateX(-7px)} 30%{transform:translateX(7px)} 45%{transform:translateX(-5px)} 60%{transform:translateX(5px)} 80%{transform:translateX(-3px)} }
+.dock.timeup { animation: tuShake .55s ease-in-out 4; border-color: var(--coral) !important; }
+@media (max-width: 1000px) { .timeup-banner { bottom: 170px; } }
+
+/* ================= HERO ================= */
+.hero { padding: 30px 0 6px; }
+.hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { font-family: 'Fira Code', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 12px; border-radius: 5px; border: 1px solid var(--border2); }
+.chip--gold { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+.chip--blue { color: var(--blue); border-color: var(--blue); background: var(--blue-dim); }
+.chip--em { color: var(--emerald); border-color: var(--emerald); background: var(--emerald-dim); }
+h1 { font-family: 'Outfit', system-ui, sans-serif; font-weight: 800; font-size: clamp(38px, 5.2vw, 60px); line-height: 1.02; letter-spacing: -1.4px; }
+h1 em { font-style: normal; color: var(--gold); }
+.hero-sub { font-size: 17px; color: var(--dim); max-width: 62ch; margin-top: 14px; }
+.hero-hr { height: 1px; background: linear-gradient(90deg, var(--gold), transparent 72%); border: none; margin: 28px 0 0; opacity: .5; }
+
+/* ================= SECTION HEAD ================= */
+.sec { scroll-margin-top: 54px; }
+.sec-head { display: flex; align-items: center; gap: 15px; margin: 70px 0 8px; flex-wrap: wrap; }
+.sec-num { font-family: 'Fira Code', monospace; font-size: 12px; font-weight: 600; color: #1b1405; background: var(--gold); border-radius: 6px; padding: 4px 9px; letter-spacing: 1px; flex-shrink: 0; }
+h2 { font-family: 'Outfit', system-ui, sans-serif; font-weight: 800; font-size: clamp(28px, 3.2vw, 38px); line-height: 1.1; letter-spacing: -0.8px; flex: 1; min-width: 200px; }
+.sec-play { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--gold); background: var(--gold-dim); color: var(--gold); font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; font-family: 'Fira Code', monospace; }
+.sec-play:hover { background: var(--gold); color: #1b1405; }
+.sec-tag { font-family: 'Fira Code', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 22px; }
+
+/* ================= READING TEXT ================= */
+.rd { font-size: 16.5px; line-height: 1.78; color: var(--text); max-width: 74ch; margin: 18px 0; padding: 4px 14px 4px 16px; border-left: 3px solid transparent; border-radius: 0 8px 8px 0; transition: background .35s, border-color .35s; }
+.rd.speaking { background: var(--gold-dim); border-left-color: var(--gold); }
+.rd b, .rd strong { color: var(--gold); font-weight: 600; }
+.rd i { color: var(--blue); font-style: normal; }
+.rd code { font-family: 'Fira Code', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 6px; border-radius: 4px; }
+
+/* ================= BOXES ================= */
+.def { background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 11px; padding: 16px 20px 14px; margin: 22px 0; max-width: 78ch; }
+.def-label { font-family: 'Fira Code', monospace; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 7px; }
+.def p { font-size: 15.5px; line-height: 1.66; }
+.def p b { color: var(--gold); }
+.memo { background: linear-gradient(150deg, var(--emerald-dim), var(--surface) 60%); border: 1px solid var(--emerald); border-left: 4px solid var(--emerald); border-radius: 11px; padding: 15px 19px; margin: 22px 0; max-width: 78ch; }
+.memo-label { font-family: 'Fira Code', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--emerald); display: block; margin-bottom: 7px; }
+.memo p, .memo li { font-size: 14.5px; line-height: 1.68; }
+.memo b { color: var(--emerald); }
+.memo ul, .memo ol { padding-left: 1.25em; }
+.callout { border-radius: 11px; padding: 14px 18px; margin: 22px 0; max-width: 78ch; font-size: 15px; line-height: 1.66; border: 1px solid var(--coral); background: var(--coral-dim); }
+.callout b { color: var(--coral); }
+.callout--info { border-color: var(--blue); background: var(--blue-dim); }
+.callout--info b { color: var(--blue); }
+
+/* ================= CARDS ================= */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(252px,1fr)); gap: 14px; margin: 22px 0; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(212px,1fr)); gap: 14px; margin: 22px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 16px 18px; min-width: 0; }
+.card h4 { font-family: 'Fira Code', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 9px; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+.card h4::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.card p, .card li { font-size: 14px; line-height: 1.62; color: var(--dim); }
+.card p b, .card li b { color: var(--text); }
+.card ul { padding-left: 1.2em; }
+.card--blue h4 { color: var(--blue); }
+.card--em h4 { color: var(--emerald); }
+.card--coral h4 { color: var(--coral); }
+
+/* ================= DIAGRAM ================= */
+.diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 22px 20px 18px; margin: 24px 0; overflow-x: auto; }
+.d-cap { font-family: 'Fira Code', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.4px; text-transform: uppercase; color: var(--faint); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.d-cap::before { content: ''; width: 7px; height: 7px; background: var(--gold); border-radius: 50%; }
+.memrow { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+.memcol { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.idx { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--blue); }
+.cell { min-width: 62px; padding: 13px 10px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 7px; font-family: 'Fira Code', monospace; font-size: 15px; font-weight: 600; }
+.cell--hl { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.cell--zero { color: var(--faint); opacity: .55; }
+.addr { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--faint); }
+.d-note { margin-top: 16px; font-size: 13.5px; color: var(--dim); line-height: 1.62; border-top: 1px dashed var(--border2); padding-top: 12px; }
+.d-note b { color: var(--gold); }
+.d-note code { font-family: 'Fira Code', monospace; color: var(--blue); font-size: .9em; }
+.formula { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-family: 'Fira Code', monospace; font-size: 14.5px; color: var(--gold); overflow-x: auto; line-height: 1.7; max-width: 78ch; }
+.formula small { display: block; color: var(--faint); font-size: 12px; margin-top: 6px; line-height: 1.6; }
+.formula .k { color: var(--blue); }
+
+/* ================= TABLES ================= */
+.table-wrap { border: 1px solid var(--border); border-radius: 13px; overflow: hidden; margin: 22px 0; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.55; }
+.data-table thead { position: sticky; top: 0; z-index: 2; }
+.data-table th { background: var(--surface3); font-family: 'Fira Code', monospace; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.3px; color: var(--dim); text-align: left; padding: 11px 15px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.data-table td { padding: 11px 15px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.data-table tbody tr:nth-child(even) { background: var(--surface2); }
+.data-table tbody tr:hover { background: var(--gold-dim); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table td b { color: var(--gold); }
+.data-table td code { font-family: 'Fira Code', monospace; font-size: 12px; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+.data-table td.num, .data-table th.num { text-align: right; font-family: 'Fira Code', monospace; font-variant-numeric: tabular-nums; }
+
+/* ================= CODE ================= */
+.code-block { font-family: 'Fira Code', monospace; font-size: 13px; line-height: 1.62; background: #0c1424; border: 1px solid var(--border2); border-left: 3px solid var(--gold); border-radius: 10px; padding: 16px 18px; margin: 20px 0; overflow-x: auto; white-space: pre-wrap; word-break: break-word; color: #dfe7f5; max-width: 78ch; }
+[data-theme="light"] .code-block { background: #f3f6fc; color: #1a2436; }
+.code-block .cm { color: #6b7a99; }
+.code-block .kw { color: #6fb3e0; }
+.code-block .st { color: #e8b44a; }
+.code-block .fn { color: #3fc9a0; }
+
+/* ================= COMPARE ================= */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+.cmp-card { border: 1px solid var(--border2); border-radius: 12px; overflow: hidden; min-width: 0; background: var(--surface); }
+.cmp-card h5 { font-family: 'Fira Code', monospace; font-size: 11.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 18px; }
+.cmp-card--a h5 { background: var(--blue-dim); color: var(--blue); border-bottom: 2px solid var(--blue); }
+.cmp-card--b h5 { background: var(--emerald-dim); color: var(--emerald); border-bottom: 2px solid var(--emerald); }
+.cmp-card ul { list-style: none; padding: 14px 18px; }
+.cmp-card li { font-size: 13.5px; line-height: 1.62; color: var(--dim); padding: 4px 0 4px 16px; position: relative; }
+.cmp-card li::before { content: '›'; position: absolute; left: 0; color: var(--faint); font-weight: 700; }
+.cmp-card li b { color: var(--text); }
+@media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
+
+/* ================= Q&A ================= */
+.qa { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin: 18px 0; overflow: hidden; }
+.qa summary { padding: 16px 20px; cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: 15.5px; font-weight: 600; }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary:hover { background: var(--surface2); }
+.qa summary::after { content: '+'; font-family: 'Fira Code', monospace; color: var(--gold); margin-left: auto; font-size: 17px; }
+.qa[open] summary::after { content: '−'; }
+.mark { font-family: 'Fira Code', monospace; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 5px; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
+.mark--2 { background: var(--blue-dim); color: var(--blue); }
+.mark--5 { background: var(--gold-dim); color: var(--gold); }
+.mark--10 { background: var(--coral-dim); color: var(--coral); }
+.qa-body { padding: 4px 20px 18px; border-top: 1px solid var(--border); }
+.qa-body p { font-size: 14.5px; line-height: 1.72; color: var(--dim); margin: 12px 0; max-width: 78ch; }
+.qa-body p b { color: var(--text); }
+.qa-body code { font-family: 'Fira Code', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+
+/* ================= SUMMARY / EXAM ================= */
+.one-liners { counter-reset: ol; display: grid; gap: 9px; margin: 22px 0; max-width: 84ch; }
+.one-liners li { list-style: none; counter-increment: ol; position: relative; padding: 9px 14px 9px 46px; font-size: 14.5px; line-height: 1.62; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--dim); }
+.one-liners li::before { content: counter(ol, decimal-leading-zero); position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-family: 'Fira Code', monospace; font-size: 11px; font-weight: 600; color: var(--gold); }
+.one-liners li b { color: var(--text); }
+.defgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(292px,1fr)); gap: 14px; margin: 24px 0; }
+.defcard { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold); border-radius: 10px; padding: 15px 17px; min-width: 0; }
+.defcard h6 { font-family: 'Fira Code', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
+.defcard p { font-size: 13.5px; line-height: 1.62; color: var(--dim); }
+.defcard p b { color: var(--text); }
+
+/* ================= SIM SHELL ================= */
+.sim { border: 1px solid var(--gold); border-radius: 13px; overflow: hidden; margin: 26px 0; background: linear-gradient(165deg, var(--gold-dim), var(--surface) 42%); }
+.sim-head { padding: 13px 20px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface2); }
+.sim-head b { font-family: 'Fira Code', monospace; font-size: 12px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold); }
+.sim-head span { font-size: 12.5px; color: var(--faint); }
+.sim-body { padding: 20px; }
+.sim-controls { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+.sim-controls label { font-family: 'Fira Code', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; flex-wrap: wrap; }
+.btn { font-family: 'Fira Code', monospace; font-size: 12px; font-weight: 500; padding: 8px 15px; border-radius: 7px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); transition: all .15s; }
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.btn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.btn--ok { border-color: var(--emerald) !important; background: var(--emerald-dim) !important; color: var(--emerald) !important; }
+.btn--bad { border-color: var(--coral) !important; background: var(--coral-dim) !important; color: var(--coral) !important; }
+.btn--warn { border-color: var(--coral); color: var(--coral); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.sim input, .sim select { font-family: 'Fira Code', monospace; font-size: 13px; background: var(--surface); border: 1px solid var(--border2); color: var(--text); border-radius: 7px; padding: 8px 10px; width: 92px; }
+.sim select { width: auto; max-width: 100%; }
+.sim input:focus, .sim select:focus { outline: none; border-color: var(--gold); }
+.sim-steps { font-family: 'Fira Code', monospace; font-size: 13px; line-height: 1.9; background: var(--surface); border: 1px dashed var(--border2); border-radius: 8px; padding: 14px 18px; margin-top: 16px; color: var(--dim); min-height: 20px; }
+.sim-steps b { color: var(--gold); font-weight: 600; }
+.sim-msg { font-size: 13.5px; margin-top: 12px; color: var(--dim); }
+.sim-msg b { color: var(--gold); }
+
+/* ================= NEW VIZ: SEARCH BEAM ================= */
+.beam-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.beam-cell { min-width: 54px; padding: 13px 6px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 15px; font-weight: 600; transition: all .22s; position: relative; }
+.beam-cell .tag { display: block; font-size: 9px; font-weight: 500; letter-spacing: 1px; color: var(--faint); margin-top: 4px; }
+.beam-cell.scan { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); box-shadow: 0 0 0 3px var(--blue-dim); }
+.beam-cell.out { opacity: .26; }
+.beam-cell.mid { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.beam-cell.hit { border-color: var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.beam-meter { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-family: 'Fira Code', monospace; font-size: 12.5px; color: var(--dim); }
+.beam-meter b { color: var(--gold); }
+
+/* ================= NEW VIZ: HASH BUCKETS ================= */
+.buckets { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+.bk-row { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.bk-idx { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--faint); min-width: 46px; text-align: right; }
+.bk-slot { flex: 1; min-width: 0; border: 1px solid var(--border2); border-radius: 7px; padding: 7px 10px; background: var(--surface3); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-family: 'Fira Code', monospace; font-size: 13px; transition: all .25s; }
+.bk-slot.new { border-color: var(--gold); background: var(--gold-dim); }
+.bk-slot.coll { border-color: var(--coral); background: var(--coral-dim); }
+.bk-key { border-radius: 5px; padding: 2px 9px; font-size: 12px; border: 1px solid var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.bk-key.probe { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.bk-empty { color: var(--faint); font-size: 12px; }
+.lf-meter { height: 10px; border-radius: 6px; background: var(--surface3); border: 1px solid var(--border2); overflow: hidden; margin-top: 8px; }
+.lf-fill { height: 100%; background: linear-gradient(90deg, var(--emerald), var(--gold)); transition: width .3s; }
+
+/* ================= NEW VIZ: SORT RACE ================= */
+.race { display: flex; flex-direction: column; gap: 14px; }
+.lane { border: 1px solid var(--border2); border-radius: 11px; padding: 12px 14px; background: var(--surface2); }
+.lane.done { border-color: var(--emerald); }
+.lane__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 9px; }
+.lane__name { font-family: 'Fira Code', monospace; font-size: 12px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--blue); }
+.lane__meta { font-family: 'Fira Code', monospace; font-size: 11.5px; color: var(--dim); }
+.lane__meta b { color: var(--gold); }
+.lane.done .lane__name { color: var(--emerald); }
+.lane__bars { display: flex; align-items: flex-end; gap: 4px; height: 78px; }
+.lane__bar { flex: 1 1 0; min-width: 6px; background: var(--surface3); border: 1px solid var(--border2); border-radius: 3px 3px 0 0; transition: height .18s ease, background .15s ease; }
+.lane__bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.lane__bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.lane__bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+
+/* ================= NEW VIZ: SORT STEPPER (code sync) ================= */
+.step-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 860px) { .step-grid { grid-template-columns: 1fr; } }
+.step-bars { display: flex; align-items: flex-end; gap: 5px; height: 170px; padding: 22px 2px 0; }
+.step-bar { flex: 1 1 0; max-width: 58px; min-width: 12px; background: var(--surface3); border: 1px solid var(--border2); border-bottom: none; border-radius: 5px 5px 0 0; position: relative; transition: height .2s, background .18s, border-color .18s; }
+.step-bar i { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-family: 'Fira Code', monospace; font-size: 10px; font-style: normal; color: var(--dim); }
+.step-bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.step-bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.step-bar.piv { background: var(--coral-dim); border-color: var(--coral); }
+.step-bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+.step-code { font-family: 'Fira Code', monospace; font-size: 12.5px; line-height: 1.8; background: #0c1424; border: 1px solid var(--border2); border-radius: 10px; padding: 12px 14px; overflow-x: auto; }
+[data-theme="light"] .step-code { background: #f3f6fc; }
+.step-code .ln { display: block; padding: 1px 8px; border-radius: 5px; border-left: 3px solid transparent; white-space: pre; color: #93a3bd; }
+[data-theme="light"] .step-code .ln { color: #5a6b86; }
+.step-code .ln.on { background: var(--gold-dim); border-left-color: var(--gold); color: var(--text); }
+.step-code .ln b { color: var(--blue); font-weight: 600; }
+.step-vars { display: flex; gap: 9px; flex-wrap: wrap; margin: 12px 0 0; }
+.step-vars div { font-family: 'Fira Code', monospace; font-size: 12.5px; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border2); background: var(--surface3); color: var(--dim); }
+.step-vars div b { color: var(--gold); font-size: 14px; }
+.step-vars div.chg { border-color: var(--gold); background: var(--gold-dim); }
+.step-vars div.chg b { color: var(--gold); }
+
+/* ================= CHART ================= */
+.chart-card { border: 1px solid var(--border2); border-radius: 13px; background: var(--surface); padding: 16px 16px 14px; margin: 22px 0; }
+.chart-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.chart-card__head b { font-family: 'Fira Code', monospace; font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+.chart-card__head .sim-controls { margin: 0; }
+.chart-wrap { position: relative; width: 100%; height: 320px; }
+.chart-wrap canvas { width: 100%; height: 100%; display: block; }
+@media (max-width: 620px) { .chart-wrap { height: 250px; } }
+.chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-family: 'Fira Code', monospace; font-size: 11px; color: var(--dim); }
+.chart-legend span { display: flex; align-items: center; gap: 6px; }
+.chart-legend em { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+.chart-note { font-size: 13px; color: var(--faint); margin-top: 10px; line-height: 1.6; }
+
+/* ================= SCORE ROUND ================= */
+.score-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.score-tbl th { font-family: 'Fira Code', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.score-tbl td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+.score-tbl td b { color: var(--gold); }
+.score-tbl td.num { text-align: right; font-family: 'Fira Code', monospace; }
+.score-tbl tr.top td { background: var(--gold-dim); }
+.spin-q { border: 1px solid var(--blue); border-radius: 12px; background: var(--surface2); padding: 16px 18px; margin-top: 16px; text-align: left; }
+.spin-q .who { font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.spin-q .qtext { font-size: 16px; font-weight: 600; line-height: 1.55; }
+.spin-q .qans { font-size: 14px; line-height: 1.65; color: var(--emerald); margin-top: 10px; display: none; border-top: 1px dashed var(--border2); padding-top: 10px; }
+.spin-q .qans.show { display: block; }
+.picker-name { font-family: 'Outfit', system-ui, sans-serif; font-weight: 800; font-size: 50px; line-height: 1.1; color: var(--blue); min-height: 58px; }
+.picker-name.spinning { opacity: .5; }
+.result-overlay { position: fixed; inset: 0; z-index: 960; background: rgba(6,10,20,.88); backdrop-filter: blur(7px); display: none; align-items: center; justify-content: center; padding: 22px; }
+.result-overlay.show { display: flex; }
+.result-card { background: var(--surface); border: 2px solid var(--gold); border-radius: 16px; padding: 26px 30px; max-width: 660px; width: 100%; max-height: 88vh; overflow: auto; box-shadow: 0 22px 60px rgba(0,0,0,.5); }
+.result-card h3 { font-family: 'Outfit', system-ui, sans-serif; font-weight: 800; font-size: 32px; color: var(--gold); margin-bottom: 4px; }
+.result-card .sub { color: var(--dim); font-size: 14px; margin-bottom: 18px; }
+.result-card .win { font-size: 15px; margin: 16px 0; padding: 12px 16px; border-radius: 10px; background: var(--emerald-dim); border: 1px solid var(--emerald); }
+.result-card .win b { color: var(--emerald); }
+.chk { display: flex; gap: 11px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); margin-bottom: 7px; cursor: pointer; }
+.chk input { margin-top: 3px; accent-color: var(--gold); width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
+.chk span { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.chk.on { border-color: var(--gold); background: var(--gold-dim); }
+.chk.on span { color: var(--text); }
+.blk { display: flex; gap: 12px; align-items: flex-start; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; cursor: pointer; transition: all .15s; }
+.blk:hover { border-color: var(--gold); }
+.blk.on { border-color: var(--gold); background: var(--gold-dim); box-shadow: 0 0 0 1px var(--gold); }
+.blk .t { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--blue); min-width: 58px; flex-shrink: 0; }
+.blk .d { font-size: 13.5px; line-height: 1.5; color: var(--dim); min-width: 0; }
+.blk .d b { color: var(--text); display: block; font-size: 14.5px; }
+.timer-big { font-family: 'Fira Code', monospace; font-size: 58px; font-weight: 600; letter-spacing: 2px; color: var(--gold); line-height: 1; }
+.timer-big.warn { color: var(--coral); }
+
+/* ================= PLAYER (chhupa hua by default) ================= */
+.player {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border2); padding: 10px 18px 12px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  transition: transform .32s ease, opacity .32s ease;
+}
+body.audio-off .player { transform: translateY(115%); opacity: 0; pointer-events: none; }
+body.audio-off .sec-play { display: none; }
+.pbtn { font-family: 'Fira Code', monospace; font-size: 13px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 8px 12px; transition: all .15s; min-width: 42px; text-align: center; }
+.pbtn:hover { border-color: var(--gold); color: var(--gold); }
+.pbtn--main { width: 52px; height: 52px; border-radius: 50%; font-size: 17px; background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 700; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+.player select { font-family: 'Fira Code', monospace; font-size: 12px; background: var(--surface3); color: var(--text); border: 1px solid var(--border2); border-radius: 7px; padding: 7px 8px; max-width: 100%; }
+.p-meta { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 2px; }
+.p-now { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice { font-family: 'Fira Code', monospace; font-size: 10.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice .on { color: var(--emerald); }
+.p-voice .off { color: var(--coral); }
+
+/* ================= THEME TOGGLE ================= */
+.theme-toggle { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); cursor: pointer; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+[data-theme="dark"] .tt-sun { display: block; } [data-theme="dark"] .tt-moon { display: none; }
+[data-theme="light"] .tt-sun { display: none; } [data-theme="light"] .tt-moon { display: block; }
+
+/* ================= FOOTER ================= */
+.foot { margin-top: 80px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--faint); font-size: 12.5px; font-family: 'Fira Code', monospace; letter-spacing: .5px; }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1000px) {
+  .wrap { grid-template-columns: 1fr; padding: 0 18px; }
+  .toc { position: sticky; top: 0; z-index: 300; grid-row: auto; display: flex; gap: 6px; align-items: center; overflow-x: auto; -webkit-overflow-scrolling: touch; background: color-mix(in srgb, var(--bg) 93%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); margin: 0 -18px; padding: 10px 60px 10px 18px; max-height: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc-title { display: none; }
+  .toc a { white-space: nowrap; flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; border-radius: 5px; padding: 6px 11px; font-size: 11.5px; }
+  .toc a.active { border-bottom-color: var(--gold); background: var(--gold-dim); }
+  .main { padding-top: 20px; }
+  .sec-head { margin-top: 54px; }
+  .player { gap: 8px; padding: 10px 14px; }
+  .p-meta { min-width: 100%; order: 5; }
+  body.audio-off .player { transform: translateY(130%); }
+}
+@media (max-width: 480px) {
+  .memrow { gap: 4px; }
+  .cell { min-width: 50px; padding: 11px 6px; font-size: 13px; }
+  .rd { font-size: 15.5px; }
+  .beam-cell { min-width: 46px; font-size: 13px; padding: 10px 4px; }
+  .timer-big { font-size: 42px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } html { scroll-behavior: auto; } }
+
+/* ================= NEON PEN ================= */
+#penCanvas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 380; pointer-events: none; touch-action: none;
+}
+body.pen-on #penCanvas { pointer-events: auto; cursor: crosshair; }
+body.pen-on { user-select: none; -webkit-user-select: none; }
+.pen-bar {
+  position: fixed; left: 50%; bottom: 14px; transform: translate(-50%, 150%);
+  z-index: 470; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--gold); border-radius: 13px; padding: 9px 12px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.5); transition: transform .28s ease;
+  max-width: calc(100vw - 24px);
+}
+body.pen-on .pen-bar { transform: translate(-50%, 0); }
+.pen-bar .sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); cursor: pointer; flex-shrink: 0; transition: transform .15s; }
+.pen-bar .sw:hover { transform: scale(1.12); }
+.pen-bar .sw.sel { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 0 14px currentColor; }
+.pen-bar .pbtn2 {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; cursor: pointer;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--text);
+  border-radius: 8px; padding: 6px 10px; transition: all .15s;
+}
+.pen-bar .pbtn2:hover { border-color: var(--gold); color: var(--gold); }
+.pen-bar .pbtn2.on { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.pen-hint {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--faint);
+  letter-spacing: .4px; white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .pen-bar { gap: 6px; padding: 8px 10px; bottom: 10px; }
+  .pen-bar .sw { width: 22px; height: 22px; }
+  .pen-hint { display: none; }
+}
+/* lean class page tweaks */
+.board-tbl td { height: 34px; }
+.board-tbl td.blank { background: color-mix(in srgb, var(--gold-dim) 45%, transparent); }
+.plan-step { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; }
+.plan-step .tm { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); min-width: 54px; flex-shrink: 0; }
+.plan-step .tx { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.plan-step .tx b { color: var(--text); display: block; font-size: 14.5px; margin-bottom: 2px; }
+
+/* mobile: banner ko viewport me rakho */
+@media (max-width: 620px) {
+  .timeup-banner { font-size: 12.5px; padding: 10px 14px; white-space: normal; max-width: 92vw; text-align: center; }
+}
+
+/* ambient canvas ko fix karo (warna wo block ban ke content dhakel deta hai) */
+#ambient { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: .62; }
+.wrap { position: relative; z-index: 1; }
+
+
+/* ============ TREE DIAGRAM (pure CSS, no SVG) ============ */
+.tree-wrap { overflow-x: auto; padding: 18px 8px 8px; border: 1px solid var(--border2); border-radius: 14px; background: var(--surface2); margin: 14px 0; }
+.tree, .tree ul { display: flex; justify-content: center; padding: 0; margin: 0; list-style: none; position: relative; }
+.tree { padding-top: 6px; }
+.tree ul { padding-top: 26px; }
+.tree li {
+  display: flex; flex-direction: column; align-items: center; position: relative;
+  padding: 26px 8px 0; list-style: none;
+}
+.tree li::before, .tree li::after {
+  content: ''; position: absolute; top: 0; right: 50%;
+  border-top: 1.6px solid var(--border2); width: 50%; height: 26px;
+}
+.tree li::after { right: auto; left: 50%; border-left: 1.6px solid var(--border2); }
+.tree li:only-child::before, .tree li:only-child::after { display: none; }
+.tree li:only-child { padding-top: 0; }
+.tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+.tree li:last-child::before { border-right: 1.6px solid var(--border2); border-radius: 0 6px 0 0; }
+.tree li:first-child::after { border-radius: 6px 0 0 0; }
+.tree ul ul::before {
+  content: ''; position: absolute; top: 0; left: 50%;
+  border-left: 1.6px solid var(--border2); width: 0; height: 26px;
+}
+.tnode {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 46px; height: 46px; padding: 0 10px; border-radius: 50%;
+  border: 2px solid var(--gold); background: var(--gold-dim); color: var(--text);
+  font-family: 'Fira Code', monospace; font-size: 15px; font-weight: 500;
+  transition: all .28s ease; position: relative; z-index: 2;
+}
+.tnode.leaf { border-color: var(--blue); background: var(--blue-dim); }
+.tnode.on { background: var(--gold); color: #14141a; transform: scale(1.16); box-shadow: 0 0 0 6px var(--gold-dim); }
+.tnode.done { opacity: .45; }
+.tree-cap { text-align: center; font-size: 12px; color: var(--faint); font-family: 'Fira Code', monospace; margin-top: 10px; }
+
+/* ============ WHY / PROBLEM CARDS ============ */
+.why { display: grid; gap: 12px; margin: 16px 0; }
+.why-card {
+  border: 1px solid var(--border2); border-left: 3px solid var(--coral);
+  border-radius: 10px; padding: 13px 16px; background: var(--surface2);
+}
+.why-card.ok { border-left-color: var(--blue); }
+.why-card h5 { margin: 0 0 6px; font-family: 'Outfit', sans-serif; font-size: 14.5px; color: var(--text); letter-spacing: .2px; }
+.why-card p { margin: 0; font-size: 13.5px; line-height: 1.7; color: var(--dim); }
+.why-card b { color: var(--text); }
+
+/* ============ MATH NOTE (brackets explained) ============ */
+.mathnote {
+  border: 1px solid var(--blue); border-radius: 12px; padding: 16px 18px;
+  background: linear-gradient(160deg, var(--blue-dim), var(--surface) 70%); margin: 16px 0;
+}
+.mathnote .big { font-family: 'Fira Code', monospace; font-size: 19px; color: var(--blue); text-align: center; margin: 10px 0; letter-spacing: 1px; }
+.bracket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.bracket-box { border: 1px solid var(--border2); border-radius: 10px; padding: 12px; background: var(--surface2); }
+.bracket-box .sym { font-family: 'Fira Code', monospace; font-size: 26px; color: var(--gold); line-height: 1; }
+.bracket-box .nm { font-size: 12px; color: var(--faint); text-transform: uppercase; letter-spacing: 1.2px; margin: 6px 0 4px; }
+.bracket-box p { margin: 0; font-size: 13px; color: var(--dim); line-height: 1.65; }
+
+/* ============ TRAVERSAL STEPPER ============ */
+.trav-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.trav-out { font-family: 'Fira Code', monospace; font-size: 15px; color: var(--blue); min-height: 26px; margin-top: 12px; letter-spacing: 2px; }
+.trav-out b { color: var(--gold); }
+
+/* ============ FIXED QUESTION CARD (bottom sheet — scroll nahi karna padega) ============ */
+.dock-q {
+  position: fixed !important; left: 50% !important; bottom: 84px !important;
+  transform: translate(-50%, 24px) scale(.97) !important;
+  width: min(680px, calc(100vw - 28px)) !important; max-height: 62vh; overflow-y: auto;
+  z-index: 60 !important; margin: 0 !important;
+  border-radius: 16px !important; border: 1px solid var(--gold) !important;
+  box-shadow: 0 18px 50px rgba(0,0,0,.6), 0 0 0 1px var(--gold-dim) !important;
+  opacity: 0; pointer-events: none;
+  transition: transform .28s cubic-bezier(.2,.9,.3,1.15), opacity .22s ease;
+}
+.dock-q.show { opacity: 1; pointer-events: auto; transform: translate(-50%, 0) scale(1) !important; }
+.dock-q::before { content: 'SAWAAL'; position: absolute; top: -11px; left: 18px; background: var(--gold); color: #14141a; font-family: 'Fira Code', monospace; font-size: 9.5px; letter-spacing: 1.6px; padding: 3px 9px; border-radius: 5px; }
+@media (max-width: 640px) { .dock-q { bottom: 76px !important; max-height: 66vh; } }
+
+/* ============ PEN BAR — icons only, thin strokes ============ */
+.pen-bar {
+  position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 6px; padding: 7px 12px;
+  background: var(--surface2); border: 1px solid var(--border2); border-radius: 30px;
+  box-shadow: var(--shadow); z-index: 55; opacity: 0; pointer-events: none; transition: opacity .2s;
+  max-width: calc(100vw - 20px); overflow-x: auto;
+}
+.pen-bar.show { opacity: 1; pointer-events: auto; }
+.pen-bar .pen-hint { display: none; }
+.pbtn2 {
+  width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; border: 1px solid var(--border2); background: var(--surface3);
+  color: var(--dim); font-size: 13px; cursor: pointer; padding: 0; line-height: 1;
+  transition: all .18s;
+}
+.pbtn2:hover { border-color: var(--gold); color: var(--gold); }
+.pbtn2.on { background: var(--gold); border-color: var(--gold); color: #14141a; }
+.pen-bar .sw { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+.pen-bar .sw.sel { border-color: var(--text); transform: scale(1.12); }
+.pen-sep { width: 1px; height: 20px; background: var(--border2); margin: 0 3px; }
+
+/* headings */
+h1, h2, h3 { font-family: 'Outfit', system-ui, sans-serif; letter-spacing: -0.5px; }
+h1 em { font-style: normal; color: var(--gold); }
+.sec { scroll-margin-top: 118px; }
+@media (max-width: 1000px) { .sec { scroll-margin-top: 138px; } }
+.picker-name { font-family: 'Outfit', system-ui, sans-serif; font-weight: 800; }
+
+/* question card ko solid background do (peeche ka text na dikhe) */
+.dock-q { background: var(--surface) !important; backdrop-filter: blur(10px); }
+.dock-q .dq { color: var(--text); }
+.dock-q .who { font-family: 'Fira Code', monospace; font-size: 10.5px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+.dock-q .da { color: var(--blue); font-size: 13.5px; line-height: 1.7; border-top: 1px dashed var(--border2); margin-top: 10px; padding-top: 10px; }
+
+/* ===== FIX 1: sidebar band karne pe content poora phaile ===== */
+body.no-side .wrap { grid-template-columns: minmax(0,1fr) !important; }
+body.no-side .toc { display: none !important; }
+body.no-side .main { padding-left: 0 !important; }
+
+/* ===== FIX 2: pen canvas (z 380) ke UPAR sab UI ===== */
+.pen-bar { z-index: 500 !important; }
+.dock { z-index: 500 !important; }
+.toc { z-index: 495 !important; }
+.dock-q { z-index: 520 !important; }
+.timeup-banner { z-index: 530 !important; }
+
+/* ===== FIX 3: question card ka top cut na ho ===== */
+.dock-q { padding-top: 24px !important; max-height: min(62vh, calc(100vh - 180px)) !important; }
+.dock-q::before { top: 7px !important; left: 16px !important; }
+
+/* card ka label aur naam overlap na karein */
+.dock-q { padding-top: 34px !important; }
+.dock-q::before { top: 9px !important; }
+.dock-q .who { margin-top: 2px !important; }
+
+</style>
+</head>
+<body class="audio-off">
+<canvas id="ambient" aria-hidden="true"></canvas>
+
+<div class="wrap">
+<canvas id="penCanvas" aria-hidden="true"></canvas>
+
+<nav class="toc" id="toc">
+  <div class="toc-title">UNIT 4 · SESSION 1</div>
+  <a href="#s0"><span class="n">00</span>Tree kyun?</a>
+  <a href="#s1"><span class="n">01</span>Terminology</a>
+  <a href="#s2"><span class="n">02</span>Types</a>
+  <a href="#s3"><span class="n">03</span>Formulas</a>
+  <a href="#s4"><span class="n">04</span>Representation</a>
+  <a href="#s5"><span class="n">05</span>Traversals</a>
+  <a href="#s6"><span class="n">06</span>Practice</a>
+</nav>
+
+<div class="main">
+
+<div class="dock" id="dock">
+  <span class="dock-timer" id="dkTimer">30:00</span>
+  <button class="dbtn dbtn--go" id="dkStart" title="Timer">▶</button>
+  <button class="dbtn" id="dkNext" title="Agla block">⏭</button>
+  <span class="dock-blk" id="dkBlk">Block select karo</span>
+  <span class="dock-sep"></span>
+  <button class="dbtn dbtn--blue" id="dkSpin" title="Student + sawaal">🎯 SPIN</button>
+  <span class="dock-name" id="dkName">—</span>
+  <button class="dbtn dbtn--ok" id="dkOk" title="Sahi">✓</button>
+  <button class="dbtn dbtn--bad" id="dkBad" title="Galat">✕</button>
+  <span class="dock-sep"></span>
+  <button class="dbtn" id="dkPen" title="Pen on/off">✏</button>
+  <span class="dock-spacer"></span>
+  <button class="dbtn" id="dkSide" title="Sidebar">☰</button>
+  <button class="dbtn" id="dkAudio" title="Audio">🎧</button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Theme"><span class="tt-sun">☀</span><span class="tt-moon">☾</span></button>
+</div>
+
+<div class="dock-q" id="dkQCard">
+  <div class="who" id="dkQWho"></div>
+  <div class="dq" id="dkQText"></div>
+  <div class="da" id="dkQAns"></div>
+  <div class="sim-controls" style="margin-top:12px">
+    <button class="btn btn--go" id="dkQShow">Jawab</button>
+    <button class="btn btn--ok" id="dkQOk">✓</button>
+    <button class="btn btn--bad" id="dkQBad">✕</button>
+    <button class="btn" id="dkQNext">🎲 Agla</button>
+    <button class="btn btn--warn" id="dkQClose">✕ Band</button>
+  </div>
+</div>
+
+<div class="pen-bar" id="penBar">
+  <span class="sw sel" data-c="var(--pen)" style="background:var(--pen)"></span>
+  <span class="sw" data-c="#ff7eb6" style="background:#ff7eb6"></span>
+  <span class="sw" data-c="#5eead4" style="background:#5eead4"></span>
+  <span class="sw" data-c="#ffd166" style="background:#ffd166"></span>
+  <span class="sw" data-c="#ffffff" style="background:#ffffff"></span>
+  <span class="pen-sep"></span>
+  <button class="pbtn2" id="penThin" title="Patli (1px)">·</button>
+  <button class="pbtn2 on" id="penMed" title="Medium (1.6px)">–</button>
+  <button class="pbtn2" id="penThick" title="Moti (2.4px)">—</button>
+  <span class="pen-sep"></span>
+  <button class="pbtn2" id="penErase" title="Eraser">⌫</button>
+  <button class="pbtn2" id="penUndo" title="Undo">↶</button>
+  <button class="pbtn2" id="penClear" title="Sab mitao">🗑</button>
+</div>
+
+<header class="hero">
+  <div class="hero-badges">
+    <span class="chip chip--gold">UNIT 4 · SESSION 1</span>
+    <span class="chip chip--blue">TREES · BASICS + TRAVERSALS</span>
+    <span class="chip chip--em">30 MIN</span>
+  </div>
+  <h1>Tree — <em>kyun</em>, <em>kahan</em>, aur <em>kaise</em></h1>
+  <p class="hero-sub">Pehle problem dikhaunga (array aur linked list se kya dikkat hai), phir tree usse kaise bachata hai. Har cheez ka <b>example</b>, har formula ka <b>kyun</b> — aur <b>brackets ⌈ ⌉</b> ka matlab bhi.</p>
+  <hr class="hero-hr">
+</header>
+
+<!-- ============================================================ S0 -->
+<section class="sec" id="s0">
+  <div class="sec-head"><span class="sec-num">00</span><h2>Tree kyun banaya gaya?</h2></div>
+  <p class="sec-tag">Pehle problem, phir solution — warna tree yaad rahega, samajh nahi aayega</p>
+
+  <p class="rd">Tumhare paas <b>10 lakh students</b> ka data hai. Kisi ka roll number dhoondhna hai. Array me linear search? 10 lakh comparison. Linked list me? Wahi 10 lakh. <b>Tree isi problem ka jawab hai.</b></p>
+
+  <div class="why">
+    <div class="why-card">
+      <h5>❌ Array ki dikkat</h5>
+      <p><b>Search:</b> sorted ho toh binary search se O(log n) — par <b>insert/delete me poora array shift</b> karna padta hai → O(n). 10 lakh records me beech me ek insert = 5 lakh elements shift. Practically bahut slow.</p>
+    </div>
+    <div class="why-card">
+      <h5>❌ Linked list ki dikkat</h5>
+      <p><b>Insert/delete:</b> O(1) — bahut fast. Par <b>search O(n)</b>, kyunki random access nahi hai (beech me pahunchne ke liye shuru se chalna padta hai). Binary search bhi nahi laga sakte.</p>
+    </div>
+    <div class="why-card ok">
+      <h5>✅ Tree (BST) — dono ka best</h5>
+      <p><b>Search, insert, delete — teeno O(log n)</b>. 10 lakh records me sirf ~20 steps. Na shifting, na poora scan. Isliye database index, file system, dictionary — sab tree pe chalte hain.</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Operation</th><th>Array</th><th>Linked List</th><th>BST (balanced)</th></tr></thead>
+      <tbody>
+        <tr><td>Search</td><td>O(n) / O(log n) sorted</td><td>O(n)</td><td><b>O(log n)</b></td></tr>
+        <tr><td>Insert</td><td>O(n) (shifting)</td><td>O(1) position pe</td><td><b>O(log n)</b></td></tr>
+        <tr><td>Delete</td><td>O(n) (shifting)</td><td>O(1) position pe</td><td><b>O(log n)</b></td></tr>
+        <tr><td>Memory</td><td>compact</td><td>+pointer overhead</td><td>+pointer overhead</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card card--em">
+      <h5 style="margin:0 0 8px;font-family:'Outfit';font-size:14px;letter-spacing:.4px">TREE ASLI ME KAHAN USE HOTA HAI</h5>
+      <p style="margin:0;font-size:13.5px;line-height:1.85;color:var(--dim)">
+        📁 <b>File system</b> — folder ke andar folder<br>
+        🌐 <b>HTML page</b> — body → div → p (DOM tree)<br>
+        🗄️ <b>DBMS index</b> — B-tree / B+ tree<br>
+        🧠 <b>Decision tree</b> — ML me<br>
+        🗜️ <b>Huffman coding</b> — file compression (ZIP)<br>
+        ⚡ <b>Priority queue</b> — heap (OS scheduler)<br>
+        🧮 <b>Expression tree</b> — calculator, compiler
+      </p>
+    </div>
+    <div class="card card--coral">
+      <h5 style="margin:0 0 8px;font-family:'Outfit';font-size:14px;letter-spacing:.4px">EK LINE ME FARAK</h5>
+      <p style="margin:0;font-size:13.5px;line-height:1.85;color:var(--dim)">
+        <b>Array</b> = seedhi line (ek dimension)<br>
+        <b>Linked list</b> = seedhi line, par tooti hui<br>
+        <b>Tree</b> = <b>shakhaayein</b> (branching) — isi branching se search aadha-aadha kat jata hai
+      </p>
+    </div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Yaad rakho:</b> tree ka poora fayda <b>branching</b> se hai. Har node pe decision lena = ek aadha data chhod dena. Isliye 10 lakh me sirf 20 step.
+  </div>
+
+  <div id="planSteps"></div>
+</section>
+
+<!-- ============================================================ S1 -->
+<section class="sec" id="s1">
+  <div class="sec-head"><span class="sec-num">01</span><h2>Terminology — parivaar ki tarah</h2></div>
+  <p class="sec-tag">Ek hi tree pe saare terms, taaki yaad rahe</p>
+
+  <p class="rd">Tree ko <b>parivaar</b> samjho: sabse upar <b>dada-dadi</b> (root), unke <b>bachche</b> (children), bachchon ke bachche... jinka aage koi nahi wo <b>leaf</b>. Poora tree = poora khandaan. Ek branch = <b>subtree</b>.</p>
+
+  <div class="tree-wrap">
+    <ul class="tree">
+      <li><span class="tnode" id="nA">A</span>
+        <ul>
+          <li><span class="tnode" id="nB">B</span>
+            <ul>
+              <li><span class="tnode leaf" id="nD">D</span></li>
+              <li><span class="tnode leaf" id="nE">E</span></li>
+            </ul>
+          </li>
+          <li><span class="tnode" id="nC">C</span>
+            <ul>
+              <li><span class="tnode leaf" id="nF">F</span></li>
+              <li><span class="tnode leaf" id="nG">G</span></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <div class="tree-cap">Fig. 1 — yahi tree poore section me use hoga (7 nodes, height 2)</div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Term</th><th>Matlab</th><th>Is tree me</th><th>Parivaar me</th></tr></thead>
+      <tbody>
+        <tr><td><b>Root</b></td><td>sabse upar wala node (jiska koi parent nahi)</td><td>A</td><td>dada-dadi</td></tr>
+        <tr><td><b>Parent</b></td><td>jiske neeche node judi hai</td><td>B ka parent A</td><td>papa</td></tr>
+        <tr><td><b>Child</b></td><td>jo neeche juda hai</td><td>A ke children B, C</td><td>bachche</td></tr>
+        <tr><td><b>Siblings</b></td><td>same parent ke bachche</td><td>B aur C</td><td>bhai-behen</td></tr>
+        <tr><td><b>Leaf / External</b></td><td>jiske koi child nahi</td><td>D, E, F, G</td><td>jinka aage koi nahi</td></tr>
+        <tr><td><b>Internal node</b></td><td>jiske kam se kam ek child ho</td><td>A, B, C</td><td>jinke bachche hain</td></tr>
+        <tr><td><b>Degree</b></td><td>children ki ginti</td><td>A = 2 · D = 0</td><td>kitne bachche</td></tr>
+        <tr><td><b>Level</b></td><td>root se doori (root = level 0)</td><td>D level 2 pe</td><td>kaunsi peedhi</td></tr>
+        <tr><td><b>Height</b></td><td>root se sabse door leaf tak <b>edges</b></td><td><b>2</b></td><td>kitni peedhiyan</td></tr>
+        <tr><td><b>Subtree</b></td><td>kisi node + uske saare descendants</td><td>B, D, E</td><td>ek shaakha</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="callout">
+    <b>Height ka trap:</b> is tree me <b>3 levels</b> hain (0, 1, 2) par <b>height = 2</b>. Kyunki height <b>edges</b> me ginti hai, nodes me nahi. Aur khaali tree ki height = <b>−1</b>, sirf root wale tree ki height = <b>0</b>. Exam me "height (edges me)" likh dena.
+  </div>
+</section>
+<!-- ============================================================ S2 -->
+<section class="sec" id="s2">
+  <div class="sec-head"><span class="sec-num">02</span><h2>Types — har type ka kaam alag</h2></div>
+  <p class="sec-tag">Sirf naam yaad mat karo — poochho "iski zaroorat kyun padi?"</p>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:6px 0 4px">1. General tree vs Binary tree</div>
+  <div class="grid2">
+    <div class="card">
+      <h5 style="margin:0 0 6px;font-family:'Outfit';font-size:13.5px">GENERAL TREE — koi bhi number of children</h5>
+      <p style="margin:0;font-size:13px;color:var(--dim);line-height:1.8">Ek node ke 3, 4, 10 bachche ho sakte hain. Jaise <b>file system</b> — ek folder me jitni files chaho.</p>
+    </div>
+    <div class="card card--em">
+      <h5 style="margin:0 0 6px;font-family:'Outfit';font-size:13.5px">BINARY TREE — max 2 children (left + right)</h5>
+      <p style="margin:0;font-size:13px;color:var(--dim);line-height:1.8">Sirf 2 — par isi limit ki wajah se <b>formula aur traversal simple</b> ho jate hain. Isliye poora syllabus binary tree pe hai.</p>
+    </div>
+  </div>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:22px 0 4px">2. Strictly (Full) Binary Tree</div>
+  <p class="rd"><b>Rule:</b> har node ke <b>0 ya 2</b> children — <b>1 child wala ek bhi node nahi</b>.</p>
+  <div class="tree-wrap">
+    <ul class="tree">
+      <li><span class="tnode">A</span>
+        <ul>
+          <li><span class="tnode">B</span>
+            <ul><li><span class="tnode leaf">D</span></li><li><span class="tnode leaf">E</span></li></ul>
+          </li>
+          <li><span class="tnode">C</span>
+            <ul><li><span class="tnode leaf">F</span></li><li><span class="tnode leaf">G</span></li></ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <div class="tree-cap">✅ Strictly binary — sabke 2 ya 0 bachche</div>
+  </div>
+  <div class="tree-wrap">
+    <ul class="tree">
+      <li><span class="tnode">A</span>
+        <ul>
+          <li><span class="tnode" style="border-color:var(--coral);background:var(--coral-dim)">B</span>
+            <ul><li><span class="tnode leaf">D</span></li></ul>
+          </li>
+          <li><span class="tnode leaf">C</span></li>
+        </ul>
+      </li>
+    </ul>
+    <div class="tree-cap">❌ Strictly binary NAHI — B ke sirf 1 child (D) hai</div>
+  </div>
+  <p class="rd" style="font-size:13px;color:var(--dim)"><b>Kahan kaam aata hai:</b> isi ki property se formula <b>n₀ = n₂ + 1</b> nikalta hai (leaves = 2-bachche wale + 1). Expression tree aur Huffman tree strictly binary hote hain.</p>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:22px 0 4px">3. Complete Binary Tree</div>
+  <p class="rd"><b>Rule:</b> saare levels bhare hue, aur <b>aakhri level left se right</b> bhar raha ho — beech me koi gap nahi.</p>
+  <div class="tree-wrap">
+    <ul class="tree">
+      <li><span class="tnode">A</span>
+        <ul>
+          <li><span class="tnode">B</span>
+            <ul><li><span class="tnode leaf">D</span></li><li><span class="tnode leaf">E</span></li></ul>
+          </li>
+          <li><span class="tnode">C</span>
+            <ul><li><span class="tnode leaf">F</span></li></ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <div class="tree-cap">✅ Complete — aakhri level left se bhara (F), right khaali</div>
+  </div>
+  <p class="rd" style="font-size:13px;color:var(--dim)"><b>Kahan kaam aata hai:</b> <b>Heap</b> (priority queue, heap sort) sirf complete binary tree hota hai — kyunki ise <b>array me bina gap</b> store kar sakte hain (index 2i+1, 2i+2). Isi liye heap me koi memory waste nahi hoti.</p>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:22px 0 4px">4. Perfect Binary Tree</div>
+  <p class="rd"><b>Rule:</b> strictly binary + <b>saare leaves same level</b> pe. Nodes = <b>2^(h+1) − 1</b>.</p>
+  <div class="tree-wrap">
+    <ul class="tree">
+      <li><span class="tnode">A</span>
+        <ul>
+          <li><span class="tnode">B</span>
+            <ul><li><span class="tnode leaf">D</span></li><li><span class="tnode leaf">E</span></li></ul>
+          </li>
+          <li><span class="tnode">C</span>
+            <ul><li><span class="tnode leaf">F</span></li><li><span class="tnode leaf">G</span></li></ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <div class="tree-cap">✅ Perfect — height 2, nodes = 2³ − 1 = 7, saare leaves level 2 pe</div>
+  </div>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:22px 0 4px">5. Skewed Tree (yahi problem hai!)</div>
+  <p class="rd"><b>Rule:</b> har node ka sirf <b>ek</b> child — left-skewed ya right-skewed. Yeh <b>linked list hi hai</b>, bas tree bola ja raha hai.</p>
+  <div class="tree-wrap">
+    <ul class="tree">
+      <li><span class="tnode">10</span>
+        <ul>
+          <li><span class="tnode">20</span>
+            <ul>
+              <li><span class="tnode">30</span>
+                <ul><li><span class="tnode leaf">40</span></li></ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <div class="tree-cap">❌ Right-skewed — height 3, par kaam linked list jaisa</div>
+  </div>
+  <div class="callout callout--info">
+    <b>Kyun important:</b> BST me <b>sorted data</b> daalo (10, 20, 30, 40) toh tree skewed ho jata hai aur search <b>O(log n) se O(n)</b> ho jata hai. <b>Isi problem ko AVL tree solve karta hai</b> (rotations se balance) — wo Session 3 me.
+  </div>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:22px 0 4px">6. Extended Binary Tree (2-tree)</div>
+  <p class="rd"><b>Rule:</b> har khaali pointer ki jagah ek <b>square node</b> (external node) laga do. Circle = internal (asli data), square = external (khaali).</p>
+  <div class="tree-wrap">
+    <ul class="tree">
+      <li><span class="tnode">A</span>
+        <ul>
+          <li><span class="tnode">B</span>
+            <ul>
+              <li><span class="tnode leaf" style="border-radius:4px;border-color:var(--faint);background:var(--surface3)">□</span></li>
+              <li><span class="tnode leaf" style="border-radius:4px;border-color:var(--faint);background:var(--surface3)">□</span></li>
+            </ul>
+          </li>
+          <li><span class="tnode leaf" style="border-radius:4px;border-color:var(--faint);background:var(--surface3)">□</span></li>
+        </ul>
+      </li>
+    </ul>
+    <div class="tree-cap">Internal nodes = 3, External (square) = 4 → 3 + 1 ✔</div>
+  </div>
+  <p class="rd" style="font-size:13px;color:var(--dim)"><b>Kahan kaam aata hai:</b> <b>Huffman coding</b> (compression) aur expression tree me — har internal node ke exactly 2 children hote hain, aur saare external nodes ek hi level pe.</p>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Type</th><th>Rule</th><th>Kahan use hota hai</th></tr></thead>
+      <tbody>
+        <tr><td><b>Strictly binary</b></td><td>har node ke 0 ya 2 children</td><td>expression tree, Huffman</td></tr>
+        <tr><td><b>Complete</b></td><td>aakhri level left se bhara</td><td><b>heap</b>, array representation</td></tr>
+        <tr><td><b>Perfect</b></td><td>full + leaves same level</td><td>max nodes ka example, theory</td></tr>
+        <tr><td><b>Skewed</b></td><td>har node ke 1 child</td><td>worst case dikhane ke liye</td></tr>
+        <tr><td><b>Extended (2-tree)</b></td><td>khaali jagah square node</td><td>Huffman, expression tree</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============================================================ S3 -->
+<section class="sec" id="s3">
+  <div class="sec-head"><span class="sec-num">03</span><h2>Formulas — aur woh brackets kya hain</h2></div>
+  <p class="sec-tag">Pehle brackets, phir har formula ka "kyun"</p>
+
+  <div class="mathnote">
+    <div style="font-family:'Outfit';font-weight:700;font-size:16px;margin-bottom:6px">Woh cut wale brackets — ⌈ ⌉ aur ⌊ ⌋</div>
+    <p style="margin:0;font-size:13.5px;color:var(--dim);line-height:1.8">Inhe <b>brackets</b> hi kehte hain, par yeh <b>rounding</b> ke symbols hain — jaise calculator me "round off". Do tarah ke hote hain:</p>
+    <div class="bracket-grid">
+      <div class="bracket-box">
+        <div class="sym">⌈x⌉</div>
+        <div class="nm">Ceiling — "chhat"</div>
+        <p>Hamesha <b>upar</b> wale poore number pe le jata hai.<br>
+        ⌈3.1⌉ = <b>4</b> · ⌈3.9⌉ = <b>4</b> · ⌈3⌉ = <b>3</b></p>
+      </div>
+      <div class="bracket-box">
+        <div class="sym">⌊x⌋</div>
+        <div class="nm">Floor — "farsh"</div>
+        <p>Hamesha <b>neeche</b> wale poore number pe le jata hai.<br>
+        ⌊3.1⌋ = <b>3</b> · ⌊3.9⌋ = <b>3</b> · ⌊3⌋ = <b>3</b></p>
+      </div>
+    </div>
+    <p style="margin:12px 0 0;font-size:13.5px;color:var(--dim);line-height:1.8"><b>Yaad rakhne ka tareeka:</b> <b>c</b>eiling me <b>c</b>hhat (upar) · <b>f</b>loor me <b>f</b>arsh (neeche). Symbol ka upar wala "kona" ⌈ upar dekhta hai, ⌊ neeche dekhta hai.</p>
+  </div>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:22px 0 4px">Formula 1 — Level i pe maximum nodes = 2ⁱ</div>
+  <div class="why">
+    <div class="why-card ok">
+      <h5>Kyun 2ⁱ?</h5>
+      <p>Root (level 0) = <b>1</b> node = 2⁰. Uske 2 bachche (level 1) = 2¹. Har bachche ke 2 bachche → level 2 me <b>4</b> = 2². Matlab <b>har level pe nodes double</b> ho jate hain.</p>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Level</th><th>Max nodes</th><th>Kaise</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>1</td><td>2⁰</td></tr>
+        <tr><td>1</td><td>2</td><td>2¹</td></tr>
+        <tr><td>2</td><td>4</td><td>2²</td></tr>
+        <tr><td>3</td><td>8</td><td>2³</td></tr>
+        <tr><td>4</td><td>16</td><td>2⁴</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:22px 0 4px">Formula 2 — Height h wale tree me maximum nodes = 2^(h+1) − 1</div>
+  <div class="why">
+    <div class="why-card ok">
+      <h5>Kyun?</h5>
+      <p>Saare levels ke max nodes <b>jod do</b>: 1 + 2 + 4 + 8 + … (h+1 terms). Yeh <b>geometric series</b> hai — sum = <b>2^(h+1) − 1</b>.</p>
+    </div>
+  </div>
+  <p class="rd"><b>Example:</b> height 2 → 2³ − 1 = <b>7 nodes</b> (bilkul wahi tree jo Fig. 1 me hai). Height 3 → 2⁴ − 1 = <b>15</b>. Height 4 → <b>31</b>.</p>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:22px 0 4px">Formula 3 — n nodes wale tree ki MINIMUM height = ⌈log₂(n+1)⌉ − 1</div>
+  <div class="mathnote">
+    <div class="big">h_min = ⌈ log₂(n + 1) ⌉ − 1</div>
+    <p style="margin:0;font-size:13.5px;color:var(--dim);line-height:1.8">Yeh formula Formula 2 ka <b>ulta</b> hai. Formula 2 kehta hai "height h me max 2^(h+1) − 1 nodes aate hain". Toh agar tumhare paas n nodes hain, toh height <b>kam se kam</b> kitni chahiye ki wo fit ho jayein? Bas n ko 2^(h+1) − 1 me daal ke h nikaal lo.</p>
+    <div class="table-wrap" style="margin:14px 0 0">
+      <div class="table-scroll"><table class="data-table">
+        <thead><tr><th>n (nodes)</th><th>log₂(n+1)</th><th>Ceiling ⌈ ⌉</th><th>−1</th><th>Min height</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>log₂2 = 1</td><td>1</td><td>0</td><td><b>0</b></td></tr>
+          <tr><td>3</td><td>log₂4 = 2</td><td>2</td><td>1</td><td><b>1</b></td></tr>
+          <tr><td>7</td><td>log₂8 = 3</td><td>3</td><td>2</td><td><b>2</b></td></tr>
+          <tr><td><b>10</b></td><td>log₂11 = <b>3.46</b></td><td><b>4</b></td><td>3</td><td><b>3</b></td></tr>
+          <tr><td>15</td><td>log₂16 = 4</td><td>4</td><td>3</td><td><b>3</b></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <p style="margin:12px 0 0;font-size:13.5px;color:var(--dim);line-height:1.8"><b>Ceiling kyun?</b> Kyunki height <b>poore number</b> me hoti hai — 3.46 level ka tree nahi banta. 10 nodes ke liye 3.46 aaya, matlab <b>3 levels me fit nahi hote</b> (3 levels me max 7 nodes). Toh <b>upar wala poora number</b> lena padega → 4 − 1 = <b>3</b>. Yahi ceiling ka kaam hai.</p>
+  </div>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:22px 0 4px">Formula 4 — Leaves ka relation: n₀ = n₂ + 1</div>
+  <div class="why">
+    <div class="why-card ok">
+      <h5>Derivation (2 line me)</h5>
+      <p>Total nodes: <b>n = n₀ + n₁ + n₂</b> (leaf + 1-child + 2-child).<br>
+      Edges = n − 1. Aur edges = children ki ginti = <b>n₁ + 2n₂</b>.<br>
+      Barabar rakho → n₀ + n₁ + n₂ − 1 = n₁ + 2n₂ → <b>n₀ = n₂ + 1</b> ✔</p>
+    </div>
+  </div>
+  <p class="rd"><b>Example:</b> 20 leaves wala strictly binary tree — kitne internal? n₀ = 20 → n₂ = 19 → kyunki strictly binary hai (n₁ = 0), total = 20 + 19 = <b>39 nodes</b>.</p>
+
+  <div class="card card--coral" style="margin-top:16px">
+    <h5 style="margin:0 0 8px;font-family:'Outfit';font-size:14px">⚡ 4 FORMULAS — EK TABLE ME</h5>
+    <p style="margin:0;font-size:13.5px;line-height:2;color:var(--dim)">
+      Level i pe max nodes = <b>2ⁱ</b><br>
+      Height h me max nodes = <b>2^(h+1) − 1</b><br>
+      n nodes ki min height = <b>⌈log₂(n+1)⌉ − 1</b><br>
+      Leaves = <b>n₂ + 1</b>
+    </p>
+  </div>
+</section>
+<!-- ============================================================ S4 -->
+<section class="sec" id="s4">
+  <div class="sec-head"><span class="sec-num">04</span><h2>Representation — array ya pointers?</h2></div>
+  <p class="sec-tag">Dono ke apne fayde, apni problem — poochho "kab kaunsa"</p>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:6px 0 4px">A. Array Representation (index se rishta)</div>
+  <p class="rd">Tree ko seedhe array me rakh do — rishta <b>index ke formula</b> se nikal aata hai:</p>
+  <div class="grid2">
+    <div class="card">
+      <h5 style="margin:0 0 8px;font-family:'Outfit';font-size:13.5px">FORMULA (0-based)</h5>
+      <p style="margin:0;font-family:'Fira Code',monospace;font-size:13px;line-height:2;color:var(--blue)">
+        left child = <b>2i + 1</b><br>
+        right child = <b>2i + 2</b><br>
+        parent = <b>(i − 1) / 2</b>
+      </p>
+    </div>
+    <div class="card card--em">
+      <h5 style="margin:0 0 8px;font-family:'Outfit';font-size:13.5px">KYUN KAAM KARTA HAI</h5>
+      <p style="margin:0;font-size:13px;line-height:1.8;color:var(--dim)">Level 0 me 1 node, level 1 me 2, level 2 me 4 — yani har level pe index <b>double</b> hota hai. Isi liye 2i+1 aur 2i+2.</p>
+    </div>
+  </div>
+
+  <p class="rd"><b>Example:</b> Fig. 1 wala tree (A B C D E F G):</p>
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
+      <tbody>
+        <tr><td>Value</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <p class="rd" style="font-size:13px;color:var(--dim)">Check karo: B (index 1) ke children → 2(1)+1 = <b>3</b> (D) aur 2(1)+2 = <b>4</b> (E) ✔</p>
+
+  <div class="why">
+    <div class="why-card">
+      <h5>❌ Problem — skewed tree me memory barbaad</h5>
+      <p>Right-skewed tree (10 → 20 → 30 → 40) me sirf <b>4 nodes</b> hain, par index 2i+2 chalte-chalte <b>index 7</b> tak jagah chahiye. Height h ke skewed tree me array size <b>2^(h+1) − 1</b> lagta hai. Height 10 me sirf 11 nodes ke liye <b>2047 slots</b>! Yahi array representation ki sabse badi dikkat hai.</p>
+    </div>
+    <div class="why-card ok">
+      <h5>✅ Kahan use karo</h5>
+      <p><b>Complete binary tree</b> me — kyunki wahan koi gap nahi hota. Isliye <b>heap</b> (priority queue, heap sort) array me hi store hota hai — koi pointer nahi, koi waste nahi, cache-friendly.</p>
+    </div>
+  </div>
+
+  <div class="sub" style="font-family:'Outfit';font-weight:700;font-size:19px;margin:22px 0 4px">B. Linked Representation (pointers se rishta)</div>
+  <p class="rd">Har node me 3 cheezein — data, left pointer, right pointer:</p>
+  <pre class="code-block"><span class="kw">struct</span> node {
+    <span class="kw">int</span> data;              <span class="cm">// asli value</span>
+    <span class="kw">struct</span> node *left;     <span class="cm">// left child ka address (ya NULL)</span>
+    <span class="kw">struct</span> node *right;    <span class="cm">// right child ka address (ya NULL)</span>
+};</pre>
+
+  <div class="diagram">
+    <div class="d-cap">EK NODE KA DHAANCHA</div>
+    <div style="display:flex;gap:0;justify-content:center;flex-wrap:wrap">
+      <div style="border:2px solid var(--blue);border-radius:8px 0 0 8px;padding:10px 16px;font-family:'Fira Code';font-size:13px;background:var(--blue-dim);color:var(--text)">left<br><span style="color:var(--faint);font-size:11px">pointer</span></div>
+      <div style="border:2px solid var(--gold);border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);padding:10px 18px;font-family:'Fira Code';font-size:13px;background:var(--gold-dim);color:var(--text)">data<br><span style="color:var(--faint);font-size:11px">value</span></div>
+      <div style="border:2px solid var(--blue);border-radius:0 8px 8px 0;padding:10px 16px;font-family:'Fira Code';font-size:13px;background:var(--blue-dim);color:var(--text)">right<br><span style="color:var(--faint);font-size:11px">pointer</span></div>
+    </div>
+    <p class="d-note">n nodes wale binary tree me <b>n + 1 NULL pointers</b> hote hain (7 nodes → 8 NULL). Yahi "waste" threaded tree me kaam me lagta hai.</p>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Point</th><th>Array</th><th>Linked</th></tr></thead>
+      <tbody>
+        <tr><td>Memory (complete tree)</td><td><b>kam</b> — koi pointer nahi</td><td>zyada — har node me 2 pointers</td></tr>
+        <tr><td>Memory (skewed tree)</td><td><b>bahut zyada</b> (2^h tak)</td><td>theek — jitne nodes utni jagah</td></tr>
+        <tr><td>Child dhoondhna</td><td><b>O(1)</b> formula se</td><td>O(1) pointer se</td></tr>
+        <tr><td>Insert / delete</td><td>mushkil (shift)</td><td><b>aasaan</b> (pointer badlo)</td></tr>
+        <tr><td>Kahan use</td><td><b>heap</b>, complete tree</td><td>BST, AVL, general tree</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============================================================ S5 -->
+<section class="sec" id="s5">
+  <div class="sec-head"><span class="sec-num">05</span><h2>Traversals — tree ko padhne ke 4 tareeke</h2></div>
+  <p class="sec-tag">Naam me hi rule hai: N = Node, L = Left, R = Right</p>
+
+  <p class="rd">Traversal = tree ke saare nodes ko ek <b>tay order</b> me visit karna. Teen naam yaad rakhne ka tareeka — <b>Node kab visit hota hai</b>:</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h5 style="margin:0 0 6px;font-family:'Outfit';font-size:13.5px;color:var(--gold)">PREORDER — N L R</h5>
+      <p style="margin:0;font-size:13px;line-height:1.8;color:var(--dim)">"<b>Pehle</b> khud, phir bachche."<br>Jaise attendance me teacher <b>pehle apna naam</b> bolti hai, phir students ka.</p>
+    </div>
+    <div class="card">
+      <h5 style="margin:0 0 6px;font-family:'Outfit';font-size:13.5px;color:var(--blue)">INORDER — L N R</h5>
+      <p style="margin:0;font-size:13px;line-height:1.8;color:var(--dim)">"Left wale, phir <b>khud</b>, phir right wale."<br>Jaise line me <b>beech</b> ka banda pehle left wale ko jaane deta hai.</p>
+    </div>
+    <div class="card">
+      <h5 style="margin:0 0 6px;font-family:'Outfit';font-size:13.5px;color:var(--coral)">POSTORDER — L R N</h5>
+      <p style="margin:0;font-size:13px;line-height:1.8;color:var(--dim)">"Bachche pehle, <b>khud sabse baad</b> me."<br>Jaise ghar khali karte waqt <b>bachche pehle nikalte</b> hain, bade baad me.</p>
+    </div>
+    <div class="card">
+      <h5 style="margin:0 0 6px;font-family:'Outfit';font-size:13.5px;color:var(--emerald)">LEVEL ORDER</h5>
+      <p style="margin:0;font-size:13px;line-height:1.8;color:var(--dim)">Level by level, left se right.<br>Jaise building me <b>pehli manzil, phir doosri</b> — queue se hota hai.</p>
+    </div>
+  </div>
+
+  <div class="sim" id="travSim" style="margin-top:18px">
+    <div class="sim-head"><b>⚡ TRAVERSAL ANIMATION</b><span>— button dabao, node ek-ek highlight hoga</span></div>
+    <div class="sim-body">
+      <div class="trav-btns">
+        <button class="btn btn--go" data-trav="pre">PREORDER (N L R)</button>
+        <button class="btn btn--blue" data-trav="in">INORDER (L N R)</button>
+        <button class="btn btn--bad" data-trav="post">POSTORDER (L R N)</button>
+        <button class="btn" data-trav="level">LEVEL ORDER</button>
+      </div>
+      <div class="tree-wrap" style="background:transparent;border:none;padding:8px 0">
+        <ul class="tree">
+          <li><span class="tnode" id="tA">A</span>
+            <ul>
+              <li><span class="tnode" id="tB">B</span>
+                <ul><li><span class="tnode leaf" id="tD">D</span></li><li><span class="tnode leaf" id="tE">E</span></li></ul>
+              </li>
+              <li><span class="tnode" id="tC">C</span>
+                <ul><li><span class="tnode leaf" id="tF">F</span></li><li><span class="tnode leaf" id="tG">G</span></li></ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="trav-out" id="travOut">Koi traversal chuno →</div>
+      <div class="sim-steps" id="travLog">PREORDER me root sabse pehle aata hai, POSTORDER me sabse baad me.</div>
+    </div>
+  </div>
+
+  <div class="table-wrap" style="margin-top:18px">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Traversal</th><th>Order</th><th>Is tree ka output</th><th>Kahan use hota hai</th></tr></thead>
+      <tbody>
+        <tr><td><b>Preorder</b></td><td>N L R</td><td>A B D E C F G</td><td>tree ki <b>copy</b> banana, prefix expression, file structure print</td></tr>
+        <tr><td><b>Inorder</b></td><td>L N R</td><td>D B E A F C G</td><td><b>BST me sorted order</b> — yahi sabse zyada poocha jata hai</td></tr>
+        <tr><td><b>Postorder</b></td><td>L R N</td><td>D E B F G C A</td><td>tree <b>delete</b> karna (bachche pehle), postfix expression</td></tr>
+        <tr><td><b>Level order</b></td><td>level by level</td><td>A B C D E F G</td><td><b>BFS</b>, level-wise printing, shortest path</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Ek line me yaad rakho:</b> <b>PRE</b>order = root <b>pehle</b> · <b>IN</b>order = root <b>beech</b> me · <b>POST</b>order = root <b>aakhir</b> me. Aur BST ka inorder = <b>sorted list</b>.
+  </div>
+</section>
+
+<!-- ============================================================ S6 -->
+<section class="sec" id="s6">
+  <div class="sec-head"><span class="sec-num">06</span><h2>Practice — khud karo</h2></div>
+  <p class="sec-tag">5 sawaal, answers neeche chhupe hain</p>
+
+  <div class="card">
+    <p style="margin:0;font-size:14px;line-height:2;color:var(--dim)">
+      <b>1.</b> 15 nodes wale binary tree ki <b>minimum height</b>?<br>
+      <span style="color:var(--faint)">→ ⌈log₂16⌉ − 1 = 4 − 1 = <b>3</b></span><br><br>
+      <b>2.</b> Height 4 wale tree me <b>maximum</b> nodes?<br>
+      <span style="color:var(--faint)">→ 2⁵ − 1 = <b>31</b></span><br><br>
+      <b>3.</b> 12 leaves wale strictly binary tree me total nodes?<br>
+      <span style="color:var(--faint)">→ n₀=12, n₂=11, n₁=0 → <b>23</b></span><br><br>
+      <b>4.</b> Tree: root 1, left 2 (children 4, 5), right 3 (children 6, 7). Inorder?<br>
+      <span style="color:var(--faint)">→ 4 2 5 <b>1</b> 6 3 7</span><br><br>
+      <b>5.</b> Skewed tree (10→20→30→40) array me store karne ke liye kitne slots?<br>
+      <span style="color:var(--faint)">→ height 3 → 2⁴ − 1 = <b>15 slots</b> (sirf 4 nodes ke liye!)</span>
+    </p>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">📝 Homework</span>
+    <ul>
+      <li>Apne naam ke 7 letters se ek binary tree banao (koi bhi shape) — uske <b>teeno traversal</b> likho</li>
+      <li>Formulas yaad karo: 2ⁱ · 2^(h+1)−1 · ⌈log₂(n+1)⌉−1 · n₀=n₂+1</li>
+      <li>Ek <b>complete</b> aur ek <b>strictly binary</b> tree draw karo — fark likho</li>
+      <li>Socho: file system tree hai ya binary tree? (jawab: general tree)</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <b>Agla session:</b> Traversals se <b>tree banana</b> (inorder + preorder diye ho toh), phir <b>BST</b> — search, insert, delete (teeno case).
+  </div>
+
+  <p class="foot">TEAM DEVDoots · UNIT 4 · SESSION 1 — TREE BASICS + TRAVERSALS</p>
+</section>
+
+</div><!-- /main -->
+</div><!-- /wrap -->
+
+<div class="player" id="player">
+  <button class="pbtn pbtn--main" id="btnPlay">▶</button>
+  <button class="pbtn" id="btnStop">■</button>
+  <button class="pbtn" id="btnPrev">⏮</button>
+  <button class="pbtn" id="btnNext">⏭</button>
+  <select id="rateSel"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option></select>
+  <select id="voiceSel"><option>Loading voices…</option></select>
+  <div class="p-meta">
+    <div class="p-now" id="pNow">Player ready</div>
+    <div class="p-voice" id="pVoice">Voices check kar rahe hain…</div>
+  </div>
+</div>
+
+<div class="timeup-banner" id="tuBanner">⏰ TIME UP — agla block!</div>
+
+<div class="result-overlay" id="resOverlay">
+  <div class="result-card">
+    <h3>🏆 Team Devdoots — Score</h3>
+    <div class="sub" id="resSub">Aaj ke sawaalon ka hisaab</div>
+    <div id="resBody"></div>
+    <div class="win" id="resWin"></div>
+    <div class="sim-controls">
+      <button class="btn btn--go" id="resClose">Band karo</button>
+      <button class="btn btn--warn" id="resReset">SCORE RESET</button>
+    </div>
+  </div>
+</div>
+<script>
+/* ============================================================
+   UNIT 4 · SESSION 1 — ENGINE
+   (pen thin + unique colour · floating question card · timer ·
+    traversal animation · agenda · audio)
+   ============================================================ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var root = document.documentElement;
+
+  /* ---------------- THEME ---------------- */
+  var themeBtn = $('themeToggle');
+  try { var savedTheme = localStorage.getItem('u4-theme'); if (savedTheme) root.setAttribute('data-theme', savedTheme); } catch (e) {}
+  if (themeBtn) themeBtn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('u4-theme', next); } catch (e) {}
+  });
+
+  /* ---------------- SIDEBAR ---------------- */
+  var toc = $('toc');
+  if ($('dkSide')) $('dkSide').addEventListener('click', function () {
+    document.body.classList.toggle('no-side');
+    var closed = document.body.classList.contains('no-side');
+    if (toc) toc.style.display = closed ? 'none' : '';
+    $('dkSide').textContent = closed ? '⇥' : '☰';
+    $('dkSide').title = closed ? 'Sidebar kholo' : 'Sidebar band karo';
+  });
+
+  /* ---------------- AMBIENT: TREE GROWING (branches) ---------------- */
+  (function () {
+    var cv = $('ambient'); if (!cv || !cv.getContext) return;
+    var ctx = cv.getContext('2d');
+    var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    var W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
+    var nodes = [], tick = 0;
+
+    function resize() {
+      W = window.innerWidth; H = window.innerHeight;
+      cv.width = Math.floor(W * dpr); cv.height = Math.floor(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      nodes = [];
+      for (var i = 0; i < 26; i++) grow();
+      nodes.forEach(function (n) { n.age = 60 + Math.random() * 120; });
+      draw();
+    }
+    function grow() {
+      if (!nodes.length) {
+        nodes.push({ x: W * (0.15 + Math.random() * 0.7), y: H * 0.94, px: null, py: null, age: 0, life: 620 + Math.random() * 260, leaf: false });
+        return;
+      }
+      var p = nodes[Math.floor(Math.random() * nodes.length)];
+      var ang = -Math.PI / 2 + (Math.random() - 0.5) * 1.5;
+      var len = 34 + Math.random() * 66;
+      nodes.push({
+        x: p.x + Math.cos(ang) * len,
+        y: p.y + Math.sin(ang) * len,
+        px: p.x, py: p.y,
+        age: 0,
+        life: 520 + Math.random() * 320,
+        leaf: Math.random() < 0.45
+      });
+      if (nodes.length > 70) nodes.shift();
+    }
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < nodes.length; i++) {
+        var n = nodes[i];
+        var a = Math.min(1, n.age / 45) * Math.max(0, 1 - n.age / n.life);
+        if (a <= 0.01) continue;
+        if (n.px !== null) {
+          ctx.beginPath();
+          ctx.moveTo(n.px, n.py);
+          ctx.lineTo(n.x, n.y);
+          ctx.strokeStyle = 'rgba(255,126,182,' + (a * 0.22).toFixed(3) + ')';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.leaf ? 2.6 : 1.8, 0, Math.PI * 2);
+        ctx.fillStyle = n.leaf
+          ? 'rgba(94,234,212,' + (a * 0.55).toFixed(3) + ')'
+          : 'rgba(255,126,182,' + (a * 0.42).toFixed(3) + ')';
+        ctx.fill();
+      }
+    }
+    function step() {
+      tick++;
+      if (tick % 9 === 0) grow();
+      for (var i = nodes.length - 1; i >= 0; i--) {
+        nodes[i].age++;
+        if (nodes[i].age > nodes[i].life) nodes.splice(i, 1);
+      }
+      draw();
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    if (reduce) { draw(); return; }
+    setInterval(function () { if (!document.hidden) step(); }, 60);
+  })();
+
+  /* ---------------- AGENDA + TIMER ---------------- */
+  var BLOCKS = [
+    { m: 3, t: 'Tree kyun?', d: 'Array vs linked list vs tree — problem se shuru.', n: 'Poochho: file system tree hai?' },
+    { m: 6, t: 'Terminology', d: 'Ek tree pe saare terms (parivaar analogy).', n: 'Height vs level ka trap' },
+    { m: 7, t: 'Types', d: 'Strictly / complete / perfect / skewed / extended.', n: 'Kaun kahan use hota hai' },
+    { m: 6, t: 'Formulas + brackets', d: '⌈ ⌉ ceiling, ⌊ ⌋ floor — phir 4 formulas.', n: 'n=10 pe min height poochho' },
+    { m: 4, t: 'Representation', d: 'Array vs linked, skew me waste.', n: 'Heap kyun array me?' },
+    { m: 3, t: 'Traversals', d: 'Animation chalao — PRE/IN/POST/LEVEL.', n: 'BST inorder = sorted' },
+    { m: 1, t: 'Practice', d: '5 sawaal khud karwao.', n: 'Homework' }
+  ];
+  var TOTAL = BLOCKS.reduce(function (s, b) { return s + b.m; }, 0) * 60;
+  var left = TOTAL, running = false, tick = null, cur = -1;
+
+  function fmt(s) { var m = Math.floor(s / 60), x = s % 60; return (m < 10 ? '0' : '') + m + ':' + (x < 10 ? '0' : '') + x; }
+  function paintTimer() {
+    if ($('dkTimer')) $('dkTimer').textContent = fmt(left);
+    if ($('tkTimer')) $('tkTimer').textContent = fmt(left);
+  }
+  function renderPlan() {
+    var host = $('planSteps'); if (!host) return;
+    var html = '<div style="font-family:\'Fira Code\',monospace;font-size:10px;letter-spacing:1.6px;color:var(--faint);text-transform:uppercase;margin-bottom:10px">AAJ KA PLAN · ' + Math.round(TOTAL / 60) + ' MIN</div>';
+    BLOCKS.forEach(function (b, i) {
+      html += '<div class="plan-step' + (i === cur ? ' on' : '') + '" data-i="' + i + '" style="display:flex;gap:12px;align-items:flex-start;padding:11px 13px;border:1px solid ' + (i === cur ? 'var(--gold)' : 'var(--border)') + ';border-radius:10px;margin-bottom:8px;cursor:pointer;background:' + (i === cur ? 'var(--gold-dim)' : 'var(--surface2)') + '">' +
+        '<span style="font-family:\'Fira Code\',monospace;font-size:11px;color:var(--gold);min-width:34px">' + b.m + 'm</span>' +
+        '<span style="flex:1"><b style="font-size:13.5px;display:block;color:var(--text)">' + b.t + '</b>' +
+        '<span style="font-size:12px;color:var(--dim);line-height:1.5;display:block;margin-top:2px">' + b.d + '</span>' +
+        '<span style="font-size:11px;color:var(--faint);display:block;margin-top:4px">→ ' + b.n + '</span></span></div>';
+    });
+    host.innerHTML = html;
+    host.querySelectorAll('.plan-step').forEach(function (el) {
+      el.addEventListener('click', function () { setBlock(parseInt(el.dataset.i, 10)); });
+    });
+  }
+  function setBlock(i) {
+    if (i < 0 || i >= BLOCKS.length) return;
+    cur = i; left = BLOCKS[i].m * 60;
+    if ($('dkBlk')) $('dkBlk').textContent = BLOCKS[i].t;
+    if ($('tkBlkName')) $('tkBlkName').textContent = BLOCKS[i].t;
+    if ($('tkNote')) $('tkNote').textContent = BLOCKS[i].n;
+    renderPlan(); paintTimer();
+  }
+  function startTimer() {
+    if (running) { running = false; clearInterval(tick); if ($('dkStart')) $('dkStart').textContent = '▶'; return; }
+    if (cur < 0) setBlock(0);
+    running = true; if ($('dkStart')) $('dkStart').textContent = '⏸';
+    tick = setInterval(function () {
+      if (left > 0) { left--; paintTimer(); }
+      else {
+        clearInterval(tick); running = false;
+        if ($('dkStart')) $('dkStart').textContent = '▶';
+        var b = $('tuBanner');
+        if (b) { b.classList.add('show'); setTimeout(function () { b.classList.remove('show'); }, 4200); }
+        try {
+          var ac = new (window.AudioContext || window.webkitAudioContext)();
+          var o = ac.createOscillator(), g = ac.createGain();
+          o.connect(g); g.connect(ac.destination);
+          o.frequency.value = 880; g.gain.value = 0.05; o.start();
+          setTimeout(function () { o.stop(); ac.close(); }, 380);
+        } catch (e) {}
+        if (cur < BLOCKS.length - 1) setBlock(cur + 1);
+      }
+    }, 1000);
+  }
+  if ($('dkStart')) $('dkStart').addEventListener('click', startTimer);
+  if ($('tkStart')) $('tkStart').addEventListener('click', startTimer);
+  if ($('dkNext')) $('dkNext').addEventListener('click', function () { setBlock(cur + 1); });
+  if ($('tkNext')) $('tkNext').addEventListener('click', function () { setBlock(cur + 1); });
+  if ($('tkReset')) $('tkReset').addEventListener('click', function () { clearInterval(tick); running = false; if ($('dkStart')) $('dkStart').textContent = '▶'; setBlock(Math.max(0, cur)); });
+  renderPlan(); paintTimer();
+  window.__cls = { state: function () { return { cur: cur, left: left, running: running }; }, setSeconds: function (s) { left = s; paintTimer(); } };
+
+  /* ---------------- PEN (thin · unique colour · icons) ---------------- */
+  var cv = $('penCanvas'), ctx = cv ? cv.getContext('2d') : null;
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  var strokes = [], active = null, penOn = false, penWidth = 1.3, penColor = '#d4ff3f', eraser = false;
+
+  function readPenColor() {
+    try {
+      var v = getComputedStyle(root).getPropertyValue('--pen').trim();
+      if (v) penColor = v;
+    } catch (e) {}
+  }
+  readPenColor();
+
+  function resizePen() {
+    if (!cv) return;
+    cv.width = Math.floor(window.innerWidth * dpr);
+    cv.height = Math.floor(window.innerHeight * dpr);
+    cv.style.width = window.innerWidth + 'px';
+    cv.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawPen();
+  }
+  function drawPen() {
+    if (!ctx) return;
+    var sy = window.scrollY || 0;
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    strokes.forEach(function (st) {
+      if (st.pts.length === 0) return;
+      ctx.strokeStyle = st.c;
+      ctx.lineWidth = st.w;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.shadowColor = st.c;
+      ctx.shadowBlur = 2.5;
+      ctx.beginPath();
+      st.pts.forEach(function (p, i) {
+        var x = p[0], y = p[1] - sy;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      if (st.pts.length === 1) ctx.lineTo(st.pts[0][0] + 0.1, st.pts[0][1] - sy + 0.1);
+      ctx.stroke();
+    });
+    ctx.shadowBlur = 0;
+  }
+  var raf = null;
+  function schedulePen() { if (raf) return; raf = requestAnimationFrame(function () { raf = null; drawPen(); }); }
+
+  if (cv) {
+    cv.addEventListener('pointerdown', function (e) {
+      if (!penOn) return;
+      cv.setPointerCapture(e.pointerId);
+      if (eraser) {
+        var sy = window.scrollY || 0, px = e.clientX, py = e.clientY + sy, before = strokes.length;
+        strokes = strokes.filter(function (st) {
+          return !st.pts.some(function (p) { return Math.abs(p[0] - px) < 16 && Math.abs(p[1] - py) < 16; });
+        });
+        if (strokes.length !== before) drawPen();
+        return;
+      }
+      active = { c: penColor, w: penWidth, pts: [[e.clientX + window.scrollX, e.clientY + window.scrollY]] };
+      strokes.push(active);
+      drawPen();
+    });
+    cv.addEventListener('pointermove', function (e) {
+      if (!penOn || !active) return;
+      active.pts.push([e.clientX + window.scrollX, e.clientY + window.scrollY]);
+      schedulePen();
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
+      cv.addEventListener(ev, function () { active = null; });
+    });
+    window.addEventListener('scroll', schedulePen, { passive: true });
+    window.addEventListener('resize', resizePen);
+    resizePen();
+  }
+
+  function setPenUI() {
+    var bar = $('penBar');
+    if (bar) bar.classList.toggle('show', penOn);
+    document.body.classList.toggle('pen-on', penOn);
+    if ($('dkPen')) $('dkPen').style.color = penOn ? 'var(--pen)' : '';
+  }
+  if ($('dkPen')) $('dkPen').addEventListener('click', function () { penOn = !penOn; setPenUI(); });
+  if ($('penThin')) $('penThin').addEventListener('click', function () {
+    penWidth = 0.8; eraser = false;
+    ['penThin', 'penMed', 'penThick'].forEach(function (id) { if ($(id)) $(id).classList.remove('on'); });
+    $('penThin').classList.add('on'); if ($('penErase')) $('penErase').classList.remove('on');
+  });
+  if ($('penMed')) $('penMed').addEventListener('click', function () {
+    penWidth = 1.3; eraser = false;
+    ['penThin', 'penMed', 'penThick'].forEach(function (id) { if ($(id)) $(id).classList.remove('on'); });
+    $('penMed').classList.add('on'); if ($('penErase')) $('penErase').classList.remove('on');
+  });
+  if ($('penThick')) $('penThick').addEventListener('click', function () {
+    penWidth = 2.0; eraser = false;
+    ['penThin', 'penMed', 'penThick'].forEach(function (id) { if ($(id)) $(id).classList.remove('on'); });
+    $('penThick').classList.add('on'); if ($('penErase')) $('penErase').classList.remove('on');
+  });
+  if ($('penErase')) $('penErase').addEventListener('click', function () {
+    eraser = !eraser; $('penErase').classList.toggle('on', eraser);
+  });
+  if ($('penUndo')) $('penUndo').addEventListener('click', function () { strokes.pop(); drawPen(); });
+  if ($('penClear')) $('penClear').addEventListener('click', function () { strokes = []; drawPen(); });
+  document.querySelectorAll('.pen-bar .sw').forEach(function (sw) {
+    sw.addEventListener('click', function () {
+      var c = sw.dataset.c;
+      penColor = c.indexOf('var(') === 0 ? getComputedStyle(root).getPropertyValue(c.slice(4, -1)).trim() : c;
+      eraser = false; if ($('penErase')) $('penErase').classList.remove('on');
+      document.querySelectorAll('.pen-bar .sw').forEach(function (s) { s.classList.remove('sel'); });
+      sw.classList.add('sel');
+    });
+  });
+  setPenUI();
+
+  /* ---------------- SPIN — floating card (scroll nahi karna padega) ---------------- */
+  var STUDENTS = ['Harsh', 'Aryan', 'Khusi'];
+  var QS = [
+    { q: 'Tree ko array, linked list se behtar kab kehte hain?', a: 'Jab <b>search + insert + delete teeno</b> chahiye — tree me teeno O(log n), array me insert O(n), list me search O(n).' },
+    { q: 'Height aur level me fark?', a: 'Level = node ki position (root = 0). Height = poore tree ki (root se door leaf tak <b>edges</b>).' },
+    { q: 'Level 3 pe maximum kitne nodes?', a: '2³ = <b>8</b>.' },
+    { q: 'Height 4 wale binary tree me max nodes?', a: '2^(4+1) − 1 = <b>31</b>.' },
+    { q: '10 nodes wale tree ki minimum height?', a: '⌈log₂11⌉ − 1 = ⌈3.46⌉ − 1 = 4 − 1 = <b>3</b>.' },
+    { q: '⌈ ⌉ aur ⌊ ⌋ ka naam aur fark?', a: '⌈ ⌉ = <b>ceiling</b> (upar wala poora number) · ⌊ ⌋ = <b>floor</b> (neeche wala).' },
+    { q: 'n₀ = n₂ + 1 ka matlab?', a: 'Leaves ki ginti = <b>2-bachche wale nodes + 1</b>.' },
+    { q: 'Complete binary tree ka rule?', a: 'Saare levels bhare, aakhri level <b>left se right</b> bhara — isliye heap array me fit ho jata hai.' },
+    { q: 'Skewed tree me search O(log n) kyun nahi rehta?', a: 'Kyunki wo <b>linked list</b> ban jata hai — height n ho jati hai, toh O(n).' },
+    { q: 'Array representation me skewed tree ki problem?', a: 'Index 2i+2 chalte-chalte <b>2^h slots</b> chahiye — 4 nodes ke liye 15 slots tak.' },
+    { q: 'Inorder traversal ka order?', a: '<b>L N R</b> — left, node, right.' },
+    { q: 'Preorder me root kab visit hota hai?', a: '<b>Sabse pehle</b> (N L R).' },
+    { q: 'Postorder kahan use hota hai?', a: 'Tree <b>delete</b> karne me (bachche pehle) aur postfix expression me.' },
+    { q: 'BST ka inorder kaisa hota hai?', a: '<b>Sorted</b> (ascending).' },
+    { q: 'Binary tree me kitne NULL pointers (n nodes)?', a: '<b>n + 1</b> — yahi threaded tree me kaam aate hain.' },
+    { q: 'Strictly binary tree ka rule?', a: 'Har node ke <b>0 ya 2</b> children — 1 child wala nahi.' }
+  ];
+  var pool = [], used = 0, lastQ = -1, tally = {};
+
+  function openCard(name, item) {
+    var card = $('dkQCard');
+    if (!card) return;
+    if ($('dkQWho')) $('dkQWho').textContent = name ? '🎯 ' + name : '';
+    if ($('dkName')) $('dkName').textContent = name || '—';
+    if ($('dkQText')) $('dkQText').innerHTML = item.q;
+    if ($('dkQAns')) { $('dkQAns').innerHTML = item.a; $('dkQAns').style.display = 'none'; }
+    card.classList.add('show');
+  }
+  function closeCard() { var c = $('dkQCard'); if (c) c.classList.remove('show'); }
+
+  if ($('dkSpin')) $('dkSpin').addEventListener('click', function () {
+    if (!pool.length) { pool = QS.map(function (q, i) { return i; }); used = 0; }
+    var pick = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+    if (pick === lastQ && pool.length) { pool.push(pick); pick = pool.splice(Math.floor(Math.random() * pool.length), 1)[0]; }
+    lastQ = pick; used++;
+    var name = STUDENTS[Math.floor(Math.random() * STUDENTS.length)];
+    openCard(name, QS[pick]);
+  });
+  if ($('dkQShow')) $('dkQShow').addEventListener('click', function () {
+    var a = $('dkQAns'); if (a) a.style.display = a.style.display === 'none' ? 'block' : 'none';
+  });
+  if ($('dkQClose')) $('dkQClose').addEventListener('click', closeCard);
+  if ($('dkQNext')) $('dkQNext').addEventListener('click', function () { if ($('dkSpin')) $('dkSpin').click(); });
+  ['dkQOk', 'dkOk'].forEach(function (id) {
+    if ($(id)) $(id).addEventListener('click', function () {
+      tally.right = (tally.right || 0) + 1;
+      var n = $('dkName'); if (n) n.style.color = 'var(--blue)';
+      closeCard();
+    });
+  });
+  ['dkQBad', 'dkBad'].forEach(function (id) {
+    if ($(id)) $(id).addEventListener('click', function () {
+      tally.wrong = (tally.wrong || 0) + 1;
+      var n = $('dkName'); if (n) n.style.color = 'var(--coral)';
+      closeCard();
+    });
+  });
+
+  /* ---------------- TRAVERSAL ANIMATION ---------------- */
+  (function () {
+    var host = $('travSim'); if (!host) return;
+    var ORDERS = {
+      pre: ['A', 'B', 'D', 'E', 'C', 'F', 'G'],
+      in: ['D', 'B', 'E', 'A', 'F', 'C', 'G'],
+      post: ['D', 'E', 'B', 'F', 'G', 'C', 'A'],
+      level: ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+    };
+    var LABEL = {
+      pre: 'Preorder (N L R) — node pehle, phir left, phir right',
+      in: 'Inorder (L N R) — left, node, right',
+      post: 'Postorder (L R N) — left, right, phir node',
+      level: 'Level order — queue se, level by level'
+    };
+    var timer = null, order = [], idx = 0, mode = '';
+
+    function clearNodes() {
+      document.querySelectorAll('#travSim .tnode').forEach(function (n) { n.classList.remove('on', 'done'); });
+    }
+    function paint() {
+      clearNodes();
+      for (var i = 0; i < idx; i++) {
+        var prev = $('t' + order[i]);
+        if (prev) prev.classList.add('done');
+      }
+      if (idx > 0) { var curN = $('t' + order[idx - 1]); if (curN) curN.classList.add('on'); }
+      if ($('travOut')) $('travOut').innerHTML = order.slice(0, idx).map(function (x) { return '<b>' + x + '</b>'; }).join(' ') || '—';
+      if ($('travLog')) {
+        $('travLog').innerHTML = idx === 0 ? LABEL[mode] + ' — STEP dabao'
+          : '<b>' + idx + '/' + order.length + '</b> · abhi visit hua: <b>' + order[idx - 1] + '</b>' + (idx === order.length ? ' · poora ho gaya ✔' : '');
+      }
+    }
+    function step() {
+      if (idx < order.length) { idx++; paint(); }
+      else { if (timer) { clearInterval(timer); timer = null; } }
+    }
+    document.querySelectorAll('#travSim [data-trav]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (timer) { clearInterval(timer); timer = null; }
+        mode = btn.dataset.trav; order = ORDERS[mode]; idx = 0;
+        document.querySelectorAll('#travSim [data-trav]').forEach(function (b) { b.classList.remove('on'); });
+        btn.classList.add('on');
+        paint();
+        timer = setInterval(function () { step(); }, 700);
+      });
+    });
+    paint();
+  })();
+
+  /* ---------------- AUDIO (chhupa hua) ---------------- */
+  (function () {
+    var synth = window.speechSynthesis;
+    if (!synth) return;
+    var chunks = [];
+    document.querySelectorAll('.sec').forEach(function (sec) {
+      var t = sec.innerText.replace(/\s+/g, ' ').trim();
+      if (t) chunks.push(t);
+    });
+    var i = 0, speaking = false, voice = null;
+    function fillVoices() {
+      var sel = $('voiceSel'); if (!sel) return;
+      var vs = synth.getVoices() || [];
+      sel.innerHTML = '';
+      if (!vs.length) { sel.innerHTML = '<option>No voice</option>'; return; }
+      vs.forEach(function (v, k) { var o = document.createElement('option'); o.value = k; o.textContent = v.name + ' (' + v.lang + ')'; sel.appendChild(o); });
+      var en = vs.findIndex(function (v) { return /en-IN|en-GB|en-US/.test(v.lang); });
+      if (en >= 0) sel.value = en;
+      voice = vs[en >= 0 ? en : 0];
+      if ($('pVoice')) $('pVoice').textContent = 'Voice: ' + (voice ? voice.name : 'none');
+    }
+    setTimeout(fillVoices, 400);
+    if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = fillVoices;
+    function speak() {
+      if (!synth || i >= chunks.length) { if ($('btnPlay')) $('btnPlay').textContent = '▶'; speaking = false; return; }
+      var u = new SpeechSynthesisUtterance(chunks[i]);
+      if (voice) u.voice = voice;
+      var rate = $('rateSel') ? parseFloat($('rateSel').value) : 1;
+      u.rate = rate;
+      u.onend = function () { if (speaking) { i++; speak(); } };
+      if ($('pNow')) $('pNow').textContent = 'Section ' + (i + 1) + ' / ' + chunks.length;
+      synth.speak(u);
+    }
+    if ($('btnPlay')) $('btnPlay').addEventListener('click', function () {
+      if (!chunks.length) return;
+      if (speaking) { synth.pause(); speaking = false; $('btnPlay').textContent = '▶'; return; }
+      if (synth.paused && !synth.speaking) { synth.resume(); speaking = true; $('btnPlay').textContent = '⏸'; return; }
+      speaking = true; $('btnPlay').textContent = '⏸'; speak();
+    });
+    if ($('btnStop')) $('btnStop').addEventListener('click', function () { synth.cancel(); speaking = false; i = 0; if ($('btnPlay')) $('btnPlay').textContent = '▶'; });
+    if ($('btnNext')) $('btnNext').addEventListener('click', function () { if (speaking) { synth.cancel(); i = Math.min(chunks.length - 1, i + 1); speak(); } });
+    if ($('btnPrev')) $('btnPrev').addEventListener('click', function () { if (speaking) { synth.cancel(); i = Math.max(0, i - 1); speak(); } });
+    var vs2 = $('voiceSel');
+    if (vs2) vs2.addEventListener('change', function () { var v = (synth.getVoices() || [])[parseInt(vs2.value, 10)]; if (v) voice = v; });
+  })();
+
+  /* audio toggle */
+  if ($('dkAudio')) $('dkAudio').addEventListener('click', function () {
+    var p = $('player'); if (!p) return;
+    var hidden = p.style.display === 'none' || getComputedStyle(p).display === 'none';
+    p.style.display = hidden ? 'flex' : 'none';
+  });
+})();
+</script>
+
+<div class="dsnav" role="navigation" aria-label="Page navigation">
+  <a class="dsnav-b" href="../unit3/DS_Unit3_AnswerCopy.html" title="Pichla page (←)">←</a>
+  <a class="dsnav-b" href="../index.html" title="Sab pages (Home)">⌂</a>
+  <a class="dsnav-b" href="DS_Unit4_Session2.html" title="Agla page (→)">→</a>
+</div>
+<style>
+/* ===== DS page nav (auto-injected) ===== */
+.dsnav{position:fixed;right:14px;bottom:78px;z-index:650;display:flex;gap:6px;align-items:center;
+  background:rgba(10,14,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:6px 8px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);opacity:.6;transition:opacity .2s ease, transform .2s ease;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.dsnav:hover{opacity:1;transform:translateY(-2px)}
+.dsnav-b{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:15px;line-height:1;
+  transition:background .15s ease,color .15s ease}
+.dsnav-b:hover{background:#ff9f45;color:#101820}
+.dsnav-b.dsnav-off{opacity:.25;pointer-events:none}
+.dsnav-tip{font-size:10px;letter-spacing:.8px;color:rgba(255,255,255,.45);padding:0 4px;white-space:nowrap}
+@media (max-width:640px){.dsnav-tip{display:none}.dsnav{right:10px;bottom:70px;padding:5px 6px}.dsnav-b{width:30px;height:30px;font-size:14px}}
+@media print{.dsnav{display:none!important}}
+</style>
+<script>
+(function(){
+  var PREV="../unit3/DS_Unit3_AnswerCopy.html", NEXT="DS_Unit4_Session2.html";
+  document.addEventListener('keydown', function(e){
+    var t=e.target||{};
+    if(/INPUT|TEXTAREA|SELECT/.test(t.tagName||'')) return;
+    if(e.key==='ArrowRight' && NEXT) window.location.href=NEXT;
+    else if(e.key==='ArrowLeft' && PREV) window.location.href=PREV;
+    else if(e.key==='Home') window.location.href='../index.html';
+  });
+})();
+</script>
+
+</body>
+</html>

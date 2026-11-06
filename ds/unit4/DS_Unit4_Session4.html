@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 4 · Session 4 — B-Tree · B+ · Huffman · Heap | Team Devdoots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;800&family=Figtree:wght@400;500;600;700&family=Azeret+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ================= TOKENS ================= */
+:root, [data-theme="dark"] {
+  --bg: #131a2b;
+  --surface: #1b2438;
+  --surface2: #222d45;
+  --surface3: #2c3a57;
+  --border: rgba(230,240,255,0.10);
+  --border2: rgba(230,240,255,0.20);
+  --text: #eef3ff;
+  --dim: #a6b4d0;
+  --faint: #71809e;
+  --gold: #ff9f45;
+  --gold-dim: rgba(255,159,69,0.14);
+  --blue: #5ce1e6;
+  --blue-dim: rgba(92,225,230,0.14);
+  --coral: #ff6b8a;
+  --coral-dim: rgba(255,107,138,0.14);
+  --emerald: #a8e063;
+  --emerald-dim: rgba(168,224,99,0.14);
+  --shadow: 0 12px 36px rgba(0,0,0,0.55);
+  --pen: #ffe066;
+}
+[data-theme="light"] {
+  --bg: #f6f8fd;
+  --surface: #ffffff;
+  --surface2: #fafcff;
+  --surface3: #eaf0fa;
+  --border: rgba(20,40,80,0.12);
+  --border2: rgba(20,40,80,0.22);
+  --text: #16203a;
+  --dim: #56637f;
+  --faint: #8b97ae;
+  --gold: #b35c00;
+  --gold-dim: rgba(179,92,0,0.12);
+  --blue: #0d7d84;
+  --blue-dim: rgba(13,125,132,0.12);
+  --coral: #b32447;
+  --coral-dim: rgba(179,36,71,0.12);
+  --emerald: #4d7a13;
+  --emerald-dim: rgba(77,122,19,0.12);
+  --shadow: 0 12px 30px rgba(20,40,80,0.14);
+  --pen: #8a6d00;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  font-size: 16px; line-height: 1.72;
+  overflow-wrap: break-word;
+  padding-bottom: 150px;
+  background-image:
+    radial-gradient(ellipse 900px 420px at 75% -90px, var(--gold-dim), transparent 62%),
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: auto, 44px 44px, 44px 44px;
+}
+body.audio-off { padding-bottom: 44px; }
+::selection { background: var(--gold-dim); }
+
+/* ================= LAYOUT ================= */
+.wrap { max-width: 1460px; margin: 0 auto; display: grid; grid-template-columns: 232px minmax(0,1fr); gap: 0 54px; padding: 0 30px; position: relative; z-index: 1; }
+.main { min-width: 0; padding: 26px 0 70px; }
+body.noside .toc { display: none !important; }
+body.noside .wrap { grid-template-columns: minmax(0,1fr); }
+body.noside .main { max-width: 1180px; margin: 0 auto; }
+
+/* ================= TOC ================= */
+.toc { position: sticky; top: 22px; align-self: start; max-height: calc(100dvh - 70px); overflow-y: auto; padding: 22px 0 26px; grid-row: 1 / -1; }
+.toc::-webkit-scrollbar { width: 3px; }
+.toc::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+.toc-title { font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--faint); padding-bottom: 11px; margin-bottom: 9px; border-bottom: 1px solid var(--border); }
+.toc a { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; color: var(--dim); text-decoration: none; padding: 5px 10px; border-radius: 6px; border-left: 2px solid transparent; transition: all .15s; line-height: 1.45; margin-bottom: 1px; }
+.toc a .n { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--faint); }
+.toc a:hover { color: var(--text); background: var(--surface); }
+.toc a.active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-dim); }
+.toc a.active .n { color: var(--gold); }
+
+/* ================= DOCK ================= */
+.dock {
+  position: sticky; top: 10px; z-index: 420;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border2); border-radius: 13px;
+  padding: 8px 12px; margin: 0 0 22px; box-shadow: var(--shadow);
+}
+.dock-timer { font-family: 'Azeret Mono', monospace; font-size: 22px; font-weight: 600; color: var(--gold); min-width: 76px; letter-spacing: 1px; }
+.dock-timer.warn { color: var(--coral); }
+.dock-blk { font-size: 12.5px; color: var(--dim); max-width: 270px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dock-name { font-family: 'Chivo', system-ui, sans-serif; font-weight: 800; font-size: 19px; color: var(--blue); min-width: 74px; letter-spacing: .3px; }
+.dock-name.spinning { opacity: .5; }
+.dbtn { font-family: 'Azeret Mono', monospace; font-size: 12px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 7px 11px; transition: all .15s; }
+.dbtn:hover { border-color: var(--gold); color: var(--gold); }
+.dbtn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.dbtn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.dbtn--blue { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+.dbtn--ok { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-dim); }
+.dbtn--bad { border-color: var(--coral); color: var(--coral); background: var(--coral-dim); }
+.dock-sep { width: 1px; height: 24px; background: var(--border2); margin: 0 3px; }
+.dock-spacer { flex: 1 1 16px; min-width: 0; }
+.dock-q { display: none; margin: -12px 0 22px; border: 1px solid var(--blue); border-left: 3px solid var(--blue); border-radius: 0 0 13px 13px; background: color-mix(in srgb, var(--blue-dim) 70%, var(--surface)); padding: 14px 18px; }
+.dock-q.show { display: block; }
+.dock-q .who { font-family: 'Azeret Mono', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.dock-q .dq { font-size: 15px; font-weight: 600; line-height: 1.55; }
+.dock-q .da { font-size: 13.5px; line-height: 1.65; color: var(--emerald); margin-top: 9px; display: none; }
+.dock-q .da.show { display: block; }
+@media (max-width: 1000px) {
+  .dock { top: 50px; padding: 7px 9px; gap: 6px; }
+  .dock-blk { display: none; }
+  .dock-timer { font-size: 18px; min-width: 64px; }
+  .dock-name { font-size: 16px; min-width: 56px; }
+  .dock-sep { display: none; }
+}
+.timeup-banner { position: fixed; bottom: 118px; left: 50%; transform: translate(-50%, 420%); z-index: 950; background: var(--coral); color: #240b06; font-family: 'Azeret Mono', monospace; font-weight: 600; font-size: 15px; letter-spacing: .8px; padding: 12px 24px; border-radius: 11px; box-shadow: 0 12px 36px rgba(0,0,0,.45); transition: transform .32s cubic-bezier(.2,.9,.3,1.4); white-space: nowrap; }
+.timeup-banner.show { transform: translate(-50%, 0); }
+@keyframes tuPulse { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+body.timeup::after { content: ''; position: fixed; inset: 0; z-index: 900; pointer-events: none; background: radial-gradient(ellipse at center, rgba(255,122,107,0.28), rgba(255,122,107,0.08) 60%, transparent 80%); animation: tuPulse .5s ease-in-out 7; }
+@keyframes tuShake { 0%,100%{transform:translateX(0)} 15%{transform:translateX(-7px)} 30%{transform:translateX(7px)} 45%{transform:translateX(-5px)} 60%{transform:translateX(5px)} 80%{transform:translateX(-3px)} }
+.dock.timeup { animation: tuShake .55s ease-in-out 4; border-color: var(--coral) !important; }
+@media (max-width: 1000px) { .timeup-banner { bottom: 170px; } }
+
+/* ================= HERO ================= */
+.hero { padding: 30px 0 6px; }
+.hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 12px; border-radius: 5px; border: 1px solid var(--border2); }
+.chip--gold { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+.chip--blue { color: var(--blue); border-color: var(--blue); background: var(--blue-dim); }
+.chip--em { color: var(--emerald); border-color: var(--emerald); background: var(--emerald-dim); }
+h1 { font-family: 'Chivo', system-ui, sans-serif; font-weight: 800; font-size: clamp(38px, 5.2vw, 60px); line-height: 1.02; letter-spacing: -1.4px; }
+h1 em { font-style: normal; color: var(--gold); }
+.hero-sub { font-size: 17px; color: var(--dim); max-width: 62ch; margin-top: 14px; }
+.hero-hr { height: 1px; background: linear-gradient(90deg, var(--gold), transparent 72%); border: none; margin: 28px 0 0; opacity: .5; }
+
+/* ================= SECTION HEAD ================= */
+.sec { scroll-margin-top: 54px; }
+.sec-head { display: flex; align-items: center; gap: 15px; margin: 70px 0 8px; flex-wrap: wrap; }
+.sec-num { font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 600; color: #1b1405; background: var(--gold); border-radius: 6px; padding: 4px 9px; letter-spacing: 1px; flex-shrink: 0; }
+h2 { font-family: 'Chivo', system-ui, sans-serif; font-weight: 800; font-size: clamp(28px, 3.2vw, 38px); line-height: 1.1; letter-spacing: -0.8px; flex: 1; min-width: 200px; }
+.sec-play { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--gold); background: var(--gold-dim); color: var(--gold); font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; font-family: 'Azeret Mono', monospace; }
+.sec-play:hover { background: var(--gold); color: #1b1405; }
+.sec-tag { font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 22px; }
+
+/* ================= READING TEXT ================= */
+.rd { font-size: 16.5px; line-height: 1.78; color: var(--text); max-width: 74ch; margin: 18px 0; padding: 4px 14px 4px 16px; border-left: 3px solid transparent; border-radius: 0 8px 8px 0; transition: background .35s, border-color .35s; }
+.rd.speaking { background: var(--gold-dim); border-left-color: var(--gold); }
+.rd b, .rd strong { color: var(--gold); font-weight: 600; }
+.rd i { color: var(--blue); font-style: normal; }
+.rd code { font-family: 'Azeret Mono', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 6px; border-radius: 4px; }
+
+/* ================= BOXES ================= */
+.def { background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 11px; padding: 16px 20px 14px; margin: 22px 0; max-width: 78ch; }
+.def-label { font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 7px; }
+.def p { font-size: 15.5px; line-height: 1.66; }
+.def p b { color: var(--gold); }
+.memo { background: linear-gradient(150deg, var(--emerald-dim), var(--surface) 60%); border: 1px solid var(--emerald); border-left: 4px solid var(--emerald); border-radius: 11px; padding: 15px 19px; margin: 22px 0; max-width: 78ch; }
+.memo-label { font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--emerald); display: block; margin-bottom: 7px; }
+.memo p, .memo li { font-size: 14.5px; line-height: 1.68; }
+.memo b { color: var(--emerald); }
+.memo ul, .memo ol { padding-left: 1.25em; }
+.callout { border-radius: 11px; padding: 14px 18px; margin: 22px 0; max-width: 78ch; font-size: 15px; line-height: 1.66; border: 1px solid var(--coral); background: var(--coral-dim); }
+.callout b { color: var(--coral); }
+.callout--info { border-color: var(--blue); background: var(--blue-dim); }
+.callout--info b { color: var(--blue); }
+
+/* ================= CARDS ================= */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(252px,1fr)); gap: 14px; margin: 22px 0; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(212px,1fr)); gap: 14px; margin: 22px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 16px 18px; min-width: 0; }
+.card h4 { font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 9px; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+.card h4::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.card p, .card li { font-size: 14px; line-height: 1.62; color: var(--dim); }
+.card p b, .card li b { color: var(--text); }
+.card ul { padding-left: 1.2em; }
+.card--blue h4 { color: var(--blue); }
+.card--em h4 { color: var(--emerald); }
+.card--coral h4 { color: var(--coral); }
+
+/* ================= DIAGRAM ================= */
+.diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 22px 20px 18px; margin: 24px 0; overflow-x: auto; }
+.d-cap { font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.4px; text-transform: uppercase; color: var(--faint); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.d-cap::before { content: ''; width: 7px; height: 7px; background: var(--gold); border-radius: 50%; }
+.memrow { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+.memcol { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.idx { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--blue); }
+.cell { min-width: 62px; padding: 13px 10px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 7px; font-family: 'Azeret Mono', monospace; font-size: 15px; font-weight: 600; }
+.cell--hl { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.cell--zero { color: var(--faint); opacity: .55; }
+.addr { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--faint); }
+.d-note { margin-top: 16px; font-size: 13.5px; color: var(--dim); line-height: 1.62; border-top: 1px dashed var(--border2); padding-top: 12px; }
+.d-note b { color: var(--gold); }
+.d-note code { font-family: 'Azeret Mono', monospace; color: var(--blue); font-size: .9em; }
+.formula { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-family: 'Azeret Mono', monospace; font-size: 14.5px; color: var(--gold); overflow-x: auto; line-height: 1.7; max-width: 78ch; }
+.formula small { display: block; color: var(--faint); font-size: 12px; margin-top: 6px; line-height: 1.6; }
+.formula .k { color: var(--blue); }
+
+/* ================= TABLES ================= */
+.table-wrap { border: 1px solid var(--border); border-radius: 13px; overflow: hidden; margin: 22px 0; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.55; }
+.data-table thead { position: sticky; top: 0; z-index: 2; }
+.data-table th { background: var(--surface3); font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.3px; color: var(--dim); text-align: left; padding: 11px 15px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.data-table td { padding: 11px 15px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.data-table tbody tr:nth-child(even) { background: var(--surface2); }
+.data-table tbody tr:hover { background: var(--gold-dim); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table td b { color: var(--gold); }
+.data-table td code { font-family: 'Azeret Mono', monospace; font-size: 12px; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+.data-table td.num, .data-table th.num { text-align: right; font-family: 'Azeret Mono', monospace; font-variant-numeric: tabular-nums; }
+
+/* ================= CODE ================= */
+.code-block { font-family: 'Azeret Mono', monospace; font-size: 13px; line-height: 1.62; background: #0c1424; border: 1px solid var(--border2); border-left: 3px solid var(--gold); border-radius: 10px; padding: 16px 18px; margin: 20px 0; overflow-x: auto; white-space: pre-wrap; word-break: break-word; color: #dfe7f5; max-width: 78ch; }
+[data-theme="light"] .code-block { background: #f3f6fc; color: #1a2436; }
+.code-block .cm { color: #6b7a99; }
+.code-block .kw { color: #6fb3e0; }
+.code-block .st { color: #e8b44a; }
+.code-block .fn { color: #3fc9a0; }
+
+/* ================= COMPARE ================= */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+.cmp-card { border: 1px solid var(--border2); border-radius: 12px; overflow: hidden; min-width: 0; background: var(--surface); }
+.cmp-card h5 { font-family: 'Azeret Mono', monospace; font-size: 11.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 18px; }
+.cmp-card--a h5 { background: var(--blue-dim); color: var(--blue); border-bottom: 2px solid var(--blue); }
+.cmp-card--b h5 { background: var(--emerald-dim); color: var(--emerald); border-bottom: 2px solid var(--emerald); }
+.cmp-card ul { list-style: none; padding: 14px 18px; }
+.cmp-card li { font-size: 13.5px; line-height: 1.62; color: var(--dim); padding: 4px 0 4px 16px; position: relative; }
+.cmp-card li::before { content: '›'; position: absolute; left: 0; color: var(--faint); font-weight: 700; }
+.cmp-card li b { color: var(--text); }
+@media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
+
+/* ================= Q&A ================= */
+.qa { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin: 18px 0; overflow: hidden; }
+.qa summary { padding: 16px 20px; cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: 15.5px; font-weight: 600; }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary:hover { background: var(--surface2); }
+.qa summary::after { content: '+'; font-family: 'Azeret Mono', monospace; color: var(--gold); margin-left: auto; font-size: 17px; }
+.qa[open] summary::after { content: '−'; }
+.mark { font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 5px; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
+.mark--2 { background: var(--blue-dim); color: var(--blue); }
+.mark--5 { background: var(--gold-dim); color: var(--gold); }
+.mark--10 { background: var(--coral-dim); color: var(--coral); }
+.qa-body { padding: 4px 20px 18px; border-top: 1px solid var(--border); }
+.qa-body p { font-size: 14.5px; line-height: 1.72; color: var(--dim); margin: 12px 0; max-width: 78ch; }
+.qa-body p b { color: var(--text); }
+.qa-body code { font-family: 'Azeret Mono', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+
+/* ================= SUMMARY / EXAM ================= */
+.one-liners { counter-reset: ol; display: grid; gap: 9px; margin: 22px 0; max-width: 84ch; }
+.one-liners li { list-style: none; counter-increment: ol; position: relative; padding: 9px 14px 9px 46px; font-size: 14.5px; line-height: 1.62; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--dim); }
+.one-liners li::before { content: counter(ol, decimal-leading-zero); position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 600; color: var(--gold); }
+.one-liners li b { color: var(--text); }
+.defgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(292px,1fr)); gap: 14px; margin: 24px 0; }
+.defcard { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold); border-radius: 10px; padding: 15px 17px; min-width: 0; }
+.defcard h6 { font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
+.defcard p { font-size: 13.5px; line-height: 1.62; color: var(--dim); }
+.defcard p b { color: var(--text); }
+
+/* ================= SIM SHELL ================= */
+.sim { border: 1px solid var(--gold); border-radius: 13px; overflow: hidden; margin: 26px 0; background: linear-gradient(165deg, var(--gold-dim), var(--surface) 42%); }
+.sim-head { padding: 13px 20px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface2); }
+.sim-head b { font-family: 'Azeret Mono', monospace; font-size: 12px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold); }
+.sim-head span { font-size: 12.5px; color: var(--faint); }
+.sim-body { padding: 20px; }
+.sim-controls { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+.sim-controls label { font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; flex-wrap: wrap; }
+.btn { font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 500; padding: 8px 15px; border-radius: 7px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); transition: all .15s; }
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.btn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.btn--ok { border-color: var(--emerald) !important; background: var(--emerald-dim) !important; color: var(--emerald) !important; }
+.btn--bad { border-color: var(--coral) !important; background: var(--coral-dim) !important; color: var(--coral) !important; }
+.btn--warn { border-color: var(--coral); color: var(--coral); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.sim input, .sim select { font-family: 'Azeret Mono', monospace; font-size: 13px; background: var(--surface); border: 1px solid var(--border2); color: var(--text); border-radius: 7px; padding: 8px 10px; width: 92px; }
+.sim select { width: auto; max-width: 100%; }
+.sim input:focus, .sim select:focus { outline: none; border-color: var(--gold); }
+.sim-steps { font-family: 'Azeret Mono', monospace; font-size: 13px; line-height: 1.9; background: var(--surface); border: 1px dashed var(--border2); border-radius: 8px; padding: 14px 18px; margin-top: 16px; color: var(--dim); min-height: 20px; }
+.sim-steps b { color: var(--gold); font-weight: 600; }
+.sim-msg { font-size: 13.5px; margin-top: 12px; color: var(--dim); }
+.sim-msg b { color: var(--gold); }
+
+/* ================= NEW VIZ: SEARCH BEAM ================= */
+.beam-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.beam-cell { min-width: 54px; padding: 13px 6px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 8px; font-family: 'Azeret Mono', monospace; font-size: 15px; font-weight: 600; transition: all .22s; position: relative; }
+.beam-cell .tag { display: block; font-size: 9px; font-weight: 500; letter-spacing: 1px; color: var(--faint); margin-top: 4px; }
+.beam-cell.scan { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); box-shadow: 0 0 0 3px var(--blue-dim); }
+.beam-cell.out { opacity: .26; }
+.beam-cell.mid { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.beam-cell.hit { border-color: var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.beam-meter { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-family: 'Azeret Mono', monospace; font-size: 12.5px; color: var(--dim); }
+.beam-meter b { color: var(--gold); }
+
+/* ================= NEW VIZ: HASH BUCKETS ================= */
+.buckets { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+.bk-row { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.bk-idx { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--faint); min-width: 46px; text-align: right; }
+.bk-slot { flex: 1; min-width: 0; border: 1px solid var(--border2); border-radius: 7px; padding: 7px 10px; background: var(--surface3); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-family: 'Azeret Mono', monospace; font-size: 13px; transition: all .25s; }
+.bk-slot.new { border-color: var(--gold); background: var(--gold-dim); }
+.bk-slot.coll { border-color: var(--coral); background: var(--coral-dim); }
+.bk-key { border-radius: 5px; padding: 2px 9px; font-size: 12px; border: 1px solid var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.bk-key.probe { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.bk-empty { color: var(--faint); font-size: 12px; }
+.lf-meter { height: 10px; border-radius: 6px; background: var(--surface3); border: 1px solid var(--border2); overflow: hidden; margin-top: 8px; }
+.lf-fill { height: 100%; background: linear-gradient(90deg, var(--emerald), var(--gold)); transition: width .3s; }
+
+/* ================= NEW VIZ: SORT RACE ================= */
+.race { display: flex; flex-direction: column; gap: 14px; }
+.lane { border: 1px solid var(--border2); border-radius: 11px; padding: 12px 14px; background: var(--surface2); }
+.lane.done { border-color: var(--emerald); }
+.lane__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 9px; }
+.lane__name { font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--blue); }
+.lane__meta { font-family: 'Azeret Mono', monospace; font-size: 11.5px; color: var(--dim); }
+.lane__meta b { color: var(--gold); }
+.lane.done .lane__name { color: var(--emerald); }
+.lane__bars { display: flex; align-items: flex-end; gap: 4px; height: 78px; }
+.lane__bar { flex: 1 1 0; min-width: 6px; background: var(--surface3); border: 1px solid var(--border2); border-radius: 3px 3px 0 0; transition: height .18s ease, background .15s ease; }
+.lane__bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.lane__bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.lane__bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+
+/* ================= NEW VIZ: SORT STEPPER (code sync) ================= */
+.step-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 860px) { .step-grid { grid-template-columns: 1fr; } }
+.step-bars { display: flex; align-items: flex-end; gap: 5px; height: 170px; padding: 22px 2px 0; }
+.step-bar { flex: 1 1 0; max-width: 58px; min-width: 12px; background: var(--surface3); border: 1px solid var(--border2); border-bottom: none; border-radius: 5px 5px 0 0; position: relative; transition: height .2s, background .18s, border-color .18s; }
+.step-bar i { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-family: 'Azeret Mono', monospace; font-size: 10px; font-style: normal; color: var(--dim); }
+.step-bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.step-bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.step-bar.piv { background: var(--coral-dim); border-color: var(--coral); }
+.step-bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+.step-code { font-family: 'Azeret Mono', monospace; font-size: 12.5px; line-height: 1.8; background: #0c1424; border: 1px solid var(--border2); border-radius: 10px; padding: 12px 14px; overflow-x: auto; }
+[data-theme="light"] .step-code { background: #f3f6fc; }
+.step-code .ln { display: block; padding: 1px 8px; border-radius: 5px; border-left: 3px solid transparent; white-space: pre; color: #93a3bd; }
+[data-theme="light"] .step-code .ln { color: #5a6b86; }
+.step-code .ln.on { background: var(--gold-dim); border-left-color: var(--gold); color: var(--text); }
+.step-code .ln b { color: var(--blue); font-weight: 600; }
+.step-vars { display: flex; gap: 9px; flex-wrap: wrap; margin: 12px 0 0; }
+.step-vars div { font-family: 'Azeret Mono', monospace; font-size: 12.5px; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border2); background: var(--surface3); color: var(--dim); }
+.step-vars div b { color: var(--gold); font-size: 14px; }
+.step-vars div.chg { border-color: var(--gold); background: var(--gold-dim); }
+.step-vars div.chg b { color: var(--gold); }
+
+/* ================= CHART ================= */
+.chart-card { border: 1px solid var(--border2); border-radius: 13px; background: var(--surface); padding: 16px 16px 14px; margin: 22px 0; }
+.chart-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.chart-card__head b { font-family: 'Azeret Mono', monospace; font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+.chart-card__head .sim-controls { margin: 0; }
+.chart-wrap { position: relative; width: 100%; height: 320px; }
+.chart-wrap canvas { width: 100%; height: 100%; display: block; }
+@media (max-width: 620px) { .chart-wrap { height: 250px; } }
+.chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--dim); }
+.chart-legend span { display: flex; align-items: center; gap: 6px; }
+.chart-legend em { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+.chart-note { font-size: 13px; color: var(--faint); margin-top: 10px; line-height: 1.6; }
+
+/* ================= SCORE ROUND ================= */
+.score-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.score-tbl th { font-family: 'Azeret Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.score-tbl td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+.score-tbl td b { color: var(--gold); }
+.score-tbl td.num { text-align: right; font-family: 'Azeret Mono', monospace; }
+.score-tbl tr.top td { background: var(--gold-dim); }
+.spin-q { border: 1px solid var(--blue); border-radius: 12px; background: var(--surface2); padding: 16px 18px; margin-top: 16px; text-align: left; }
+.spin-q .who { font-family: 'Azeret Mono', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.spin-q .qtext { font-size: 16px; font-weight: 600; line-height: 1.55; }
+.spin-q .qans { font-size: 14px; line-height: 1.65; color: var(--emerald); margin-top: 10px; display: none; border-top: 1px dashed var(--border2); padding-top: 10px; }
+.spin-q .qans.show { display: block; }
+.picker-name { font-family: 'Chivo', system-ui, sans-serif; font-weight: 800; font-size: 50px; line-height: 1.1; color: var(--blue); min-height: 58px; }
+.picker-name.spinning { opacity: .5; }
+.result-overlay { position: fixed; inset: 0; z-index: 960; background: rgba(6,10,20,.88); backdrop-filter: blur(7px); display: none; align-items: center; justify-content: center; padding: 22px; }
+.result-overlay.show { display: flex; }
+.result-card { background: var(--surface); border: 2px solid var(--gold); border-radius: 16px; padding: 26px 30px; max-width: 660px; width: 100%; max-height: 88vh; overflow: auto; box-shadow: 0 22px 60px rgba(0,0,0,.5); }
+.result-card h3 { font-family: 'Chivo', system-ui, sans-serif; font-weight: 800; font-size: 32px; color: var(--gold); margin-bottom: 4px; }
+.result-card .sub { color: var(--dim); font-size: 14px; margin-bottom: 18px; }
+.result-card .win { font-size: 15px; margin: 16px 0; padding: 12px 16px; border-radius: 10px; background: var(--emerald-dim); border: 1px solid var(--emerald); }
+.result-card .win b { color: var(--emerald); }
+.chk { display: flex; gap: 11px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); margin-bottom: 7px; cursor: pointer; }
+.chk input { margin-top: 3px; accent-color: var(--gold); width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
+.chk span { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.chk.on { border-color: var(--gold); background: var(--gold-dim); }
+.chk.on span { color: var(--text); }
+.blk { display: flex; gap: 12px; align-items: flex-start; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; cursor: pointer; transition: all .15s; }
+.blk:hover { border-color: var(--gold); }
+.blk.on { border-color: var(--gold); background: var(--gold-dim); box-shadow: 0 0 0 1px var(--gold); }
+.blk .t { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--blue); min-width: 58px; flex-shrink: 0; }
+.blk .d { font-size: 13.5px; line-height: 1.5; color: var(--dim); min-width: 0; }
+.blk .d b { color: var(--text); display: block; font-size: 14.5px; }
+.timer-big { font-family: 'Azeret Mono', monospace; font-size: 58px; font-weight: 600; letter-spacing: 2px; color: var(--gold); line-height: 1; }
+.timer-big.warn { color: var(--coral); }
+
+/* ================= PLAYER (chhupa hua by default) ================= */
+.player {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border2); padding: 10px 18px 12px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  transition: transform .32s ease, opacity .32s ease;
+}
+body.audio-off .player { transform: translateY(115%); opacity: 0; pointer-events: none; }
+body.audio-off .sec-play { display: none; }
+.pbtn { font-family: 'Azeret Mono', monospace; font-size: 13px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 8px 12px; transition: all .15s; min-width: 42px; text-align: center; }
+.pbtn:hover { border-color: var(--gold); color: var(--gold); }
+.pbtn--main { width: 52px; height: 52px; border-radius: 50%; font-size: 17px; background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 700; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+.player select { font-family: 'Azeret Mono', monospace; font-size: 12px; background: var(--surface3); color: var(--text); border: 1px solid var(--border2); border-radius: 7px; padding: 7px 8px; max-width: 100%; }
+.p-meta { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 2px; }
+.p-now { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice { font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice .on { color: var(--emerald); }
+.p-voice .off { color: var(--coral); }
+
+/* ================= THEME TOGGLE ================= */
+.theme-toggle { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); cursor: pointer; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+[data-theme="dark"] .tt-sun { display: block; } [data-theme="dark"] .tt-moon { display: none; }
+[data-theme="light"] .tt-sun { display: none; } [data-theme="light"] .tt-moon { display: block; }
+
+/* ================= FOOTER ================= */
+.foot { margin-top: 80px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--faint); font-size: 12.5px; font-family: 'Azeret Mono', monospace; letter-spacing: .5px; }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1000px) {
+  .wrap { grid-template-columns: 1fr; padding: 0 18px; }
+  .toc { position: sticky; top: 0; z-index: 300; grid-row: auto; display: flex; gap: 6px; align-items: center; overflow-x: auto; -webkit-overflow-scrolling: touch; background: color-mix(in srgb, var(--bg) 93%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); margin: 0 -18px; padding: 10px 60px 10px 18px; max-height: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc-title { display: none; }
+  .toc a { white-space: nowrap; flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; border-radius: 5px; padding: 6px 11px; font-size: 11.5px; }
+  .toc a.active { border-bottom-color: var(--gold); background: var(--gold-dim); }
+  .main { padding-top: 20px; }
+  .sec-head { margin-top: 54px; }
+  .player { gap: 8px; padding: 10px 14px; }
+  .p-meta { min-width: 100%; order: 5; }
+  body.audio-off .player { transform: translateY(130%); }
+}
+@media (max-width: 480px) {
+  .memrow { gap: 4px; }
+  .cell { min-width: 50px; padding: 11px 6px; font-size: 13px; }
+  .rd { font-size: 15.5px; }
+  .beam-cell { min-width: 46px; font-size: 13px; padding: 10px 4px; }
+  .timer-big { font-size: 42px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } html { scroll-behavior: auto; } }
+
+/* ================= NEON PEN ================= */
+#penCanvas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 380; pointer-events: none; touch-action: none;
+}
+body.pen-on #penCanvas { pointer-events: auto; cursor: crosshair; }
+body.pen-on { user-select: none; -webkit-user-select: none; }
+.pen-bar {
+  position: fixed; left: 50%; bottom: 14px; transform: translate(-50%, 150%);
+  z-index: 470; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--gold); border-radius: 13px; padding: 9px 12px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.5); transition: transform .28s ease;
+  max-width: calc(100vw - 24px);
+}
+body.pen-on .pen-bar { transform: translate(-50%, 0); }
+.pen-bar .sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); cursor: pointer; flex-shrink: 0; transition: transform .15s; }
+.pen-bar .sw:hover { transform: scale(1.12); }
+.pen-bar .sw.sel { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 0 14px currentColor; }
+.pen-bar .pbtn2 {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; cursor: pointer;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--text);
+  border-radius: 8px; padding: 6px 10px; transition: all .15s;
+}
+.pen-bar .pbtn2:hover { border-color: var(--gold); color: var(--gold); }
+.pen-bar .pbtn2.on { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.pen-hint {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--faint);
+  letter-spacing: .4px; white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .pen-bar { gap: 6px; padding: 8px 10px; bottom: 10px; }
+  .pen-bar .sw { width: 22px; height: 22px; }
+  .pen-hint { display: none; }
+}
+/* lean class page tweaks */
+.board-tbl td { height: 34px; }
+.board-tbl td.blank { background: color-mix(in srgb, var(--gold-dim) 45%, transparent); }
+.plan-step { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; }
+.plan-step .tm { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); min-width: 54px; flex-shrink: 0; }
+.plan-step .tx { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.plan-step .tx b { color: var(--text); display: block; font-size: 14.5px; margin-bottom: 2px; }
+
+/* mobile: banner ko viewport me rakho */
+@media (max-width: 620px) {
+  .timeup-banner { font-size: 12.5px; padding: 10px 14px; white-space: normal; max-width: 92vw; text-align: center; }
+}
+
+/* ambient canvas ko fix karo (warna wo block ban ke content dhakel deta hai) */
+#ambient { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: .62; }
+.wrap { position: relative; z-index: 1; }
+
+
+/* dock select + count badge */
+.dock-sel {
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: .4px;
+  background: var(--surface2); color: var(--text); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 5px 8px; max-width: 190px; cursor: pointer;
+}
+.dock-sel:focus { outline: none; border-color: var(--gold); }
+.dock-cnt {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .6px;
+  color: var(--blue); background: var(--blue-dim); border: 1px solid var(--blue);
+  border-radius: 20px; padding: 3px 9px; white-space: nowrap;
+}
+
+/* tree + why cards (same as session 1) */
+.tree-wrap { overflow-x: auto; padding: 18px 8px 8px; border: 1px solid var(--border2); border-radius: 14px; background: var(--surface2); margin: 14px 0; }
+.tree, .tree ul { display: flex; justify-content: center; padding: 0; margin: 0; list-style: none; position: relative; }
+.tree { padding-top: 6px; }
+.tree ul { padding-top: 26px; }
+.tree li { display: flex; flex-direction: column; align-items: center; position: relative; padding: 26px 8px 0; list-style: none; }
+.tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 1.6px solid var(--border2); width: 50%; height: 26px; }
+.tree li::after { right: auto; left: 50%; border-left: 1.6px solid var(--border2); }
+.tree li:only-child::before, .tree li:only-child::after { display: none; }
+.tree li:only-child { padding-top: 0; }
+.tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+.tree li:last-child::before { border-right: 1.6px solid var(--border2); border-radius: 0 6px 0 0; }
+.tree li:first-child::after { border-radius: 6px 0 0 0; }
+.tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 1.6px solid var(--border2); width: 0; height: 26px; }
+.tnode {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px;
+  border-radius: 50%; border: 2px solid var(--gold); background: var(--gold-dim); color: var(--text);
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500; transition: all .28s ease; position: relative; z-index: 2;
+}
+.tnode.leaf { border-color: var(--blue); background: var(--blue-dim); }
+.tnode.on { background: var(--gold); color: #14172a; transform: scale(1.16); box-shadow: 0 0 0 6px var(--gold-dim); }
+.tnode.done { opacity: .45; }
+.tnode.miss { border-color: var(--coral); background: var(--coral-dim); box-shadow: 0 0 0 6px var(--coral-dim); }
+.tree-cap { text-align: center; font-size: 12px; color: var(--faint); font-family: 'JetBrains Mono', monospace; margin-top: 10px; }
+
+.why { display: grid; gap: 12px; margin: 16px 0; }
+.why-card { border: 1px solid var(--border2); border-left: 3px solid var(--coral); border-radius: 10px; padding: 13px 16px; background: var(--surface2); }
+.why-card.ok { border-left-color: var(--blue); }
+.why-card h5 { margin: 0 0 6px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: var(--text); }
+.why-card p { margin: 0; font-size: 13.5px; line-height: 1.7; color: var(--dim); }
+
+/* question card (solid + not cut) */
+.dock-q { position: fixed !important; left: 50% !important; bottom: 84px !important; transform: translate(-50%, 24px) scale(.97) !important;
+  width: min(680px, calc(100vw - 28px)) !important; max-height: min(62vh, calc(100vh - 180px)) !important; overflow-y: auto;
+  z-index: 520 !important; margin: 0 !important; padding: 34px 18px 18px !important; border-radius: 16px !important;
+  border: 1px solid var(--gold) !important; background: var(--surface) !important;
+  box-shadow: 0 18px 50px rgba(0,0,0,.6) !important; opacity: 0; pointer-events: none;
+  transition: transform .28s cubic-bezier(.2,.9,.3,1.15), opacity .22s ease; }
+.dock-q.show { opacity: 1; pointer-events: auto; transform: translate(-50%, 0) scale(1) !important; }
+.dock-q::before { content: 'SAWAAL'; position: absolute; top: 9px; left: 16px; background: var(--gold); color: #14172a; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; padding: 3px 9px; border-radius: 5px; }
+.dock-q .who { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gold); margin: 2px 0 8px; }
+.dock-q .dq { color: var(--text); font-size: 14.5px; line-height: 1.7; }
+.dock-q .da { color: var(--blue); font-size: 13.5px; line-height: 1.7; border-top: 1px dashed var(--border2); margin-top: 10px; padding-top: 10px; }
+
+/* pen */
+.pen-bar { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px;
+  padding: 7px 12px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 30px; box-shadow: var(--shadow);
+  z-index: 500; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: calc(100vw - 20px); overflow-x: auto; }
+.pen-bar.show { opacity: 1; pointer-events: auto; }
+.pen-bar .pen-hint { display: none; }
+.pbtn2 { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--dim); font-size: 13px; cursor: pointer; padding: 0; line-height: 1; transition: all .18s; }
+.pbtn2:hover { border-color: var(--gold); color: var(--gold); }
+.pbtn2.on { background: var(--gold); border-color: var(--gold); color: #14172a; }
+.pen-bar .sw { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+.pen-bar .sw.sel { border-color: var(--text); transform: scale(1.12); }
+.pen-sep { width: 1px; height: 20px; background: var(--border2); margin: 0 3px; }
+
+/* sidebar + z-index fixes */
+body.no-side .wrap { grid-template-columns: minmax(0,1fr) !important; }
+body.no-side .toc { display: none !important; }
+body.no-side .main { padding-left: 0 !important; }
+.dock { z-index: 500 !important; }
+.toc { z-index: 495 !important; }
+.timeup-banner { z-index: 530 !important; }
+
+h1, h2, h3 { font-family: 'Space Grotesk', system-ui, sans-serif; letter-spacing: -0.5px; }
+h1 em { font-style: normal; color: var(--gold); }
+.sec { scroll-margin-top: 118px; }
+@media (max-width: 1000px) { .sec { scroll-margin-top: 150px; } }
+.picker-name { font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 700; }
+@media (max-width: 900px) { .dock-sel { max-width: 140px; font-size: 10px; } }
+
+/* dock ek hi row me rahe (bahut items hain) */
+.dock { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: thin; }
+.dock::-webkit-scrollbar { height: 4px; }
+.dock::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+.dock-blk { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dock-spacer { min-width: 8px; }
+@media (max-width: 1180px) { .dock-blk { display: none; } }
+
+/* ===== TREE LINES — ab saaf dikhengi ===== */
+.tree li::before, .tree li::after {
+  border-top: 2px solid var(--dim) !important;
+  height: 26px;
+}
+.tree li::after { border-left: 2px solid var(--dim) !important; }
+.tree li:last-child::before {
+  border-right: 2px solid var(--dim) !important;
+  border-top: 2px solid var(--dim) !important;
+  border-radius: 0 7px 0 0;
+}
+.tree li:first-child::after {
+  border-top: 2px solid var(--dim) !important;
+  border-left: 2px solid var(--dim) !important;
+  border-radius: 7px 0 0 0;
+}
+.tree ul ul::before { border-left: 2px solid var(--dim) !important; }
+/* node ke neeche chhota stub, taaki line circle tak pahunche */
+.tnode::after {
+  content: ''; position: absolute; left: 50%; bottom: -13px; width: 2px; height: 13px;
+  background: var(--dim); transform: translateX(-50%); opacity: .9;
+}
+.tnode.leaf::after { display: none; }
+
+/* ===== PRACTICE — chhupe hue jawab ===== */
+.qa { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; background: var(--surface2); }
+.qa-q { font-size: 14px; color: var(--text); line-height: 1.65; }
+.qa-btn {
+  margin-top: 9px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 1px;
+  text-transform: uppercase; cursor: pointer; padding: 5px 12px; border-radius: 7px;
+  border: 1px solid var(--blue); background: var(--blue-dim); color: var(--blue);
+}
+.qa-btn:hover { background: var(--blue); color: #10142a; }
+.qa-a { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border2);
+  font-size: 13.5px; line-height: 1.75; color: var(--blue); }
+.qa-a.show { display: block; }
+
+/* ===== AVL stepper ===== */
+.avl-box { border: 1px solid var(--border2); border-radius: 12px; background: var(--surface2); padding: 16px; margin: 14px 0; }
+.avl-tree {
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.7; color: var(--text);
+  white-space: pre; text-align: left; overflow-x: auto; padding: 12px 0;
+  width: fit-content; max-width: 100%; margin: 0 auto;
+  background: rgba(255,255,255,0.02); border-radius: 8px; min-height: 60px;
+}
+.avl-tree .hl-bad { color: var(--coral); }
+.avl-tree .hl-ok { color: var(--blue); }
+.avl-tree .bad { color: var(--coral); font-weight: 700; }
+.avl-tree .good { color: var(--blue); }
+.avl-note { font-size: 13.5px; line-height: 1.75; color: var(--dim); margin-top: 10px; }
+.avl-note b { color: var(--text); }
+.avl-bf { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--faint); margin-top: 8px; }
+
+/* ===== BF / height badges on nodes ===== */
+.tnode { position: relative; }
+.tnode .hgt {
+  position: absolute; top: -9px; right: -7px; font-size: 8.5px; line-height: 1;
+  font-family: 'JetBrains Mono', monospace; color: var(--faint);
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 5px; padding: 2px 3px;
+}
+.tnode .bfb {
+  position: absolute; bottom: -10px; right: -9px; font-size: 9.5px; line-height: 1;
+  font-family: 'JetBrains Mono', monospace; padding: 2px 4px; border-radius: 5px;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--dim);
+}
+.tnode .bfb.ok { color: var(--blue); border-color: var(--blue); background: var(--blue-dim); }
+.tnode .bfb.bad { color: var(--coral); border-color: var(--coral); background: var(--coral-dim); }
+.tnode.bad { border-color: var(--coral); background: var(--coral-dim); }
+.tnode.mark { border-color: var(--coral); box-shadow: 0 0 0 5px var(--coral-dim); }
+.tnode.new { border-color: var(--blue); box-shadow: 0 0 0 5px var(--blue-dim); }
+
+/* ===== before / after pair ===== */
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+@media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+.pair .cellbox { border: 1px solid var(--border2); border-radius: 12px; background: var(--surface2); padding: 10px; overflow-x: auto; }
+.pair .lbl { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--faint); text-align: center; margin-bottom: 6px; }
+.pair .lbl.bad { color: var(--coral); }
+.pair .lbl.ok { color: var(--blue); }
+.pair .arrowmid { display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--gold); }
+
+/* ===== moving dot (edge travel animation) ===== */
+#travelDot {
+  display: none; position: fixed; left: -100px; top: -100px; width: 14px; height: 14px; border-radius: 50%; z-index: 640;
+  background: var(--gold); box-shadow: 0 0 0 5px var(--gold-dim), 0 0 18px var(--gold);
+  opacity: 0; pointer-events: none; transform: translate(-50%, -50%);
+}
+
+/* ===== small step tree captions ===== */
+.stepcap {
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: .6px;
+  color: var(--faint); text-align: center; margin-top: 4px;
+}
+.stepcap b { color: var(--gold); }
+
+/* khaali slot (right/left child missing) */
+.tnode.ghost {
+  border-style: dashed !important; border-color: var(--faint) !important;
+  background: transparent !important; box-shadow: none !important;
+  color: var(--faint) !important; font-size: 13px !important; opacity: .75;
+}
+.tnode.ghost::after { display: none; }
+.tnode.ghost .hgt, .tnode.ghost .bfb { display: none; }
+
+/* pen OFF button */
+.pbtn2--off { border-color: var(--coral) !important; color: var(--coral) !important; }
+.pbtn2--off:hover { background: var(--coral) !important; color: #14172a !important; }
+.pbtn2.on { box-shadow: 0 0 0 3px var(--gold-dim); }
+
+/* scoreboard (spin card ke andar) */
+.sb { margin-top: 12px; border-top: 1px dashed var(--border2); padding-top: 10px; }
+.sb-h { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.4px; color: var(--faint); margin-bottom: 6px; }
+.sb-row { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; padding: 3px 0; }
+.sb-n { flex: 1; color: var(--text); }
+.sb-c { color: var(--blue); }
+.sb-p { color: var(--gold); min-width: 42px; text-align: right; }
+
+/* B-tree node boxes (circle nahi, box) */
+.tnode.bnode { border-radius: 8px; min-width: 78px; height: 40px; font-size: 13px; padding: 0 12px; }
+.tnode.bnode::after { bottom: -13px; }
+
+/* Huffman / heap ke liye thoda bada node (2 line label) */
+.tnode.tall { height: 54px; min-width: 54px; border-radius: 12px; flex-direction: column; line-height: 1.05; font-size: 13px; padding: 0 8px; }
+.tnode.tall small { font-size: 9.5px; color: var(--faint); font-family: 'Azeret Mono', monospace; }
+.tnode.heap { border-color: var(--blue); background: var(--blue-dim); }
+.tnode.heaproot { border-color: var(--gold); background: var(--gold-dim); }
+
+/* code table (Huffman) */
+.htab { font-family: 'Azeret Mono', monospace; font-size: 12.5px; }
+.htab td { padding: 5px 10px; }
+
+</style>
+</head>
+<body class="audio-off">
+<canvas id="ambient" aria-hidden="true"></canvas>
+
+<div class="wrap">
+<canvas id="penCanvas" aria-hidden="true"></canvas>
+
+<nav class="toc" id="toc">
+  <div class="toc-title">UNIT 4 · SESSION 4</div>
+  <a href="#s0"><span class="n">00</span>Aaj ka plan</a>
+  <a href="#s1"><span class="n">01</span>B-Tree insert</a>
+  <a href="#s2"><span class="n">02</span>B+ Tree</a>
+  <a href="#s3"><span class="n">03</span>Huffman</a>
+  <a href="#s4"><span class="n">04</span>Heap</a>
+  <a href="#s5"><span class="n">05</span>Practice</a>
+</nav>
+
+<div class="main">
+
+<div class="dock" id="dock">
+  <span class="dock-timer" id="dkTimer">28:00</span>
+  <button class="dbtn dbtn--go" id="dkStart" title="Timer">▶</button>
+  <button class="dbtn" id="dkNext" title="Agla block">⏭</button>
+  <span class="dock-blk" id="dkBlk">Block select karo</span>
+  <span class="dock-sep"></span>
+  <select class="dock-sel" id="dkSec" title="Kis section se sawaal?">
+    <option value="auto">🎯 Auto (jahan page khula hai)</option>
+    <option value="s1">01 · B-Tree insert</option>
+    <option value="s2">02 · B+ Tree</option>
+    <option value="s3">03 · Huffman</option>
+    <option value="s4">04 · Heap</option>
+    <option value="s5">05 · Practice</option>
+  </select>
+  <button class="dbtn dbtn--blue" id="dkSpin" title="Student + sawaal">🎯</button>
+  <span class="dock-cnt" id="dkCnt">—</span>
+  <span class="dock-name" id="dkName">—</span>
+  <button class="dbtn dbtn--ok" id="dkOk" title="Sahi">✓</button>
+  <button class="dbtn dbtn--bad" id="dkBad" title="Galat">✕</button>
+  <span class="dock-sep"></span>
+  <button class="dbtn" id="dkPen" title="Pen on/off">✏</button>
+  <span class="dock-spacer"></span>
+  <button class="dbtn" id="dkSide" title="Sidebar">☰</button>
+  <button class="dbtn" id="dkAudio" title="Audio">🎧</button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Theme"><span class="tt-sun">☀</span><span class="tt-moon">☾</span></button>
+</div>
+
+<div class="dock-q" id="dkQCard">
+  <div class="who" id="dkQWho"></div>
+  <div class="dq" id="dkQText"></div>
+  <div class="da" id="dkQAns"></div>
+  <div class="sim-controls" style="margin-top:12px">
+    <button class="btn btn--go" id="dkQShow">Jawab</button>
+    <button class="btn btn--ok" id="dkQOk">✓</button>
+    <button class="btn btn--bad" id="dkQBad">✕</button>
+    <button class="btn" id="dkQNext">🎲 Agla sawaal</button>
+    <button class="btn btn--warn" id="dkQClose">✕ Band</button>
+  </div>
+</div>
+
+<div class="pen-bar" id="penBar">
+  <span class="sw sel" data-c="var(--pen)" style="background:var(--pen)"></span>
+  <span class="sw" data-c="#ff9f45" style="background:#ff9f45"></span>
+  <span class="sw" data-c="#5ce1e6" style="background:#5ce1e6"></span>
+  <span class="sw" data-c="#a8e063" style="background:#a8e063"></span>
+  <span class="sw" data-c="#ffffff" style="background:#ffffff"></span>
+  <span class="pen-sep"></span>
+  <button class="pbtn2" id="penThin" title="Patli (1px)">·</button>
+  <button class="pbtn2 on" id="penMed" title="Medium (1.6px)">–</button>
+  <button class="pbtn2" id="penThick" title="Moti (2.4px)">—</button>
+  <span class="pen-sep"></span>
+  <button class="pbtn2" id="penErase" title="Eraser">⌫</button>
+  <button class="pbtn2" id="penUndo" title="Undo">↶</button>
+  <button class="pbtn2" id="penClear" title="Sab mitao">🗑</button>
+  <span class="pen-sep"></span>
+  <button class="pbtn2 pbtn2--off" id="penOff" title="Pen band karo">✕</button>
+</div>
+
+<header class="hero">
+  <div class="hero-badges">
+    <span class="chip chip--gold">UNIT 4 · SESSION 4</span>
+    <span class="chip chip--blue">B-TREE · B+ · HUFFMAN · HEAP</span>
+    <span class="chip chip--em">28 MIN</span>
+  </div>
+  <h1>B-Tree se <em>Heap</em> tak</h1>
+  <p class="hero-sub">Aaj chaar cheezein: B-tree me insert (order 5), <b>B+ tree</b> ka fark, <b>Huffman coding</b> ka poora example, aur <b>binary heap</b> — sab diagram + table ke saath.</p>
+  <hr class="hero-hr">
+</header>
+
+<section class="sec" id="s0">
+  <div class="sec-head"><span class="sec-num">00</span><h2>Aaj ka plan</h2></div>
+  <p class="sec-tag">28 min · B-tree · B+ tree · Huffman · Heap</p>
+
+  <div class="grid2">
+    <div class="card card--em">
+      <h5 style="margin:0 0 8px;font-family:'Chivo';font-size:14px">PICHLE SESSION SE</h5>
+      <p style="margin:0;font-size:13.5px;line-height:1.85;color:var(--dim)">AVL poora — BF, chaaron rotation (LR/RL), bada example. B-tree ka intro bhi ho gaya.</p>
+    </div>
+    <div class="card card--coral">
+      <h5 style="margin:0 0 8px;font-family:'Chivo';font-size:14px">AAJ</h5>
+      <p style="margin:0;font-size:13.5px;line-height:1.85;color:var(--dim)"><b>1.</b> B-tree me insert (order 5)<br><b>2.</b> B+ tree — DBMS ka favourite<br><b>3.</b> Huffman coding<br><b>4.</b> Binary Heap</p>
+    </div>
+  </div>
+
+  <div id="planSteps"></div>
+</section>
+<section class="sec" id="s1">
+  <div class="sec-head"><span class="sec-num">01</span><h2>B-Tree — insert (order 5)</h2></div>
+  <p class="sec-tag">Order 5 = ek node me max 4 keys · 5 se zyada → split</p>
+
+  <div class="def">
+    <span class="def-label">RULES (order m = 5)</span>
+    <p>max keys = <b>m − 1 = 4</b> · max children = <b>m = 5</b> · <b>saare leaves same level</b> · split me <b>beech wali key upar</b></p>
+  </div>
+
+  <div class="sub" style="font-family:'Chivo';font-weight:700;font-size:18px;margin:18px 0 6px">Overflow kab hoga? — order pe depend karta hai</div>
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Order (m)</th><th>Max keys (m−1)</th><th>Overflow kab</th></tr></thead>
+      <tbody>
+        <tr><td>3</td><td>2</td><td>3rd key aane pe</td></tr>
+        <tr><td><b>4</b></td><td><b>3</b></td><td><b>4th key aane pe</b></td></tr>
+        <tr><td>5</td><td>4</td><td>5th key aane pe</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="sub" style="font-family:'Chivo';font-weight:700;font-size:18px;margin:18px 0 6px">Order 4 ka example — 10, 20, 30 + 40</div>
+  <p class="rd">Order 4 hai → ek node me max <b>3 keys</b>. 10, 20, 30 aane pe node bhar gaya; <b>40</b> aaya → <b>overflow</b>.</p>
+  <div class="grid2" style="gap:12px;"><div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--coral);text-align:center;margin-bottom:6px">40 aaya → OVERFLOW</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">10, 20, 30, 40</span></li></ul><div class="tree-cap">4 keys — max 3 se zyada → overflow</div></div></div><div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--blue);text-align:center;margin-bottom:6px">Split ke baad</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">20</span><ul><li><span class="tnode bnode">10</span></li><li><span class="tnode bnode">30, 40</span></li></ul></li></ul><div class="tree-cap">root 20 · left 10 · right 30, 40</div></div></div></div>
+
+  <div class="callout">
+    <b>Kaun upar gaya? — BEECH wali key (20).</b> Na sabse chhoti (10), na sabse badi (40). Split ke baad: left me [10], right me [30, 40], aur root me [20]. Root hi split hua, isliye <b>height 1 badh gayi</b>.
+  </div>
+
+  <div class="callout callout--info">
+    <b>Convention:</b> 4 keys me exact beech nahi hota — 20 aur 30 dono beech me hain. Standard (⌈m/2⌉) me <b>20 upar</b> jata hai; doosri convention me <b>30 upar</b> jata hai (left [10, 20], right [40]). <b>Dono valid hain</b> — exam me ek hi tarika follow karo.
+  </div>
+
+  <div class="sub" style="font-family:'Chivo';font-weight:700;font-size:18px;margin:18px 0 6px">Step 1–4 — 10, 20, 30, 40</div>
+  <div class="grid2" style="gap:12px;"><div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--faint);text-align:center;margin-bottom:6px">10, 20, 30, 40 insert</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">10, 20, 30, 40</span></li></ul><div class="tree-cap">4 keys — node bhar gaya</div></div></div><div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--coral);text-align:center;margin-bottom:6px">50 aaya → OVERFLOW</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">10, 20, 30, 40, 50</span></li></ul><div class="tree-cap">5 keys = 4 se zyada → overflow</div></div></div></div>
+
+  <div class="callout">
+    <b>Split:</b> 5 keys me se <b>beech wali (30) upar</b>, baaki do-ke-do group: [10, 20] left, [40, 50] right.
+  </div>
+
+  <div class="grid2" style="gap:12px;"><div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--blue);text-align:center;margin-bottom:6px">Split ke baad</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">30</span><ul><li><span class="tnode bnode">10, 20</span></li><li><span class="tnode bnode">40, 50</span></li></ul></li></ul><div class="tree-cap">root 30 · do bachche</div></div></div><div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--faint);text-align:center;margin-bottom:6px">60 insert</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">30</span><ul><li><span class="tnode bnode">10, 20</span></li><li><span class="tnode bnode">40, 50, 60</span></li></ul></li></ul><div class="tree-cap">right child me 3 keys — theek</div></div></div></div>
+
+  <div class="sub" style="font-family:'Chivo';font-weight:700;font-size:18px;margin:18px 0 6px">Step 5–7 — 70, phir 80</div>
+  <div class="grid2" style="gap:12px;"><div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--faint);text-align:center;margin-bottom:6px">70 insert</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">30</span><ul><li><span class="tnode bnode">10, 20</span></li><li><span class="tnode bnode">40, 50, 60, 70</span></li></ul></li></ul><div class="tree-cap">4 keys — abhi theek</div></div></div><div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--coral);text-align:center;margin-bottom:6px">80 insert → OVERFLOW</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">30</span><ul><li><span class="tnode bnode">10, 20</span></li><li><span class="tnode bnode">40, 50, 60, 70, 80</span></li></ul></li></ul><div class="tree-cap">5 keys → dobara overflow</div></div></div></div>
+
+  <div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--blue);text-align:center;margin-bottom:6px">FINAL — 60 upar gaya, root [30, 60]</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">30, 60</span><ul><li><span class="tnode bnode">10, 20</span></li><li><span class="tnode bnode">40, 50</span></li><li><span class="tnode bnode">70, 80</span></li></ul></li></ul><div class="tree-cap">root me 2 keys, teen bachche</div></div></div>
+
+  <div class="callout callout--info">
+    <b>Dhyan do:</b> split hamesha <b>leaf</b> me hota hai, par uski <b>beech wali key upar</b> jati hai. Agar <b>root</b> bhi overflow ho jaye toh naya root ban jata hai aur <b>tree ki height 1 badh jati hai</b> — B-tree sirf isi tarah badhta hai (upar se, neeche se nahi).
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Insert</th><th>Kahan gaya</th><th>Kya hua</th></tr></thead>
+      <tbody>
+        <tr><td>10, 20, 30, 40</td><td>root</td><td>node bhara (4 keys)</td></tr>
+        <tr><td>50</td><td>root</td><td><b>overflow → split</b>, 30 upar</td></tr>
+        <tr><td>60</td><td>right child [40,50]</td><td>3 keys — theek</td></tr>
+        <tr><td>70</td><td>right child</td><td>4 keys — theek</td></tr>
+        <tr><td>80</td><td>right child</td><td><b>overflow → split</b>, 60 upar</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+<section class="sec" id="s2">
+  <div class="sec-head"><span class="sec-num">02</span><h2>B+ Tree — DBMS ka favourite</h2></div>
+  <p class="sec-tag">B-tree jaisa, par data sirf leaves me</p>
+
+  <div class="def">
+    <span class="def-label">FARK — ek line me</span>
+    <p><b>B-tree:</b> data har node me ho sakta hai.<br>
+    <b>B+ tree:</b> data <b>sirf leaves</b> me; andar ke nodes me sirf <b>keys (raaste)</b>; aur saari leaves <b>linked list</b> se judi hain.</p>
+  </div>
+
+  <div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--blue);text-align:center;margin-bottom:6px">B+ tree (order 3)</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">30</span><ul><li><span class="tnode bnode">10, 20</span></li><li><span class="tnode bnode">30, 40</span></li></ul></li></ul><div class="tree-cap">root [30] sirf raasta batata hai · data dono leaves me · leaves → linked</div></div></div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Point</th><th>B-Tree</th><th>B+ Tree</th></tr></thead>
+      <tbody>
+        <tr><td>Data kahan</td><td>har node me</td><td><b>sirf leaves me</b></td></tr>
+        <tr><td>Leaves jude?</td><td>nahi</td><td><b>haan, linked list</b></td></tr>
+        <tr><td>Range query (10 se 50)</td><td>har node dhoondhna padta</td><td><b>leaf me jao, phir aage-aage chalo</b></td></tr>
+        <tr><td>Height</td><td>thoda kam</td><td>thoda zyada (data sirf leaves me)</td></tr>
+        <tr><td>Kahan use</td><td>file system</td><td><b>DBMS index (MySQL, Oracle)</b></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="callout">
+    <b>DBMS B+ kyun use karta hai?</b> Kyunki query aksar <b>range</b> ki hoti hai — "50 se 100 ke beech sab records". B+ me ek baar leaf tak pahuncho, phir <b>linked list</b> se aage badhte jao. B-tree me har node dobara dhoondhna padta.
+  </div>
+</section>
+<section class="sec" id="s3">
+  <div class="sec-head"><span class="sec-num">03</span><h2>Huffman Coding</h2></div>
+  <p class="sec-tag">File compression — chhote code zyada aane wale characters ko</p>
+
+  <div class="def">
+    <span class="def-label">STEPS (4)</span>
+    <p><b>1.</b> Har character ki frequency lo, sabko <b>min-heap</b> me daalo<br>
+    <b>2.</b> <b>Do sabse chhoti</b> nikalo, jodo → naya node (sum) → wapas heap me<br>
+    <b>3.</b> Jab tak <b>ek hi node</b> na bache, repeat karo<br>
+    <b>4.</b> Left edge = <b>0</b>, right edge = <b>1</b> → codes mil gaye</p>
+  </div>
+
+  <p class="rd"><b>Frequencies:</b> a = 5, b = 9, c = 12, d = 13, e = 16, f = 45 (total = 100)</p>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Step</th><th>Do sabse chhoti</th><th>Jod</th><th>Heap me ab</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>5 (a) + 9 (b)</td><td><b>14</b></td><td>12, 13, 14, 16, 45</td></tr>
+        <tr><td>2</td><td>12 (c) + 13 (d)</td><td><b>25</b></td><td>14, 16, 25, 45</td></tr>
+        <tr><td>3</td><td>14 + 16 (e)</td><td><b>30</b></td><td>25, 30, 45</td></tr>
+        <tr><td>4</td><td>25 + 30</td><td><b>55</b></td><td>45, 55</td></tr>
+        <tr><td>5</td><td>45 (f) + 55</td><td><b>100</b></td><td>bas — tree ban gaya</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode tall">100</span><ul><li><span class="tnode tall">45<small>f</small></span></li><li><span class="tnode tall">55</span><ul><li><span class="tnode tall">25</span><ul><li><span class="tnode tall">12<small>c</small></span></li><li><span class="tnode tall">13<small>d</small></span></li></ul></li><li><span class="tnode tall">30</span><ul><li><span class="tnode tall">14</span><ul><li><span class="tnode tall">5<small>a</small></span></li><li><span class="tnode tall">9<small>b</small></span></li></ul></li><li><span class="tnode tall">16<small>e</small></span></li></ul></li></ul></li></ul></li></ul><div class="tree-cap">Fig. 1 — Huffman tree (patte me frequencies, jitna neeche utna kam frequency)</div></div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table htab">
+      <thead><tr><th>Character</th><th>Frequency</th><th>Code (left=0, right=1)</th><th>Bits used</th></tr></thead>
+      <tbody>
+        <tr><td><b>f</b></td><td>45</td><td><b>0</b></td><td>45 × 1 = 45</td></tr>
+        <tr><td><b>c</b></td><td>12</td><td><b>100</b></td><td>12 × 3 = 36</td></tr>
+        <tr><td><b>d</b></td><td>13</td><td><b>101</b></td><td>13 × 3 = 39</td></tr>
+        <tr><td><b>a</b></td><td>5</td><td><b>1100</b></td><td>5 × 4 = 20</td></tr>
+        <tr><td><b>b</b></td><td>9</td><td><b>1101</b></td><td>9 × 4 = 36</td></tr>
+        <tr><td><b>e</b></td><td>16</td><td><b>111</b></td><td>16 × 3 = 48</td></tr>
+        <tr><th>Total</th><th>100</th><th>—</th><th><b>224 bits</b></th></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Fayda:</b> agar har character ko <b>3 bits</b> (fixed length) dete toh 100 × 3 = <b>300 bits</b> lagte. Huffman se <b>224 bits</b> — yani <b>25% bachat</b>. Isi liye ZIP, JPEG, MP3 me use hota hai.
+  </div>
+
+  <div class="callout">
+    <b>Prefix property:</b> koi bhi code doosre ka <b>shuru (prefix)</b> nahi hota — isliye decoding me confusion nahi hoti. Jaise <code>0</code> (f) kisi bhi doosre code ka shuruaati hissa nahi hai.
+  </div>
+</section>
+<section class="sec" id="s4">
+  <div class="sec-head"><span class="sec-num">04</span><h2>Binary Heap</h2></div>
+  <p class="sec-tag">Complete binary tree + heap property = priority queue</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION</span>
+    <p><b>Max-heap:</b> complete binary tree jisme har parent apne bachchon se <b>bada</b> ho (root pe sabse bada).<br>
+    <b>Min-heap:</b> ulta — parent chhota, root pe sabse chhota.</p>
+  </div>
+
+  <div class="grid2" style="gap:12px;"><div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--faint);text-align:center;margin-bottom:6px">Max-heap ka tree</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode heap heaproot">50</span><ul><li><span class="tnode heap">30</span><ul><li><span class="tnode heap">10</span></li><li><span class="tnode heap">20</span></li></ul></li><li><span class="tnode heap">40</span><ul><li><span class="tnode heap">35</span></li><li><span class="tnode ghost">∅</span></li></ul></li></ul></li></ul><div class="tree-cap">root 50 = sabse bada</div></div></div><div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--faint);text-align:center;margin-bottom:6px">Array representation</div><div class="table-wrap" style="margin:0"><div class="table-scroll"><table class="data-table"><thead><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody><tr><td>Value</td><td>50</td><td>30</td><td>40</td><td>10</td><td>20</td><td>35</td></tr></tbody></table></div></div><div class="tree-cap">wahi heap array me — left = 2i+1, right = 2i+2</div></div></div>
+
+  <div class="sub" style="font-family:'Chivo';font-weight:700;font-size:18px;margin:20px 0 6px">Insert 60 — bubble up</div>
+  <p class="rd">Naya element <b>aakhri jagah</b> lagao, phir <b>parent se compare</b> karke upar uthao jab tak property theek na ho.</p>
+  <div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--blue);text-align:center;margin-bottom:6px">Insert ke baad</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode heap heaproot">60</span><ul><li><span class="tnode heap">50</span><ul><li><span class="tnode heap">30</span><ul><li><span class="tnode heap">10</span></li><li><span class="tnode heap">20</span></li></ul></li><li><span class="tnode heap">40</span><ul><li><span class="tnode heap">35</span></li><li><span class="tnode ghost">∅</span></li></ul></li></ul></li><li><span class="tnode ghost">∅</span></li></ul></li></ul><div class="tree-cap">60 root tak pahunch gaya (3 swap)</div></div></div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Step</th><th>Kya hua</th><th>Array</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>60 end me (index 6)</td><td>50, 30, 40, 10, 20, 35, <b>60</b></td></tr>
+        <tr><td>2</td><td>parent 40 &lt; 60 → swap</td><td>50, 30, <b>60</b>, 10, 20, 35, 40</td></tr>
+        <tr><td>3</td><td>parent 50 &lt; 60 → swap</td><td><b>60</b>, 30, 50, 10, 20, 35, 40</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="sub" style="font-family:'Chivo';font-weight:700;font-size:18px;margin:20px 0 6px">Delete (max nikaalna) — heapify down</div>
+  <p class="rd">Root (50) nikaalo → <b>aakhri element (35) root pe</b> rakho → phir <b>neeche</b> utaaro: dono bachchon me se <b>bade</b> se swap karo.</p>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Operation</th><th>Time</th><th>Kyun</th></tr></thead>
+      <tbody>
+        <tr><td>Peek (max/min)</td><td><b>O(1)</b></td><td>root pe hi hai</td></tr>
+        <tr><td>Insert</td><td><b>O(log n)</b></td><td>height tak bubble up</td></tr>
+        <tr><td>Delete root</td><td><b>O(log n)</b></td><td>height tak heapify down</td></tr>
+        <tr><td>Build heap</td><td><b>O(n)</b></td><td>neeche se heapify</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="callout">
+    <b>Kahan use hota hai:</b> <b>Priority queue</b> (OS scheduler, Dijkstra, Huffman ka min-heap) aur <b>heap sort</b> (jo Unit 3 me kiya tha).
+  </div>
+</section>
+<section class="sec" id="s5">
+  <div class="sec-head"><span class="sec-num">05</span><h2>Practice</h2></div>
+  <p class="sec-tag">Pehle khud socho, phir jawab kholo</p>
+
+  <div class="qa">
+    <div class="qa-q"><b>1.</b> Order 5 ke B-tree me 10, 20, 30, 40, 50 insert karo — split ke baad root kya hoga?</div>
+    <button class="qa-btn">Jawab dekho</button>
+    <div class="qa-a">5 keys (4 se zyada) → overflow → beech wali <b>30 upar</b>. Root = <b>[30]</b>, bachche [10, 20] aur [40, 50].
+    <div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--faint);text-align:center;margin-bottom:6px">answer</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">30</span><ul><li><span class="tnode bnode">10, 20</span></li><li><span class="tnode bnode">40, 50</span></li></ul></li></ul><div class="tree-cap">root 30</div></div></div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q"><b>2.</b> Usi tree me 60, 70, 80 insert karo — final root?</div>
+    <button class="qa-btn">Jawab dekho</button>
+    <div class="qa-a">80 pe right child overflow → <b>60 upar</b>. Root = <b>[30, 60]</b>, bachche [10,20] [40,50] [70,80].
+    <div class="cellbox" style="border:1px solid var(--border2);border-radius:12px;background:var(--surface2);padding:10px"><div class="lbl" style="font-family:'Azeret Mono';font-size:9.5px;letter-spacing:1.3px;color:var(--blue);text-align:center;margin-bottom:6px">answer</div><div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode bnode">30, 60</span><ul><li><span class="tnode bnode">10, 20</span></li><li><span class="tnode bnode">40, 50</span></li><li><span class="tnode bnode">70, 80</span></li></ul></li></ul><div class="tree-cap">final</div></div></div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q"><b>3.</b> B+ tree me data kahan hota hai?</div>
+    <button class="qa-btn">Jawab dekho</button>
+    <div class="qa-a"><b>Sirf leaves me.</b> Andar ke nodes me sirf keys (raasta batane ke liye), aur saari leaves <b>linked list</b> se judi hoti hain.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q"><b>4.</b> a=5, b=9, c=12, d=13, e=16, f=45 — Huffman me pehla merge kya hoga?</div>
+    <button class="qa-btn">Jawab dekho</button>
+    <div class="qa-a">Do sabse chhoti: <b>5 + 9 = 14</b> (a aur b). Phir heap me 12, 13, 14, 16, 45.</div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q"><b>5.</b> Isi example me <b>f</b> ka code kya banega aur kyun?</div>
+    <button class="qa-btn">Jawab dekho</button>
+    <div class="qa-a"><b>f = 0</b> — kyunki f ki frequency sabse zyada (45) hai, aur Huffman sabse zyada aane wale ko <b>sabse chhota code</b> deta hai.
+    <div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode tall">100</span><ul><li><span class="tnode tall">45<small>f</small></span></li><li><span class="tnode tall">55</span><ul><li><span class="tnode tall">25</span><ul><li><span class="tnode tall">12<small>c</small></span></li><li><span class="tnode tall">13<small>d</small></span></li></ul></li><li><span class="tnode tall">30</span><ul><li><span class="tnode tall">14</span><ul><li><span class="tnode tall">5<small>a</small></span></li><li><span class="tnode tall">9<small>b</small></span></li></ul></li><li><span class="tnode tall">16<small>e</small></span></li></ul></li></ul></li></ul></li></ul><div class="tree-cap">tree me f sabse upar (root ka left)</div></div>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="qa-q"><b>6.</b> Max-heap me 60 insert karo — kitne swap lagenge?</div>
+    <div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode heap heaproot">50</span><ul><li><span class="tnode heap">30</span><ul><li><span class="tnode heap">10</span></li><li><span class="tnode heap">20</span></li></ul></li><li><span class="tnode heap">40</span><ul><li><span class="tnode heap">35</span></li><li><span class="tnode ghost">∅</span></li></ul></li></ul></li></ul><div class="tree-cap">Fig. 2 — shuruaati heap</div></div>
+    <button class="qa-btn">Jawab dekho</button>
+    <div class="qa-a">60 end me → parent 40 se swap → parent 50 se swap → root. <b>2 swap</b>, O(log n).
+    <div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode heap heaproot">60</span><ul><li><span class="tnode heap">50</span><ul><li><span class="tnode heap">30</span><ul><li><span class="tnode heap">10</span></li><li><span class="tnode heap">20</span></li></ul></li><li><span class="tnode heap">40</span><ul><li><span class="tnode heap">35</span></li><li><span class="tnode ghost">∅</span></li></ul></li></ul></li><li><span class="tnode ghost">∅</span></li></ul></li></ul><div class="tree-cap">final heap</div></div>
+    </div>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">📝 Homework</span>
+    <ul>
+      <li>Order 3 ke B-tree me 5, 10, 15, 20, 25 insert karo — splits dikhao</li>
+      <li>a=10, b=15, c=30, d=40, e=5 — Huffman tree banao aur codes likho</li>
+      <li>Min-heap me 50, 30, 40, 10, 20 insert karo — array banao</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <b>Agla session:</b> poore Unit 4 ka revision + threaded binary tree + PYQ practice.
+  </div>
+
+  <p class="foot">TEAM DEVDoots · UNIT 4 · SESSION 4 — B-TREE · B+ · HUFFMAN · HEAP</p>
+</section>
+
+</div><!-- /main -->
+</div><!-- /wrap -->
+
+<div class="player" id="player">
+  <button class="pbtn pbtn--main" id="btnPlay">▶</button>
+  <button class="pbtn" id="btnStop">■</button>
+  <button class="pbtn" id="btnPrev">⏮</button>
+  <button class="pbtn" id="btnNext">⏭</button>
+  <select id="rateSel"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option></select>
+  <select id="voiceSel"><option>Loading voices…</option></select>
+  <div class="p-meta">
+    <div class="p-now" id="pNow">Player ready</div>
+    <div class="p-voice" id="pVoice">Voices check kar rahe hain…</div>
+  </div>
+</div>
+
+<div class="timeup-banner" id="tuBanner">⏰ TIME UP — agla block!</div>
+
+<div class="result-overlay" id="resOverlay">
+  <div class="result-card">
+    <h3>🏆 Team Devdoots — Score</h3>
+    <div class="sub" id="resSub">Aaj ke sawaalon ka hisaab</div>
+    <div id="resBody"></div>
+    <div class="win" id="resWin"></div>
+    <div class="sim-controls">
+      <button class="btn btn--go" id="resClose">Band karo</button>
+      <button class="btn btn--warn" id="resReset">SCORE RESET</button>
+    </div>
+  </div>
+</div>
+<script>
+/* ============================================================
+   UNIT 4 · SESSION 2 — ENGINE
+   aurora background · section-wise spin (auto + manual) ·
+   question count · thin pen with unique colour · timer
+   ============================================================ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var root = document.documentElement;
+
+  /* ---------------- THEME ---------------- */
+  try { var st = localStorage.getItem('u5-theme'); if (st) root.setAttribute('data-theme', st); } catch (e) {}
+  if ($('themeToggle')) $('themeToggle').addEventListener('click', function () {
+    var nx = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', nx);
+    try { localStorage.setItem('u5-theme', nx); } catch (e) {}
+  });
+
+  /* ---------------- SIDEBAR ---------------- */
+  var toc = $('toc');
+  if ($('dkSide')) $('dkSide').addEventListener('click', function () {
+    document.body.classList.toggle('no-side');
+    var closed = document.body.classList.contains('no-side');
+    if (toc) toc.style.display = closed ? 'none' : '';
+    $('dkSide').textContent = closed ? '⇥' : '☰';
+  });
+
+  /* ---------------- AMBIENT: DIAGONAL LINES + PULSE ---------------- */
+  (function () {
+    var cv = $('ambient'); if (!cv || !cv.getContext) return;
+    var ctx = cv.getContext('2d');
+    var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    var W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1), t = 0;
+
+    function resize() {
+      W = window.innerWidth; H = window.innerHeight;
+      cv.width = Math.floor(W * dpr); cv.height = Math.floor(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    }
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      /* pulsing glow (theme colours) */
+      var cx = W * 0.5 + Math.sin(t * 0.004) * W * 0.12;
+      var cy = H * 0.34 + Math.cos(t * 0.005) * H * 0.08;
+      var r = Math.min(W, H) * (0.55 + 0.05 * Math.sin(t * 0.02));
+      var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, 'rgba(255,159,69,0.10)');
+      g.addColorStop(0.5, 'rgba(92,225,230,0.05)');
+      g.addColorStop(1, 'rgba(92,225,230,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+
+      /* drifting diagonal lines */
+      var gap = 54, off = (t * 0.32) % gap;
+      for (var x = -H - gap; x < W + gap; x += gap) {
+        var x1 = x + off;
+        ctx.beginPath();
+        ctx.moveTo(x1, 0);
+        ctx.lineTo(x1 - H, H);
+        ctx.strokeStyle = 'rgba(255,159,69,0.055)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+      for (var x2 = -H - gap * 1.7; x2 < W + gap; x2 += gap * 1.7) {
+        var xx = x2 - off * 0.6;
+        ctx.beginPath();
+        ctx.moveTo(xx, 0);
+        ctx.lineTo(xx - H, H);
+        ctx.strokeStyle = 'rgba(92,225,230,0.045)';
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+      }
+    }
+    function step() { t++; draw(); }
+    resize(); window.addEventListener('resize', resize);
+    if (!reduce) setInterval(function () { if (!document.hidden) step(); }, 50);
+  })();
+
+  /* ---------------- AGENDA + TIMER ---------------- */
+  var BLOCKS = [
+    { m: 3, t: 'Plan + recall', d: 'AVL ka recap, aaj ka goal.', n: 'B-tree order ka matlab?' },
+    { m: 7, t: 'B-Tree insert', d: 'Order 5 me 7 insert — do splits.', n: 'Split me kaun upar?' },
+    { m: 4, t: 'B+ Tree', d: 'Data sirf leaves me, leaves linked.', n: 'DBMS kaun use karta hai?' },
+    { m: 8, t: 'Huffman', d: '5 merge, codes, 224 vs 300 bits.', n: 'Pehla merge kya?' },
+    { m: 4, t: 'Binary Heap', d: 'Max-heap, array, insert/delete.', n: 'Root pe kaun?' },
+    { m: 2, t: 'Practice', d: '6 sawaal + scoreboard.', n: 'SPIN se test' }
+  ];
+  var TOTAL = BLOCKS.reduce(function (s, b) { return s + b.m; }, 0) * 60;
+  var left = TOTAL, running = false, tick = null, cur = -1;
+  function fmt(s) { var m = Math.floor(s / 60), x = s % 60; return (m < 10 ? '0' : '') + m + ':' + (x < 10 ? '0' : '') + x; }
+  function paintTimer() { if ($('dkTimer')) $('dkTimer').textContent = fmt(left); if ($('tkTimer')) $('tkTimer').textContent = fmt(left); }
+  function renderPlan() {
+    var host = $('planSteps'); if (!host) return;
+    var html = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:10px;letter-spacing:1.6px;color:var(--faint);text-transform:uppercase;margin-bottom:10px">PLAN · ' + Math.round(TOTAL / 60) + ' MIN</div>';
+    BLOCKS.forEach(function (b, i) {
+      html += '<div class="plan-step" data-i="' + i + '" style="display:flex;gap:12px;align-items:flex-start;padding:11px 13px;border:1px solid ' + (i === cur ? 'var(--gold)' : 'var(--border)') + ';border-radius:10px;margin-bottom:8px;cursor:pointer;background:' + (i === cur ? 'var(--gold-dim)' : 'var(--surface2)') + '">' +
+        '<span style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--gold);min-width:34px">' + b.m + 'm</span>' +
+        '<span style="flex:1"><b style="font-size:13.5px;display:block;color:var(--text)">' + b.t + '</b>' +
+        '<span style="font-size:12px;color:var(--dim);line-height:1.5;display:block;margin-top:2px">' + b.d + '</span>' +
+        '<span style="font-size:11px;color:var(--faint);display:block;margin-top:4px">→ ' + b.n + '</span></span></div>';
+    });
+    host.innerHTML = html;
+    host.querySelectorAll('.plan-step').forEach(function (el) {
+      el.addEventListener('click', function () { setBlock(parseInt(el.dataset.i, 10)); });
+    });
+  }
+  function setBlock(i) {
+    if (i < 0 || i >= BLOCKS.length) return;
+    cur = i; left = BLOCKS[i].m * 60;
+    if ($('dkBlk')) $('dkBlk').textContent = BLOCKS[i].t;
+    renderPlan(); paintTimer();
+  }
+  function startTimer() {
+    if (running) { running = false; clearInterval(tick); if ($('dkStart')) $('dkStart').textContent = '▶'; return; }
+    if (cur < 0) setBlock(0);
+    running = true; if ($('dkStart')) $('dkStart').textContent = '⏸';
+    tick = setInterval(function () {
+      if (left > 0) { left--; paintTimer(); }
+      else {
+        clearInterval(tick); running = false;
+        if ($('dkStart')) $('dkStart').textContent = '▶';
+        var b = $('tuBanner');
+        if (b) { b.classList.add('show'); setTimeout(function () { b.classList.remove('show'); }, 4200); }
+        try {
+          var ac = new (window.AudioContext || window.webkitAudioContext)();
+          var o = ac.createOscillator(), g = ac.createGain();
+          o.connect(g); g.connect(ac.destination); o.frequency.value = 880; g.gain.value = 0.05;
+          o.start(); setTimeout(function () { o.stop(); ac.close(); }, 380);
+        } catch (e) {}
+        if (cur < BLOCKS.length - 1) setBlock(cur + 1);
+      }
+    }, 1000);
+  }
+  if ($('dkStart')) $('dkStart').addEventListener('click', startTimer);
+  if ($('dkNext')) $('dkNext').addEventListener('click', function () { setBlock(cur + 1); });
+  renderPlan(); paintTimer();
+  window.__cls = { state: function () { return { cur: cur, left: left, running: running }; }, setSeconds: function (s) { left = s; paintTimer(); } };
+
+  /* ---------------- PEN ---------------- */
+  var cv = $('penCanvas'), ctx = cv ? cv.getContext('2d') : null;
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  var strokes = [], active = null, penOn = false, penWidth = 1.3, penColor = '#d0b3ff', eraser = false;
+  try { var pv = getComputedStyle(root).getPropertyValue('--pen').trim(); if (pv) penColor = pv; } catch (e) {}
+
+  function resizePen() {
+    if (!cv) return;
+    cv.width = Math.floor(window.innerWidth * dpr);
+    cv.height = Math.floor(window.innerHeight * dpr);
+    cv.style.width = window.innerWidth + 'px'; cv.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); drawPen();
+  }
+  function drawPen() {
+    if (!ctx) return;
+    var sy = window.scrollY || 0;
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    strokes.forEach(function (s) {
+      if (!s.pts.length) return;
+      ctx.strokeStyle = s.c; ctx.lineWidth = s.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.shadowColor = s.c; ctx.shadowBlur = 2.5;
+      ctx.beginPath();
+      s.pts.forEach(function (p, i) { var x = p[0], y = p[1] - sy; if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
+      if (s.pts.length === 1) ctx.lineTo(s.pts[0][0] + .1, s.pts[0][1] - sy + .1);
+      ctx.stroke();
+    });
+    ctx.shadowBlur = 0;
+  }
+  var raf = null;
+  function sched() { if (raf) return; raf = requestAnimationFrame(function () { raf = null; drawPen(); }); }
+  if (cv) {
+    cv.addEventListener('pointerdown', function (e) {
+      if (!penOn) return;
+      cv.setPointerCapture(e.pointerId);
+      if (eraser) {
+        var sy = window.scrollY || 0, px = e.clientX, py = e.clientY + sy, before = strokes.length;
+        strokes = strokes.filter(function (s) { return !s.pts.some(function (p) { return Math.abs(p[0] - px) < 16 && Math.abs(p[1] - py) < 16; }); });
+        if (strokes.length !== before) drawPen();
+        return;
+      }
+      active = { c: penColor, w: penWidth, pts: [[e.clientX + window.scrollX, e.clientY + window.scrollY]] };
+      strokes.push(active); drawPen();
+    });
+    cv.addEventListener('pointermove', function (e) {
+      if (!penOn || !active) return;
+      active.pts.push([e.clientX + window.scrollX, e.clientY + window.scrollY]); sched();
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) { cv.addEventListener(ev, function () { active = null; }); });
+    window.addEventListener('scroll', sched, { passive: true });
+    window.addEventListener('resize', resizePen);
+    resizePen();
+  }
+  function penUI() {
+    if ($('penBar')) $('penBar').classList.toggle('show', penOn);
+    document.body.classList.toggle('pen-on', penOn);
+    if ($('dkPen')) $('dkPen').style.color = penOn ? 'var(--pen)' : '';
+  }
+  if ($('dkPen')) $('dkPen').addEventListener('click', function () { penOn = !penOn; penUI(); });
+  [['penThin', 0.8], ['penMed', 1.3], ['penThick', 2.0]].forEach(function (p) {
+    if ($(p[0])) $(p[0]).addEventListener('click', function () {
+      penWidth = p[1]; eraser = false;
+      ['penThin', 'penMed', 'penThick'].forEach(function (id) { if ($(id)) $(id).classList.remove('on'); });
+      $(p[0]).classList.add('on'); if ($('penErase')) $('penErase').classList.remove('on');
+    });
+  });
+  if ($('penErase')) $('penErase').addEventListener('click', function () { eraser = !eraser; $('penErase').classList.toggle('on', eraser); });
+  if ($('penOff')) $('penOff').addEventListener('click', function () { penOn = false; penUI(); });
+  if ($('penUndo')) $('penUndo').addEventListener('click', function () { strokes.pop(); drawPen(); });
+  if ($('penClear')) $('penClear').addEventListener('click', function () { strokes = []; drawPen(); });
+  document.querySelectorAll('.pen-bar .sw').forEach(function (sw) {
+    sw.addEventListener('click', function () {
+      var c = sw.dataset.c;
+      penColor = c.indexOf('var(') === 0 ? getComputedStyle(root).getPropertyValue(c.slice(4, -1)).trim() : c;
+      eraser = false; if ($('penErase')) $('penErase').classList.remove('on');
+      document.querySelectorAll('.pen-bar .sw').forEach(function (s) { s.classList.remove('sel'); });
+      sw.classList.add('sel');
+    });
+  });
+  penUI();
+
+  /* ---------------- SECTION DETECT + SPIN ---------------- */
+  var SEC_NAME = { s1: 'B-Tree insert', s2: 'B+ Tree', s3: 'Huffman', s4: 'Binary Heap', s5: 'Practice' };
+  var QS = [
+    { s: 's1', q: 'Order 5 ke B-tree me ek node me max kitni keys?', a: '<b>m − 1 = 4</b> keys (aur max 5 children).' },
+    { s: 's1', q: '10, 20, 30, 40, 50 insert — split ke baad root?', a: 'Beech wali <b>30 upar</b> → root <b>[30]</b>, bachche [10,20] aur [40,50].' },
+    { s: 's1', q: 'Split me kaunsi key upar jati hai?', a: '<b>Beech wali</b> (median) — baaki do left/right me bat jati hain.' },
+    { s: 's1', q: 'B-tree ki height kab badhti hai?', a: 'Jab <b>root overflow</b> ho — tab naya root banta hai aur height 1 badh jati hai.' },
+    { s: 's1', q: 'B-tree me saare leaves kahan hote hain?', a: '<b>Same level pe</b> — yahi B-tree ki khaas baat hai.' },
+    { s: 's2', q: 'B+ tree me data kahan hota hai?', a: '<b>Sirf leaves me</b> — andar ke nodes me sirf keys (raasta).' },
+    { s: 's2', q: 'B+ tree me leaves kaisi hoti hain?', a: '<b>Linked list</b> se judi — isliye range query fast.' },
+    { s: 's2', q: 'DBMS kaunsa use karta hai aur kyun?', a: '<b>B+ tree</b> — range queries ke liye (leaf se aage-aage chalo).' },
+    { s: 's3', q: 'Huffman ka pehla step?', a: 'Sabse <b>chhoti do frequencies</b> jodo (jaise 5 + 9 = 14).' },
+    { s: 's3', q: 'Huffman me left aur right edge pe kya likhte hain?', a: '<b>Left = 0</b>, <b>right = 1</b>.' },
+    { s: 's3', q: 'Is example me f ka code?', a: '<b>0</b> — sabse zyada frequency (45) → sabse chhota code.' },
+    { s: 's3', q: 'Total bits Huffman se (a5,b9,c12,d13,e16,f45)?', a: '<b>224 bits</b> — fixed 3-bit me 300 lagte (25% bachat).' },
+    { s: 's3', q: 'Prefix property kya hai?', a: 'Koi code doosre ka <b>shuruaati hissa</b> nahi hota — isliye decoding clear rehti hai.' },
+    { s: 's4', q: 'Max-heap me root pe kaun hota hai?', a: '<b>Sabse bada</b> element.' },
+    { s: 's4', q: 'Heap array me bachche kaise nikalte hain?', a: 'Node i ke bachche <b>2i+1</b> aur <b>2i+2</b>.' },
+    { s: 's4', q: 'Heap me insert ki complexity?', a: '<b>O(log n)</b> — bubble up height tak.' },
+    { s: 's4', q: 'Heap kahan use hota hai?', a: '<b>Priority queue</b>, heap sort, Dijkstra, Huffman ka min-heap.' },
+    { s: 's5', q: 'B-tree aur B+ me sabse bada fark?', a: 'B+ me data <b>sirf leaves</b> me + leaves <b>linked</b>.' },
+    { s: 's5', q: 'Huffman me sabse zyada aane wale character ka code?', a: '<b>Sabse chhota</b> — isi se compression hota hai.' }
+  ];
+  var STUDENTS = ['Harsh', 'Aryan', 'Khusi'];
+  var pools = {}, lastQ = {}, activeSec = 's1';
+
+  function resetPools() {
+    pools = {};
+    Object.keys(SEC_NAME).forEach(function (s) { pools[s] = []; });
+    QS.forEach(function (q, i) { if (pools[q.s]) pools[q.s].push(i); });
+  }
+  resetPools();
+
+  function detectSection() {
+    var mid = window.innerHeight * 0.42, best = 's1', bestD = 1e9;
+    document.querySelectorAll('.sec').forEach(function (sec) {
+      var r = sec.getBoundingClientRect();
+      var d = Math.abs(r.top - mid);
+      if (r.top <= mid + 80 && d < bestD) { bestD = d; best = sec.id; }
+    });
+    return SEC_NAME[best] ? best : 's1';
+  }
+  function chosenSection() {
+    var sel = $('dkSec');
+    if (sel && sel.value !== 'auto') return sel.value;
+    return detectSection();
+  }
+  function updateCount() {
+    var s = chosenSection();
+    var total = QS.filter(function (q) { return q.s === s; }).length;
+    var leftN = (pools[s] || []).length;
+    if ($('dkCnt')) $('dkCnt').textContent = s.toUpperCase() + ' · ' + leftN + '/' + total + ' sawaal';
+    var sel = $('dkSec');
+    if (sel && sel.value === 'auto' && $('dkCnt')) $('dkCnt').title = 'Auto: ' + SEC_NAME[s] + ' (' + leftN + ' bache)';
+  }
+  window.addEventListener('scroll', function () { updateCount(); }, { passive: true });
+  if ($('dkSec')) $('dkSec').addEventListener('change', updateCount);
+
+  function openCard(name, item, s, idx, total) {
+    var card = $('dkQCard'); if (!card) return;
+    if ($('dkQWho')) $('dkQWho').textContent = (name ? name : '') + ' · ' + SEC_NAME[s] + ' · sawaal ' + idx + '/' + total;
+    if ($('dkName')) $('dkName').textContent = name || '—';
+    if ($('dkQText')) $('dkQText').innerHTML = item.q;
+    if ($('dkQAns')) { $('dkQAns').innerHTML = item.a; $('dkQAns').style.display = 'none'; }
+    card.classList.add('show');
+  }
+  function closeCard() { if ($('dkQCard')) $('dkQCard').classList.remove('show'); }
+
+  if ($('dkSpin')) $('dkSpin').addEventListener('click', function () {
+    var s = chosenSection();
+    var total = QS.filter(function (q) { return q.s === s; }).length;
+    if (!pools[s] || !pools[s].length) {
+      if (pools[s] && pools[s].length === 0 && total > 0) {
+        pools[s] = QS.map(function (q, i) { return q.s === s ? i : -1; }).filter(function (i) { return i >= 0; });
+      }
+    }
+    var pool = pools[s] || [];
+    if (!pool.length) return;
+    var pick = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+    if (pick === lastQ[s] && pool.length) { pool.push(pick); pick = pool.splice(Math.floor(Math.random() * pool.length), 1)[0]; }
+    lastQ[s] = pick;
+    var idx = total - pool.length;
+    var name = STUDENTS[Math.floor(Math.random() * STUDENTS.length)];
+    currentName = name; marked = false;
+    tally[name] = tally[name] || { asked: 0, right: 0 };
+    tally[name].asked++;
+    openCard(name, QS[pick], s, idx, total);
+    renderBoard();
+    updateCount();
+  });
+  if ($('dkQShow')) $('dkQShow').addEventListener('click', function () {
+    var a = $('dkQAns'); if (a) a.style.display = a.style.display === 'none' ? 'block' : 'none';
+  });
+  if ($('dkQClose')) $('dkQClose').addEventListener('click', closeCard);
+  if ($('dkQNext')) $('dkQNext').addEventListener('click', function () { if ($('dkSpin')) $('dkSpin').click(); });
+  /* ---- scoreboard ---- */
+  var tally = {};
+  function boardHTML() {
+    var names = Object.keys(tally);
+    if (!names.length) return '';
+    var rows = names.map(function (n) {
+      var t = tally[n];
+      var pct = t.asked ? Math.round(t.right / t.asked * 100) : 0;
+      return '<div class="sb-row"><span class="sb-n">' + n + '</span>' +
+             '<span class="sb-c">' + t.right + '/' + t.asked + '</span>' +
+             '<span class="sb-p">' + pct + '%</span></div>';
+    }).join('');
+    var totalRight = names.reduce(function (s, n) { return s + tally[n].right; }, 0);
+    var totalAsked = names.reduce(function (s, n) { return s + tally[n].asked; }, 0);
+    return '<div class="sb"><div class="sb-h">SCORE · ' + totalRight + ' / ' + totalAsked + '</div>' + rows + '</div>';
+  }
+  function renderBoard() {
+    var card = $('dkQCard'); if (!card) return;
+    var box = card.querySelector('.sb');
+    if (!box) { box = document.createElement('div'); card.appendChild(box); }
+    box.outerHTML = boardHTML() || '<div class="sb"></div>';
+  }
+  var currentName = null, marked = false;
+
+  function mark(kind) {
+    if (!currentName) return;
+    var t = tally[currentName] || (tally[currentName] = { asked: 0, right: 0 });
+    if (marked) return;                 // ek sawaal pe ek hi baar mark
+    if (kind === 'ok') { t.right++; marked = true; }
+    else { marked = true; }
+    var n = $('dkName'); if (n) n.style.color = (kind === 'ok') ? 'var(--blue)' : 'var(--coral)';
+    var okBtn = $('dkQOk'), badBtn = $('dkQBad');
+    if (okBtn) okBtn.classList.toggle('on', kind === 'ok');
+    if (badBtn) badBtn.classList.toggle('on', kind === 'bad');
+    renderBoard();                      // CARD KHULA RAHEGA — band nahi hoga
+    if ($('dkQWho')) $('dkQWho').innerHTML += ' · <b style="color:' + (kind === 'ok' ? 'var(--blue)' : 'var(--coral)') + '">' + (kind === 'ok' ? 'sahi ✔' : 'galat ✕') + '</b>';
+  }
+  ['dkQOk', 'dkOk'].forEach(function (id) { if ($(id)) $(id).addEventListener('click', function () { mark('ok'); }); });
+  ['dkQBad', 'dkBad'].forEach(function (id) { if ($(id)) $(id).addEventListener('click', function () { mark('bad'); }); });
+  updateCount();
+
+  /* ---------------- BST SEARCH — dot edge ke saath chalta hai ---------------- */
+  (function () {
+    var host = $('bstSim'); if (!host) return;
+    var PATHS = {
+      '40': { path: ['c50', 'c30', 'c40'], log: ['50 dekha → 40 < 50, LEFT jao', '30 dekha → 40 > 30, RIGHT jao', '40 mil gaya ✔'], ok: true },
+      '60': { path: ['c50', 'c70', 'c60'], log: ['50 dekha → 60 > 50, RIGHT jao', '70 dekha → 60 < 70, LEFT jao', '60 mil gaya ✔'], ok: true },
+      '55': { path: ['c50', 'c70', 'c60'], log: ['50 dekha → 55 > 50, RIGHT jao', '70 dekha → 55 < 70, LEFT jao', '60 dekha → 55 < 60, LEFT jao → NULL'], ok: false }
+    };
+    var dot = document.createElement('div');
+    dot.id = 'travelDot';
+    document.body.appendChild(dot);
+    var timers = [], running = false;
+
+    function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+    function center(el) {
+      var r = el.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    function parkDot(el) {
+      var c = center(el);
+      dot.style.display = 'block';
+      dot.style.transition = 'none';
+      dot.style.left = c.x + 'px'; dot.style.top = c.y + 'px'; dot.style.opacity = '1';
+    }
+    function travel(fromEl, toEl, dur, done) {
+      var a = center(fromEl), b = center(toEl);
+      dot.style.display = 'block';
+      dot.style.transition = 'none';
+      dot.style.left = a.x + 'px'; dot.style.top = a.y + 'px'; dot.style.opacity = '1';
+      void dot.offsetWidth;
+      dot.style.transition = 'left ' + dur + 'ms cubic-bezier(.4,0,.6,1), top ' + dur + 'ms cubic-bezier(.4,0,.6,1)';
+      dot.style.left = b.x + 'px'; dot.style.top = b.y + 'px';
+      timers.push(setTimeout(done, dur + 40));
+    }
+    function reset() {
+      clearTimers(); running = false;
+      document.querySelectorAll('#bstSim .tnode').forEach(function (n) { n.classList.remove('on', 'done', 'miss'); });
+      dot.style.opacity = '0'; dot.style.display = 'none';
+      if ($('bstLog')) $('bstLog').textContent = 'Koi key chuno — dot edge ke saath agle node tak jayega.';
+    }
+    function run(key) {
+      var data = PATHS[key]; if (!data) return;
+      reset();
+      running = true;
+      var i = 0, gap = 900;
+      var first = $(data.path[0]);
+      if (!first) return;
+      parkDot(first);
+      first.classList.add('on');
+      if ($('bstLog')) $('bstLog').innerHTML = '<b>' + key + ' search</b> · ' + data.log[0];
+      function nextStep() {
+        if (i >= data.path.length - 1) {
+          var lastEl = $(data.path[data.path.length - 1]);
+          if (!data.ok && lastEl) { lastEl.classList.remove('on'); lastEl.classList.add('miss'); }
+          if ($('bstLog')) $('bstLog').innerHTML = '<b>' + (data.ok ? key + ' mil gaya ✔' : '55 nahi mila ✕') + '</b> · ' + data.path.length + ' nodes dekhe';
+          timers.push(setTimeout(function () { dot.style.opacity = '0'; dot.style.display = 'none'; running = false; }, 700));
+          return;
+        }
+        var fromEl = $(data.path[i]), toEl = $(data.path[i + 1]);
+        if (!fromEl || !toEl) return;
+        travel(fromEl, toEl, 620, function () {
+          fromEl.classList.remove('on'); fromEl.classList.add('done');
+          toEl.classList.add('on');
+          i++;
+          if ($('bstLog')) $('bstLog').innerHTML = '<b>Step ' + (i + 1) + '</b> · ' + data.log[i];
+          timers.push(setTimeout(nextStep, 380));
+        });
+      }
+      timers.push(setTimeout(nextStep, gap));
+    }
+    document.querySelectorAll('#bstSim [data-find]').forEach(function (b) {
+      b.addEventListener('click', function () { run(b.dataset.find); });
+    });
+    if ($('bstReset')) $('bstReset').addEventListener('click', reset);
+    window.addEventListener('resize', function () { if (!running) { dot.style.opacity = '0'; dot.style.display = 'none'; } });
+  })();
+
+  /* ---------------- AUDIO ---------------- */
+  (function () {
+    var synth = window.speechSynthesis; if (!synth) return;
+    var chunks = [];
+    document.querySelectorAll('.sec').forEach(function (sec) {
+      var t = sec.innerText.replace(/\s+/g, ' ').trim(); if (t) chunks.push(t);
+    });
+    var i = 0, speaking = false, voice = null;
+    function fill() {
+      var sel = $('voiceSel'); if (!sel) return;
+      var vs = synth.getVoices() || [];
+      sel.innerHTML = '';
+      if (!vs.length) { sel.innerHTML = '<option>No voice</option>'; return; }
+      vs.forEach(function (v, k) { var o = document.createElement('option'); o.value = k; o.textContent = v.name + ' (' + v.lang + ')'; sel.appendChild(o); });
+      var en = vs.findIndex(function (v) { return /en-IN|en-GB|en-US/.test(v.lang); });
+      if (en >= 0) sel.value = en;
+      voice = vs[en >= 0 ? en : 0];
+      if ($('pVoice')) $('pVoice').textContent = 'Voice: ' + (voice ? voice.name : 'none');
+    }
+    setTimeout(fill, 400);
+    if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = fill;
+    function speak() {
+      if (i >= chunks.length) { if ($('btnPlay')) $('btnPlay').textContent = '▶'; speaking = false; return; }
+      var u = new SpeechSynthesisUtterance(chunks[i]);
+      if (voice) u.voice = voice;
+      u.rate = $('rateSel') ? parseFloat($('rateSel').value) : 1;
+      u.onend = function () { if (speaking) { i++; speak(); } };
+      if ($('pNow')) $('pNow').textContent = 'Section ' + (i + 1) + ' / ' + chunks.length;
+      synth.speak(u);
+    }
+    if ($('btnPlay')) $('btnPlay').addEventListener('click', function () {
+      if (!chunks.length) return;
+      if (speaking) { synth.pause(); speaking = false; $('btnPlay').textContent = '▶'; return; }
+      if (synth.paused && !synth.speaking) { synth.resume(); speaking = true; $('btnPlay').textContent = '⏸'; return; }
+      speaking = true; $('btnPlay').textContent = '⏸'; speak();
+    });
+    if ($('btnStop')) $('btnStop').addEventListener('click', function () { synth.cancel(); speaking = false; i = 0; if ($('btnPlay')) $('btnPlay').textContent = '▶'; });
+    if ($('btnNext')) $('btnNext').addEventListener('click', function () { if (speaking) { synth.cancel(); i = Math.min(chunks.length - 1, i + 1); speak(); } });
+    if ($('btnPrev')) $('btnPrev').addEventListener('click', function () { if (speaking) { synth.cancel(); i = Math.max(0, i - 1); speak(); } });
+  })();
+  if ($('dkAudio')) $('dkAudio').addEventListener('click', function () {
+    var p = $('player'); if (!p) return;
+    var hidden = p.style.display === 'none' || getComputedStyle(p).display === 'none';
+    p.style.display = hidden ? 'flex' : 'none';
+  });
+
+  /* ---------------- AVL NUMERICAL STEPPER ---------------- */
+  (function () {
+    var host = $('avlSim'); if (!host) return;
+    var F = [
+      { tree: "        30", note: "Step 1: 30 insert hua. Pehla node = root.\nBF(30) = height(left) − height(right) = 0 − 0 = 0", bf: "BF(30) = 0  ✓" },
+      { tree: "        30\n       /\n      20", note: "Step 2: 20 < 30 → left me gaya.\nBF(30) = height(20)=0 − height(NULL)=−1 = +1 → limit me hai ✓", bf: "BF(30) = +1  ✓" },
+      { tree: "        30   ← BF = +2  ✗\n       /\n      20   ← BF = +1\n     /\n    10", note: "Step 3: 10 < 30 → left; 10 < 20 → left.\nDo baar LEFT gaya = LL case. BF(30) = 1 − (−1) = +2 → bigad gaya → RIGHT rotation.", bf: "BF(30) = +2  ✗  →  LL  →  right rotation" },
+      { tree: "        20\n       /  \\\n     10    30", note: "Step 3 ke baad: 30 pe right rotation hui.\n20 root ban gaya, 10 left me, 30 right me.\nAb teeno ka BF = 0 ✓", bf: "BF(20)=0 · BF(10)=0 · BF(30)=0  ✓" },
+      { tree: "        20\n       /  \\\n     10    30\n          /\n         25", note: "Step 4: 25 > 20 → right; 25 < 30 → left.\nBF(30) = 0 − (−1) = +1 ✓ · BF(20) = 0 − 1 = −1 ✓ → kuch nahi karna.", bf: "BF(20) = −1  ✓   BF(30) = +1  ✓" },
+      { tree: "        20\n       /  \\\n     10    30   ← BF = +2  ✗\n          /\n         25   ← BF = −1\n           \\\n           28", note: "Step 5: 28 > 20 → right; 28 < 30 → left; 28 > 25 → right.\n30 ka left child 25 hai aur naya node uske RIGHT me gira = LR case.\nPehle 25 pe LEFT rotation, phir 30 pe RIGHT rotation.", bf: "BF(30) = +2  ✗  →  LR  →  left(25) + right(30)" },
+      { tree: "        20\n       /  \\\n     10    28\n          /  \\\n        25    30", note: "Final AVL tree — har node ka BF −1, 0 ya +1 ✓\nHeight = 2 (3 levels). Yahi answer exam me likhna hai.", bf: "BF: 20 → −1 · 28 → 0 · 10,25,30 → 0  ✓" }
+    ];
+    var i = -1, timer = null;
+    function paint() {
+      if (i < 0) {
+        if ($('avlTree')) $('avlTree').textContent = 'STEP dabao — pehla node insert karenge';
+        if ($('avlNote')) $('avlNote').textContent = 'Yahan har step ka hisaab dikhega.';
+        if ($('avlBf')) $('avlBf').textContent = '';
+        return;
+      }
+      var f = F[i];
+      if ($('avlTree')) $('avlTree').textContent = f.tree;
+      if ($('avlNote')) $('avlNote').innerHTML = f.note.replace(/\n/g, '<br>');
+      if ($('avlBf')) $('avlBf').textContent = f.bf + '   ·   step ' + (i + 1) + ' / ' + F.length;
+    }
+    function step() { if (i < F.length - 1) { i++; paint(); } else { if (timer) { clearInterval(timer); timer = null; } } }
+    if ($('avlStep')) $('avlStep').addEventListener('click', function () { if (timer) { clearInterval(timer); timer = null; } step(); });
+    if ($('avlAuto')) $('avlAuto').addEventListener('click', function () {
+      if (timer) { clearInterval(timer); timer = null; return; }
+      if (i >= F.length - 1) i = -1;
+      paint();
+      timer = setInterval(function () { step(); }, 1500);
+    });
+    if ($('avlReset')) $('avlReset').addEventListener('click', function () { if (timer) { clearInterval(timer); timer = null; } i = -1; paint(); });
+    paint();
+  })();
+
+  /* ---------------- PRACTICE — chhupe jawab ---------------- */
+  (function () {
+    document.querySelectorAll('.qa').forEach(function (qa) {
+      var btn = qa.querySelector('.qa-btn'), ans = qa.querySelector('.qa-a');
+      if (!btn || !ans) return;
+      btn.addEventListener('click', function () {
+        var open = ans.classList.toggle('show');
+        btn.textContent = open ? 'Jawab chhupao' : 'Jawab dekho';
+      });
+    });
+  })();
+
+})();
+</script>
+
+<div class="dsnav" role="navigation" aria-label="Page navigation">
+  <a class="dsnav-b" href="DS_Unit4_Session3.html" title="Pichla page (←)">←</a>
+  <a class="dsnav-b" href="../index.html" title="Sab pages (Home)">⌂</a>
+  <a class="dsnav-b" href="../unit3/DS_Unit3.html" title="Agla page (→)">→</a>
+</div>
+<style>
+/* ===== DS page nav (auto-injected) ===== */
+.dsnav{position:fixed;right:14px;bottom:78px;z-index:650;display:flex;gap:6px;align-items:center;
+  background:rgba(10,14,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:6px 8px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);opacity:.6;transition:opacity .2s ease, transform .2s ease;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.dsnav:hover{opacity:1;transform:translateY(-2px)}
+.dsnav-b{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:15px;line-height:1;
+  transition:background .15s ease,color .15s ease}
+.dsnav-b:hover{background:#ff9f45;color:#101820}
+.dsnav-b.dsnav-off{opacity:.25;pointer-events:none}
+.dsnav-tip{font-size:10px;letter-spacing:.8px;color:rgba(255,255,255,.45);padding:0 4px;white-space:nowrap}
+@media (max-width:640px){.dsnav-tip{display:none}.dsnav{right:10px;bottom:70px;padding:5px 6px}.dsnav-b{width:30px;height:30px;font-size:14px}}
+@media print{.dsnav{display:none!important}}
+</style>
+<script>
+(function(){
+  var PREV="DS_Unit4_Session3.html", NEXT="../unit3/DS_Unit3.html";
+  document.addEventListener('keydown', function(e){
+    var t=e.target||{};
+    if(/INPUT|TEXTAREA|SELECT/.test(t.tagName||'')) return;
+    if(e.key==='ArrowRight' && NEXT) window.location.href=NEXT;
+    else if(e.key==='ArrowLeft' && PREV) window.location.href=PREV;
+    else if(e.key==='Home') window.location.href='../index.html';
+  });
+})();
+</script>
+
+</body>
+</html>

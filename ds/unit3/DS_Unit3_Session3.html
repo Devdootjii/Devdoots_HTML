@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 3 · Session 3 — Merge + Quick Sort (commented code) | Team Devdoots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=Karla:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ================= TOKENS ================= */
+:root, [data-theme="dark"] {
+  --bg: #14100c;
+  --surface: #1e1813;
+  --surface2: #272019;
+  --surface3: #332a20;
+  --border: rgba(255,240,225,0.10);
+  --border2: rgba(255,240,225,0.20);
+  --text: #f7efe4;
+  --dim: #bcaa95;
+  --faint: #8d7b67;
+  --gold: #e8734a;
+  --gold-dim: rgba(232,115,74,0.14);
+  --blue: #8fb98a;
+  --blue-dim: rgba(143,185,138,0.14);
+  --coral: #ff6b5a;
+  --coral-dim: rgba(255,107,90,0.14);
+  --emerald: #f2c14e;
+  --emerald-dim: rgba(242,193,78,0.14);
+  --shadow: 0 12px 36px rgba(0,0,0,0.5);
+}
+[data-theme="light"] {
+  --bg: #faf4ec;
+  --surface: #ffffff;
+  --surface2: #fbf6ef;
+  --surface3: #f0e6d9;
+  --border: rgba(50,34,22,0.12);
+  --border2: rgba(50,34,22,0.22);
+  --text: #241a12;
+  --dim: #6b5745;
+  --faint: #9a8471;
+  --gold: #b84a24;
+  --gold-dim: rgba(184,74,36,0.12);
+  --blue: #4c7a48;
+  --blue-dim: rgba(76,122,72,0.12);
+  --coral: #c0422f;
+  --coral-dim: rgba(192,66,47,0.12);
+  --emerald: #9a6c10;
+  --emerald-dim: rgba(154,108,16,0.13);
+  --shadow: 0 12px 30px rgba(60,40,25,0.13);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Karla', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  font-size: 16px; line-height: 1.72;
+  overflow-wrap: break-word;
+  padding-bottom: 150px;
+  background-image:
+    radial-gradient(ellipse 900px 420px at 75% -90px, var(--gold-dim), transparent 62%),
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: auto, 44px 44px, 44px 44px;
+}
+body.audio-off { padding-bottom: 44px; }
+::selection { background: var(--gold-dim); }
+
+/* ================= LAYOUT ================= */
+.wrap { max-width: 1460px; margin: 0 auto; display: grid; grid-template-columns: 232px minmax(0,1fr); gap: 0 54px; padding: 0 30px; position: relative; z-index: 1; }
+.main { min-width: 0; padding: 26px 0 70px; }
+body.noside .toc { display: none !important; }
+body.noside .wrap { grid-template-columns: minmax(0,1fr); }
+body.noside .main { max-width: 1180px; margin: 0 auto; }
+
+/* ================= TOC ================= */
+.toc { position: sticky; top: 22px; align-self: start; max-height: calc(100dvh - 70px); overflow-y: auto; padding: 22px 0 26px; grid-row: 1 / -1; }
+.toc::-webkit-scrollbar { width: 3px; }
+.toc::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+.toc-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--faint); padding-bottom: 11px; margin-bottom: 9px; border-bottom: 1px solid var(--border); }
+.toc a { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; color: var(--dim); text-decoration: none; padding: 5px 10px; border-radius: 6px; border-left: 2px solid transparent; transition: all .15s; line-height: 1.45; margin-bottom: 1px; }
+.toc a .n { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--faint); }
+.toc a:hover { color: var(--text); background: var(--surface); }
+.toc a.active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-dim); }
+.toc a.active .n { color: var(--gold); }
+
+/* ================= DOCK ================= */
+.dock {
+  position: sticky; top: 10px; z-index: 420;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border2); border-radius: 13px;
+  padding: 8px 12px; margin: 0 0 22px; box-shadow: var(--shadow);
+}
+.dock-timer { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 600; color: var(--gold); min-width: 76px; letter-spacing: 1px; }
+.dock-timer.warn { color: var(--coral); }
+.dock-blk { font-size: 12.5px; color: var(--dim); max-width: 270px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dock-name { font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: 19px; color: var(--blue); min-width: 74px; letter-spacing: .3px; }
+.dock-name.spinning { opacity: .5; }
+.dbtn { font-family: 'JetBrains Mono', monospace; font-size: 12px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 7px 11px; transition: all .15s; }
+.dbtn:hover { border-color: var(--gold); color: var(--gold); }
+.dbtn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.dbtn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.dbtn--blue { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+.dbtn--ok { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-dim); }
+.dbtn--bad { border-color: var(--coral); color: var(--coral); background: var(--coral-dim); }
+.dock-sep { width: 1px; height: 24px; background: var(--border2); margin: 0 3px; }
+.dock-spacer { flex: 1 1 16px; min-width: 0; }
+.dock-q { display: none; margin: -12px 0 22px; border: 1px solid var(--blue); border-left: 3px solid var(--blue); border-radius: 0 0 13px 13px; background: color-mix(in srgb, var(--blue-dim) 70%, var(--surface)); padding: 14px 18px; }
+.dock-q.show { display: block; }
+.dock-q .who { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.dock-q .dq { font-size: 15px; font-weight: 600; line-height: 1.55; }
+.dock-q .da { font-size: 13.5px; line-height: 1.65; color: var(--emerald); margin-top: 9px; display: none; }
+.dock-q .da.show { display: block; }
+@media (max-width: 1000px) {
+  .dock { top: 50px; padding: 7px 9px; gap: 6px; }
+  .dock-blk { display: none; }
+  .dock-timer { font-size: 18px; min-width: 64px; }
+  .dock-name { font-size: 16px; min-width: 56px; }
+  .dock-sep { display: none; }
+}
+.timeup-banner { position: fixed; bottom: 118px; left: 50%; transform: translate(-50%, 420%); z-index: 950; background: var(--coral); color: #240b06; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 15px; letter-spacing: .8px; padding: 12px 24px; border-radius: 11px; box-shadow: 0 12px 36px rgba(0,0,0,.45); transition: transform .32s cubic-bezier(.2,.9,.3,1.4); white-space: nowrap; }
+.timeup-banner.show { transform: translate(-50%, 0); }
+@keyframes tuPulse { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+body.timeup::after { content: ''; position: fixed; inset: 0; z-index: 900; pointer-events: none; background: radial-gradient(ellipse at center, rgba(255,122,107,0.28), rgba(255,122,107,0.08) 60%, transparent 80%); animation: tuPulse .5s ease-in-out 7; }
+@keyframes tuShake { 0%,100%{transform:translateX(0)} 15%{transform:translateX(-7px)} 30%{transform:translateX(7px)} 45%{transform:translateX(-5px)} 60%{transform:translateX(5px)} 80%{transform:translateX(-3px)} }
+.dock.timeup { animation: tuShake .55s ease-in-out 4; border-color: var(--coral) !important; }
+@media (max-width: 1000px) { .timeup-banner { bottom: 170px; } }
+
+/* ================= HERO ================= */
+.hero { padding: 30px 0 6px; }
+.hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 12px; border-radius: 5px; border: 1px solid var(--border2); }
+.chip--gold { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+.chip--blue { color: var(--blue); border-color: var(--blue); background: var(--blue-dim); }
+.chip--em { color: var(--emerald); border-color: var(--emerald); background: var(--emerald-dim); }
+h1 { font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: clamp(38px, 5.2vw, 60px); line-height: 1.02; letter-spacing: -1.4px; }
+h1 em { font-style: normal; color: var(--gold); }
+.hero-sub { font-size: 17px; color: var(--dim); max-width: 62ch; margin-top: 14px; }
+.hero-hr { height: 1px; background: linear-gradient(90deg, var(--gold), transparent 72%); border: none; margin: 28px 0 0; opacity: .5; }
+
+/* ================= SECTION HEAD ================= */
+.sec { scroll-margin-top: 54px; }
+.sec-head { display: flex; align-items: center; gap: 15px; margin: 70px 0 8px; flex-wrap: wrap; }
+.sec-num { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: #1b1405; background: var(--gold); border-radius: 6px; padding: 4px 9px; letter-spacing: 1px; flex-shrink: 0; }
+h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: clamp(28px, 3.2vw, 38px); line-height: 1.1; letter-spacing: -0.8px; flex: 1; min-width: 200px; }
+.sec-play { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--gold); background: var(--gold-dim); color: var(--gold); font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; }
+.sec-play:hover { background: var(--gold); color: #1b1405; }
+.sec-tag { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 22px; }
+
+/* ================= READING TEXT ================= */
+.rd { font-size: 16.5px; line-height: 1.78; color: var(--text); max-width: 74ch; margin: 18px 0; padding: 4px 14px 4px 16px; border-left: 3px solid transparent; border-radius: 0 8px 8px 0; transition: background .35s, border-color .35s; }
+.rd.speaking { background: var(--gold-dim); border-left-color: var(--gold); }
+.rd b, .rd strong { color: var(--gold); font-weight: 600; }
+.rd i { color: var(--blue); font-style: normal; }
+.rd code { font-family: 'JetBrains Mono', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 6px; border-radius: 4px; }
+
+/* ================= BOXES ================= */
+.def { background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 11px; padding: 16px 20px 14px; margin: 22px 0; max-width: 78ch; }
+.def-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 7px; }
+.def p { font-size: 15.5px; line-height: 1.66; }
+.def p b { color: var(--gold); }
+.memo { background: linear-gradient(150deg, var(--emerald-dim), var(--surface) 60%); border: 1px solid var(--emerald); border-left: 4px solid var(--emerald); border-radius: 11px; padding: 15px 19px; margin: 22px 0; max-width: 78ch; }
+.memo-label { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--emerald); display: block; margin-bottom: 7px; }
+.memo p, .memo li { font-size: 14.5px; line-height: 1.68; }
+.memo b { color: var(--emerald); }
+.memo ul, .memo ol { padding-left: 1.25em; }
+.callout { border-radius: 11px; padding: 14px 18px; margin: 22px 0; max-width: 78ch; font-size: 15px; line-height: 1.66; border: 1px solid var(--coral); background: var(--coral-dim); }
+.callout b { color: var(--coral); }
+.callout--info { border-color: var(--blue); background: var(--blue-dim); }
+.callout--info b { color: var(--blue); }
+
+/* ================= CARDS ================= */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(252px,1fr)); gap: 14px; margin: 22px 0; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(212px,1fr)); gap: 14px; margin: 22px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 16px 18px; min-width: 0; }
+.card h4 { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 9px; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+.card h4::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.card p, .card li { font-size: 14px; line-height: 1.62; color: var(--dim); }
+.card p b, .card li b { color: var(--text); }
+.card ul { padding-left: 1.2em; }
+.card--blue h4 { color: var(--blue); }
+.card--em h4 { color: var(--emerald); }
+.card--coral h4 { color: var(--coral); }
+
+/* ================= DIAGRAM ================= */
+.diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 22px 20px 18px; margin: 24px 0; overflow-x: auto; }
+.d-cap { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.4px; text-transform: uppercase; color: var(--faint); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.d-cap::before { content: ''; width: 7px; height: 7px; background: var(--gold); border-radius: 50%; }
+.memrow { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+.memcol { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.idx { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--blue); }
+.cell { min-width: 62px; padding: 13px 10px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 7px; font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; }
+.cell--hl { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.cell--zero { color: var(--faint); opacity: .55; }
+.addr { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--faint); }
+.d-note { margin-top: 16px; font-size: 13.5px; color: var(--dim); line-height: 1.62; border-top: 1px dashed var(--border2); padding-top: 12px; }
+.d-note b { color: var(--gold); }
+.d-note code { font-family: 'JetBrains Mono', monospace; color: var(--blue); font-size: .9em; }
+.formula { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-family: 'JetBrains Mono', monospace; font-size: 14.5px; color: var(--gold); overflow-x: auto; line-height: 1.7; max-width: 78ch; }
+.formula small { display: block; color: var(--faint); font-size: 12px; margin-top: 6px; line-height: 1.6; }
+.formula .k { color: var(--blue); }
+
+/* ================= TABLES ================= */
+.table-wrap { border: 1px solid var(--border); border-radius: 13px; overflow: hidden; margin: 22px 0; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.55; }
+.data-table thead { position: sticky; top: 0; z-index: 2; }
+.data-table th { background: var(--surface3); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.3px; color: var(--dim); text-align: left; padding: 11px 15px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.data-table td { padding: 11px 15px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.data-table tbody tr:nth-child(even) { background: var(--surface2); }
+.data-table tbody tr:hover { background: var(--gold-dim); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table td b { color: var(--gold); }
+.data-table td code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+.data-table td.num, .data-table th.num { text-align: right; font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+
+/* ================= CODE ================= */
+.code-block { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.62; background: #0c1424; border: 1px solid var(--border2); border-left: 3px solid var(--gold); border-radius: 10px; padding: 16px 18px; margin: 20px 0; overflow-x: auto; white-space: pre-wrap; word-break: break-word; color: #dfe7f5; max-width: 78ch; }
+[data-theme="light"] .code-block { background: #f3f6fc; color: #1a2436; }
+.code-block .cm { color: #6b7a99; }
+.code-block .kw { color: #6fb3e0; }
+.code-block .st { color: #e8b44a; }
+.code-block .fn { color: #3fc9a0; }
+
+/* ================= COMPARE ================= */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+.cmp-card { border: 1px solid var(--border2); border-radius: 12px; overflow: hidden; min-width: 0; background: var(--surface); }
+.cmp-card h5 { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 18px; }
+.cmp-card--a h5 { background: var(--blue-dim); color: var(--blue); border-bottom: 2px solid var(--blue); }
+.cmp-card--b h5 { background: var(--emerald-dim); color: var(--emerald); border-bottom: 2px solid var(--emerald); }
+.cmp-card ul { list-style: none; padding: 14px 18px; }
+.cmp-card li { font-size: 13.5px; line-height: 1.62; color: var(--dim); padding: 4px 0 4px 16px; position: relative; }
+.cmp-card li::before { content: '›'; position: absolute; left: 0; color: var(--faint); font-weight: 700; }
+.cmp-card li b { color: var(--text); }
+@media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
+
+/* ================= Q&A ================= */
+.qa { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin: 18px 0; overflow: hidden; }
+.qa summary { padding: 16px 20px; cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: 15.5px; font-weight: 600; }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary:hover { background: var(--surface2); }
+.qa summary::after { content: '+'; font-family: 'JetBrains Mono', monospace; color: var(--gold); margin-left: auto; font-size: 17px; }
+.qa[open] summary::after { content: '−'; }
+.mark { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 5px; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
+.mark--2 { background: var(--blue-dim); color: var(--blue); }
+.mark--5 { background: var(--gold-dim); color: var(--gold); }
+.mark--10 { background: var(--coral-dim); color: var(--coral); }
+.qa-body { padding: 4px 20px 18px; border-top: 1px solid var(--border); }
+.qa-body p { font-size: 14.5px; line-height: 1.72; color: var(--dim); margin: 12px 0; max-width: 78ch; }
+.qa-body p b { color: var(--text); }
+.qa-body code { font-family: 'JetBrains Mono', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+
+/* ================= SUMMARY / EXAM ================= */
+.one-liners { counter-reset: ol; display: grid; gap: 9px; margin: 22px 0; max-width: 84ch; }
+.one-liners li { list-style: none; counter-increment: ol; position: relative; padding: 9px 14px 9px 46px; font-size: 14.5px; line-height: 1.62; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--dim); }
+.one-liners li::before { content: counter(ol, decimal-leading-zero); position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--gold); }
+.one-liners li b { color: var(--text); }
+.defgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(292px,1fr)); gap: 14px; margin: 24px 0; }
+.defcard { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold); border-radius: 10px; padding: 15px 17px; min-width: 0; }
+.defcard h6 { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
+.defcard p { font-size: 13.5px; line-height: 1.62; color: var(--dim); }
+.defcard p b { color: var(--text); }
+
+/* ================= SIM SHELL ================= */
+.sim { border: 1px solid var(--gold); border-radius: 13px; overflow: hidden; margin: 26px 0; background: linear-gradient(165deg, var(--gold-dim), var(--surface) 42%); }
+.sim-head { padding: 13px 20px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface2); }
+.sim-head b { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold); }
+.sim-head span { font-size: 12.5px; color: var(--faint); }
+.sim-body { padding: 20px; }
+.sim-controls { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+.sim-controls label { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; flex-wrap: wrap; }
+.btn { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; padding: 8px 15px; border-radius: 7px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); transition: all .15s; }
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.btn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.btn--ok { border-color: var(--emerald) !important; background: var(--emerald-dim) !important; color: var(--emerald) !important; }
+.btn--bad { border-color: var(--coral) !important; background: var(--coral-dim) !important; color: var(--coral) !important; }
+.btn--warn { border-color: var(--coral); color: var(--coral); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.sim input, .sim select { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--surface); border: 1px solid var(--border2); color: var(--text); border-radius: 7px; padding: 8px 10px; width: 92px; }
+.sim select { width: auto; max-width: 100%; }
+.sim input:focus, .sim select:focus { outline: none; border-color: var(--gold); }
+.sim-steps { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.9; background: var(--surface); border: 1px dashed var(--border2); border-radius: 8px; padding: 14px 18px; margin-top: 16px; color: var(--dim); min-height: 20px; }
+.sim-steps b { color: var(--gold); font-weight: 600; }
+.sim-msg { font-size: 13.5px; margin-top: 12px; color: var(--dim); }
+.sim-msg b { color: var(--gold); }
+
+/* ================= NEW VIZ: SEARCH BEAM ================= */
+.beam-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.beam-cell { min-width: 54px; padding: 13px 6px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; transition: all .22s; position: relative; }
+.beam-cell .tag { display: block; font-size: 9px; font-weight: 500; letter-spacing: 1px; color: var(--faint); margin-top: 4px; }
+.beam-cell.scan { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); box-shadow: 0 0 0 3px var(--blue-dim); }
+.beam-cell.out { opacity: .26; }
+.beam-cell.mid { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.beam-cell.hit { border-color: var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.beam-meter { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--dim); }
+.beam-meter b { color: var(--gold); }
+
+/* ================= NEW VIZ: HASH BUCKETS ================= */
+.buckets { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+.bk-row { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.bk-idx { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--faint); min-width: 46px; text-align: right; }
+.bk-slot { flex: 1; min-width: 0; border: 1px solid var(--border2); border-radius: 7px; padding: 7px 10px; background: var(--surface3); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-family: 'JetBrains Mono', monospace; font-size: 13px; transition: all .25s; }
+.bk-slot.new { border-color: var(--gold); background: var(--gold-dim); }
+.bk-slot.coll { border-color: var(--coral); background: var(--coral-dim); }
+.bk-key { border-radius: 5px; padding: 2px 9px; font-size: 12px; border: 1px solid var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.bk-key.probe { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.bk-empty { color: var(--faint); font-size: 12px; }
+.lf-meter { height: 10px; border-radius: 6px; background: var(--surface3); border: 1px solid var(--border2); overflow: hidden; margin-top: 8px; }
+.lf-fill { height: 100%; background: linear-gradient(90deg, var(--emerald), var(--gold)); transition: width .3s; }
+
+/* ================= NEW VIZ: SORT RACE ================= */
+.race { display: flex; flex-direction: column; gap: 14px; }
+.lane { border: 1px solid var(--border2); border-radius: 11px; padding: 12px 14px; background: var(--surface2); }
+.lane.done { border-color: var(--emerald); }
+.lane__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 9px; }
+.lane__name { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--blue); }
+.lane__meta { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--dim); }
+.lane__meta b { color: var(--gold); }
+.lane.done .lane__name { color: var(--emerald); }
+.lane__bars { display: flex; align-items: flex-end; gap: 4px; height: 78px; }
+.lane__bar { flex: 1 1 0; min-width: 6px; background: var(--surface3); border: 1px solid var(--border2); border-radius: 3px 3px 0 0; transition: height .18s ease, background .15s ease; }
+.lane__bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.lane__bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.lane__bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+
+/* ================= NEW VIZ: SORT STEPPER (code sync) ================= */
+.step-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 860px) { .step-grid { grid-template-columns: 1fr; } }
+.step-bars { display: flex; align-items: flex-end; gap: 5px; height: 170px; padding: 22px 2px 0; }
+.step-bar { flex: 1 1 0; max-width: 58px; min-width: 12px; background: var(--surface3); border: 1px solid var(--border2); border-bottom: none; border-radius: 5px 5px 0 0; position: relative; transition: height .2s, background .18s, border-color .18s; }
+.step-bar i { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-style: normal; color: var(--dim); }
+.step-bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.step-bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.step-bar.piv { background: var(--coral-dim); border-color: var(--coral); }
+.step-bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+.step-code { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.8; background: #0c1424; border: 1px solid var(--border2); border-radius: 10px; padding: 12px 14px; overflow-x: auto; }
+[data-theme="light"] .step-code { background: #f3f6fc; }
+.step-code .ln { display: block; padding: 1px 8px; border-radius: 5px; border-left: 3px solid transparent; white-space: pre; color: #93a3bd; }
+[data-theme="light"] .step-code .ln { color: #5a6b86; }
+.step-code .ln.on { background: var(--gold-dim); border-left-color: var(--gold); color: var(--text); }
+.step-code .ln b { color: var(--blue); font-weight: 600; }
+.step-vars { display: flex; gap: 9px; flex-wrap: wrap; margin: 12px 0 0; }
+.step-vars div { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border2); background: var(--surface3); color: var(--dim); }
+.step-vars div b { color: var(--gold); font-size: 14px; }
+.step-vars div.chg { border-color: var(--gold); background: var(--gold-dim); }
+.step-vars div.chg b { color: var(--gold); }
+
+/* ================= CHART ================= */
+.chart-card { border: 1px solid var(--border2); border-radius: 13px; background: var(--surface); padding: 16px 16px 14px; margin: 22px 0; }
+.chart-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.chart-card__head b { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+.chart-card__head .sim-controls { margin: 0; }
+.chart-wrap { position: relative; width: 100%; height: 320px; }
+.chart-wrap canvas { width: 100%; height: 100%; display: block; }
+@media (max-width: 620px) { .chart-wrap { height: 250px; } }
+.chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim); }
+.chart-legend span { display: flex; align-items: center; gap: 6px; }
+.chart-legend em { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+.chart-note { font-size: 13px; color: var(--faint); margin-top: 10px; line-height: 1.6; }
+
+/* ================= SCORE ROUND ================= */
+.score-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.score-tbl th { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.score-tbl td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+.score-tbl td b { color: var(--gold); }
+.score-tbl td.num { text-align: right; font-family: 'JetBrains Mono', monospace; }
+.score-tbl tr.top td { background: var(--gold-dim); }
+.spin-q { border: 1px solid var(--blue); border-radius: 12px; background: var(--surface2); padding: 16px 18px; margin-top: 16px; text-align: left; }
+.spin-q .who { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.spin-q .qtext { font-size: 16px; font-weight: 600; line-height: 1.55; }
+.spin-q .qans { font-size: 14px; line-height: 1.65; color: var(--emerald); margin-top: 10px; display: none; border-top: 1px dashed var(--border2); padding-top: 10px; }
+.spin-q .qans.show { display: block; }
+.picker-name { font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: 50px; line-height: 1.1; color: var(--blue); min-height: 58px; }
+.picker-name.spinning { opacity: .5; }
+.result-overlay { position: fixed; inset: 0; z-index: 960; background: rgba(6,10,20,.88); backdrop-filter: blur(7px); display: none; align-items: center; justify-content: center; padding: 22px; }
+.result-overlay.show { display: flex; }
+.result-card { background: var(--surface); border: 2px solid var(--gold); border-radius: 16px; padding: 26px 30px; max-width: 660px; width: 100%; max-height: 88vh; overflow: auto; box-shadow: 0 22px 60px rgba(0,0,0,.5); }
+.result-card h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: 32px; color: var(--gold); margin-bottom: 4px; }
+.result-card .sub { color: var(--dim); font-size: 14px; margin-bottom: 18px; }
+.result-card .win { font-size: 15px; margin: 16px 0; padding: 12px 16px; border-radius: 10px; background: var(--emerald-dim); border: 1px solid var(--emerald); }
+.result-card .win b { color: var(--emerald); }
+.chk { display: flex; gap: 11px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); margin-bottom: 7px; cursor: pointer; }
+.chk input { margin-top: 3px; accent-color: var(--gold); width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
+.chk span { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.chk.on { border-color: var(--gold); background: var(--gold-dim); }
+.chk.on span { color: var(--text); }
+.blk { display: flex; gap: 12px; align-items: flex-start; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; cursor: pointer; transition: all .15s; }
+.blk:hover { border-color: var(--gold); }
+.blk.on { border-color: var(--gold); background: var(--gold-dim); box-shadow: 0 0 0 1px var(--gold); }
+.blk .t { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--blue); min-width: 58px; flex-shrink: 0; }
+.blk .d { font-size: 13.5px; line-height: 1.5; color: var(--dim); min-width: 0; }
+.blk .d b { color: var(--text); display: block; font-size: 14.5px; }
+.timer-big { font-family: 'JetBrains Mono', monospace; font-size: 58px; font-weight: 600; letter-spacing: 2px; color: var(--gold); line-height: 1; }
+.timer-big.warn { color: var(--coral); }
+
+/* ================= PLAYER (chhupa hua by default) ================= */
+.player {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border2); padding: 10px 18px 12px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  transition: transform .32s ease, opacity .32s ease;
+}
+body.audio-off .player { transform: translateY(115%); opacity: 0; pointer-events: none; }
+body.audio-off .sec-play { display: none; }
+.pbtn { font-family: 'JetBrains Mono', monospace; font-size: 13px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 8px 12px; transition: all .15s; min-width: 42px; text-align: center; }
+.pbtn:hover { border-color: var(--gold); color: var(--gold); }
+.pbtn--main { width: 52px; height: 52px; border-radius: 50%; font-size: 17px; background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 700; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+.player select { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--surface3); color: var(--text); border: 1px solid var(--border2); border-radius: 7px; padding: 7px 8px; max-width: 100%; }
+.p-meta { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 2px; }
+.p-now { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice .on { color: var(--emerald); }
+.p-voice .off { color: var(--coral); }
+
+/* ================= THEME TOGGLE ================= */
+.theme-toggle { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); cursor: pointer; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+[data-theme="dark"] .tt-sun { display: block; } [data-theme="dark"] .tt-moon { display: none; }
+[data-theme="light"] .tt-sun { display: none; } [data-theme="light"] .tt-moon { display: block; }
+
+/* ================= FOOTER ================= */
+.foot { margin-top: 80px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--faint); font-size: 12.5px; font-family: 'JetBrains Mono', monospace; letter-spacing: .5px; }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1000px) {
+  .wrap { grid-template-columns: 1fr; padding: 0 18px; }
+  .toc { position: sticky; top: 0; z-index: 300; grid-row: auto; display: flex; gap: 6px; align-items: center; overflow-x: auto; -webkit-overflow-scrolling: touch; background: color-mix(in srgb, var(--bg) 93%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); margin: 0 -18px; padding: 10px 60px 10px 18px; max-height: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc-title { display: none; }
+  .toc a { white-space: nowrap; flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; border-radius: 5px; padding: 6px 11px; font-size: 11.5px; }
+  .toc a.active { border-bottom-color: var(--gold); background: var(--gold-dim); }
+  .main { padding-top: 20px; }
+  .sec-head { margin-top: 54px; }
+  .player { gap: 8px; padding: 10px 14px; }
+  .p-meta { min-width: 100%; order: 5; }
+  body.audio-off .player { transform: translateY(130%); }
+}
+@media (max-width: 480px) {
+  .memrow { gap: 4px; }
+  .cell { min-width: 50px; padding: 11px 6px; font-size: 13px; }
+  .rd { font-size: 15.5px; }
+  .beam-cell { min-width: 46px; font-size: 13px; padding: 10px 4px; }
+  .timer-big { font-size: 42px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } html { scroll-behavior: auto; } }
+
+/* ================= NEON PEN ================= */
+#penCanvas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 380; pointer-events: none; touch-action: none;
+}
+body.pen-on #penCanvas { pointer-events: auto; cursor: crosshair; }
+body.pen-on { user-select: none; -webkit-user-select: none; }
+.pen-bar {
+  position: fixed; left: 50%; bottom: 14px; transform: translate(-50%, 150%);
+  z-index: 470; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--gold); border-radius: 13px; padding: 9px 12px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.5); transition: transform .28s ease;
+  max-width: calc(100vw - 24px);
+}
+body.pen-on .pen-bar { transform: translate(-50%, 0); }
+.pen-bar .sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); cursor: pointer; flex-shrink: 0; transition: transform .15s; }
+.pen-bar .sw:hover { transform: scale(1.12); }
+.pen-bar .sw.sel { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 0 14px currentColor; }
+.pen-bar .pbtn2 {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; cursor: pointer;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--text);
+  border-radius: 8px; padding: 6px 10px; transition: all .15s;
+}
+.pen-bar .pbtn2:hover { border-color: var(--gold); color: var(--gold); }
+.pen-bar .pbtn2.on { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.pen-hint {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--faint);
+  letter-spacing: .4px; white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .pen-bar { gap: 6px; padding: 8px 10px; bottom: 10px; }
+  .pen-bar .sw { width: 22px; height: 22px; }
+  .pen-hint { display: none; }
+}
+/* lean class page tweaks */
+.board-tbl td { height: 34px; }
+.board-tbl td.blank { background: color-mix(in srgb, var(--gold-dim) 45%, transparent); }
+.plan-step { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; }
+.plan-step .tm { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); min-width: 54px; flex-shrink: 0; }
+.plan-step .tx { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.plan-step .tx b { color: var(--text); display: block; font-size: 14.5px; margin-bottom: 2px; }
+
+/* mobile: banner ko viewport me rakho */
+@media (max-width: 620px) {
+  .timeup-banner { font-size: 12.5px; padding: 10px 14px; white-space: normal; max-width: 92vw; text-align: center; }
+}
+
+/* ambient canvas ko fix karo (warna wo block ban ke content dhakel deta hai) */
+#ambient { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: .62; }
+.wrap { position: relative; z-index: 1; }
+
+
+/* ================= RECURSION TREE ================= */
+.tree { display: flex; flex-direction: column; gap: 12px; }
+.tree-lvl { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.tree-lvl .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: var(--faint); min-width: 58px; text-transform: uppercase; letter-spacing: 1.2px; flex-shrink: 0; }
+.tnode { display: flex; gap: 2px; padding: 5px 7px; border: 1px solid var(--border2); border-radius: 8px; background: var(--surface3); transition: all .2s; }
+.tnode span { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--text); padding: 1px 3px; }
+.tnode.hl { border-color: var(--gold); background: var(--gold-dim); }
+.tnode.hl span { color: var(--gold); }
+.tnode.sorted { border-color: var(--emerald); background: var(--emerald-dim); }
+.tnode.sorted span { color: var(--emerald); }
+.tnode .pv { color: var(--coral); font-weight: 600; }
+.tree-arrow { text-align: center; color: var(--faint); font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 2px; }
+.tree-split { display: flex; flex-direction: column; gap: 6px; padding-left: 14px; border-left: 1px dashed var(--border2); }
+.tree-node { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ================= TWO POINTER MERGE ================= */
+.tp-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 9px; }
+.tp-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--faint); min-width: 62px; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
+.tp-cell { min-width: 42px; padding: 9px 5px; text-align: center; border: 1px solid var(--border2); border-radius: 7px; background: var(--surface3); font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; transition: all .2s; }
+.tp-cell.ptr { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); box-shadow: 0 0 0 2px var(--blue-dim); }
+.tp-cell.taken { opacity: .3; }
+.tp-cell.out { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.tp-cell.null { opacity: .35; font-style: normal; }
+@media (max-width: 520px) {
+  .tnode span { font-size: 10.5px; padding: 0 2px; }
+  .tp-cell { min-width: 36px; font-size: 12px; padding: 7px 3px; }
+}
+
+
+/* ================= CALL STACK TRACE ================= */
+.cs-row { display: flex; flex-direction: column; gap: 6px; }
+.cs-frame {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 13px; border: 1px solid var(--border2); border-radius: 9px;
+  background: var(--surface3); font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px; color: var(--dim); transition: all .2s;
+}
+.cs-frame.on { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); font-weight: 600; }
+.cs-frame.done { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); }
+.cs-frame .ind { font-size: 10px; color: var(--faint); min-width: 14px; }
+
+/* code colours for the new palette */
+.code-block { background: #17120d; color: #f1e7d9; }
+[data-theme="light"] .code-block { background: #fbf6ef; color: #241a12; }
+.code-block .cm { color: #8d7b67; }
+.code-block .kw { color: #8fb98a; }
+.code-block .fn { color: #f2c14e; }
+.code-block .st { color: #e8734a; }
+.step-code { background: #17120d; }
+[data-theme="light"] .step-code { background: #fbf6ef; }
+.step-code .ln { color: #a8947c; }
+[data-theme="light"] .step-code .ln { color: #6b5745; }
+.step-code .ln.on { background: var(--gold-dim); border-left-color: var(--gold); color: var(--text); }
+.step-code .ln b { color: var(--blue); }
+/* hero / headings in Fraunces look better slightly tighter */
+h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif; }
+h1 em { font-style: italic; color: var(--gold); }
+
+/* anchors ko dock ke neeche na chhupne do */
+.sec { scroll-margin-top: 120px; }
+@media (max-width: 1000px) { .sec { scroll-margin-top: 140px; } }
+
+</style>
+</head>
+<body class="audio-off">
+<canvas id="ambient" aria-hidden="true"></canvas>
+
+<div class="wrap">
+<canvas id="penCanvas" aria-hidden="true"></canvas>
+
+<nav class="toc" id="toc">
+  <div class="toc-title">SESSION 3 · 30 MIN</div>
+  <a href="#s0"><span class="n">00</span>Aaj ka plan</a>
+  <a href="#s1"><span class="n">01</span>Merge sort</a>
+  <a href="#s2"><span class="n">02</span>Quick sort</a>
+  <a href="#s3"><span class="n">03</span>Comparison</a>
+  <a href="#s4"><span class="n">04</span>Question round</a>
+  <a href="#s5"><span class="n">05</span>Homework</a>
+</nav>
+
+<div class="main">
+
+<div class="dock" id="dock">
+  <span class="dock-timer" id="dkTimer">30:00</span>
+  <button class="dbtn dbtn--go" id="dkStart" title="Timer — ek baar chalao, khud chalta rahega">▶</button>
+  <button class="dbtn" id="dkNext" title="Agla block">⏭</button>
+  <span class="dock-blk" id="dkBlk">Block select karo (neeche plan se)</span>
+  <span class="dock-sep"></span>
+  <button class="dbtn dbtn--blue" id="dkSpin" title="Student + sawaal">🎯 SPIN</button>
+  <span class="dock-name" id="dkName">—</span>
+  <button class="dbtn dbtn--ok" id="dkOk" title="Sahi jawab">✓</button>
+  <button class="dbtn dbtn--bad" id="dkBad" title="Galat jawab">✕</button>
+  <span class="dock-sep"></span>
+  <button class="dbtn" id="dkPen" title="Neon pen on / off">✏️ PEN</button>
+  <span class="dock-spacer"></span>
+  <button class="dbtn" id="dkSide" title="Sidebar chhupao / dikhao">⇤ SIDEBAR</button>
+  <button class="dbtn" id="dkAudio" title="Audio player dikhao / chhupao">🎧 AUDIO</button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Theme toggle" title="Theme badlo"><span class="tt-sun">☀</span><span class="tt-moon">☾</span></button>
+</div>
+
+<div class="dock-q" id="dkQCard">
+  <div class="who" id="dkQWho"></div>
+  <div class="dq" id="dkQText"></div>
+  <div class="da" id="dkQAns"></div>
+  <div class="sim-controls" style="margin-top:12px">
+    <button class="btn btn--go" id="dkQShow">Jawab dekho</button>
+    <button class="btn btn--ok" id="dkQOk">✓ Sahi</button>
+    <button class="btn btn--bad" id="dkQBad">✕ Galat</button>
+    <button class="btn" id="dkQNext">🎲 Agla</button>
+    <button class="btn btn--warn" id="dkQClose">Band</button>
+  </div>
+</div>
+
+<div class="pen-bar" id="penBar">
+  <span class="pen-hint">NEON PEN</span>
+  <span class="sw sel" data-c="#ffd166" style="background:#ffd166;color:#ffd166"></span>
+  <span class="sw" data-c="#8fb98a" style="background:#8fb98a;color:#8fb98a"></span>
+  <span class="sw" data-c="#e8734a" style="background:#e8734a;color:#e8734a"></span>
+  <span class="sw" data-c="#ff6b5a" style="background:#ff6b5a;color:#ff6b5a"></span>
+  <span class="sw" data-c="#7ec8e3" style="background:#7ec8e3;color:#7ec8e3"></span>
+  <button class="pbtn2" id="penThin" title="Patli">thin</button>
+  <button class="pbtn2 on" id="penMed" title="Medium">med</button>
+  <button class="pbtn2" id="penThick" title="Moti">thick</button>
+  <button class="pbtn2" id="penErase" title="Eraser">eraser</button>
+  <button class="pbtn2" id="penUndo" title="Last line hatao">undo</button>
+  <button class="pbtn2" id="penClear" title="Sab mitao">clear</button>
+  <span class="pen-hint" style="color:var(--gold)">likha hua page ke saath scroll hota hai ✓</span>
+</div>
+
+<header class="hero">
+  <div class="hero-badges">
+    <span class="chip chip--gold">UNIT 3 · SESSION 3</span>
+    <span class="chip chip--blue">30 MIN · MERGE + QUICK SORT</span>
+    <span class="chip chip--em">EVERY LINE COMMENTED</span>
+  </div>
+  <h1>Aaj: <em>todo</em> aur <em>baanto</em></h1>
+  <p class="hero-sub">Do fast sorting algorithms. Merge sort me <b>har code line ke saath comment</b>, ek <b>call-stack trace</b> (recursion kaise chalti hai), two-pointer merge, aur quick sort ka partition. Neeche <b>ek hi question round</b> hai — <b>19 sawaal</b>, count ke saath.</p>
+  <hr class="hero-hr">
+</header>
+
+<!-- ============================================================ S0 -->
+<section class="sec" id="s0">
+  <div class="sec-head">
+    <span class="sec-num">00</span>
+    <h2>Aaj ka plan — 30 minute</h2>
+  </div>
+  <p class="sec-tag">Block pe click karo → timer set → START (phir khud chalta rahega)</p>
+
+  <div class="grid2" style="align-items:start">
+    <div id="planSteps"></div>
+    <div>
+      <div style="border:1px solid var(--border2);border-radius:14px;background:linear-gradient(160deg,var(--gold-dim),var(--surface) 55%);padding:20px 16px;text-align:center">
+        <div class="timer-big" id="tkTimer">30:00</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:2px;color:var(--faint);margin-top:8px">BAACHA HUA TIME</div>
+        <div style="font-size:14px;font-weight:600;margin-top:10px;min-height:20px" id="tkBlkName">Block select karo →</div>
+        <div class="sim-controls" style="justify-content:center;margin-top:16px">
+          <button class="btn btn--go" id="tkStart">▶ START</button>
+          <button class="btn" id="tkNext">⏭ NEXT</button>
+          <button class="btn btn--warn" id="tkReset">■ RESET</button>
+        </div>
+        <div class="sim-msg" id="tkNote" style="margin-top:12px;font-size:12.5px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Recall (30 second):</b> "Selection aur insertion ki complexity?" → <b>O(n²)</b>. "1 lakh elements pe?" → bahut slow. Aaj woh do algorithms jo <b>O(n log n)</b> dete hain — dono <b>recursion</b> pe chalte hain.
+  </div>
+</section>
+
+<!-- ============================================================ S1 -->
+<section class="sec" id="s1">
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <h2>Merge Sort — todo, phir jodo</h2>
+  </div>
+  <p class="sec-tag">Divide &amp; conquer · har case O(n log n) · stable · O(n) space</p>
+
+  <p class="rd" data-dev="मर्ज सॉर्ट को दो पत्तों के ढेर से समझो। मान लो दो ढेर हैं और दोनों पहले से सॉर्टेड हैं। तुम्हें एक सॉर्टेड ढेर बनाना है। तुम दोनों ढेरों के सबसे ऊपर वाले पत्ते देखते हो, जो छोटा है उसे पहले उठाते हो। बस यही मर्ज है। और ऐसे सॉर्टेड ढेर बनाने के लिए पहले ऐरे को आधा-आधा तोड़ते जाओ जब तक एक-एक एलिमेंट न बचे।"><b>Analogy — do patton ke dher.</b> Maan lo do dher hain, dono <b>already sorted</b>. Ek sorted dher banana hai: dono ke <b>upar wale patte dekho, jo chhota hai wo pehle uthao</b>. Bas yahi <b>merge</b> hai. Aur aise sorted dher banane ke liye pehle array ko <b>aadha-aadha todte</b> jao jab tak <b>1-1 element</b> na bache (1 element toh hamesha sorted hota hai).</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — SCREEN PE LIKHO</span>
+    <p><b>Merge Sort:</b> A divide-and-conquer algorithm that splits the array into halves, recursively sorts each half, and merges the two sorted halves using two pointers. <b>O(n log n)</b> in all cases, <b>O(n)</b> extra space, <b>stable</b>.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>STEP 1 — TODO (DIVIDE)</h4>
+      <p>Array ko <b>beech se do hisson</b> me todo. Har hisse pe <b>wahi kaam</b> (recursion). Jab <b>1 element</b> bacha → ruk jao (<b>base case</b>) — kyunki 1 element already sorted hai.</p>
+    </div>
+    <div class="card card--em">
+      <h4>STEP 2 — JODO (MERGE)</h4>
+      <p>Ab do <b>sorted</b> hisse aaye hain. Dono ke shuru me <b>ek-ek pointer</b>. Jo chhota hai wo output me, uska pointer aage. Ek hissa khatam → <b>bacha hua poora copy</b>.</p>
+    </div>
+  </div>
+
+  <div class="diagram">
+    <div class="d-cap">RECURSION TREE — [38, 27, 43, 3, 9, 82]</div>
+    <div class="tree">
+      <div class="tree-lvl"><span class="lbl">TODO ↓</span>
+        <div class="tnode"><span>38</span><span>27</span><span>43</span><span>3</span><span>9</span><span>82</span></div>
+      </div>
+      <div class="tree-lvl"><span class="lbl"></span>
+        <div class="tnode"><span>38</span><span>27</span><span>43</span></div>
+        <div class="tnode"><span>3</span><span>9</span><span>82</span></div>
+      </div>
+      <div class="tree-lvl"><span class="lbl"></span>
+        <div class="tnode"><span>38</span><span>27</span></div>
+        <div class="tnode"><span>43</span></div>
+        <div class="tnode"><span>3</span><span>9</span></div>
+        <div class="tnode"><span>82</span></div>
+      </div>
+      <div class="tree-lvl"><span class="lbl">base case</span>
+        <div class="tnode"><span>38</span></div><div class="tnode"><span>27</span></div><div class="tnode"><span>43</span></div>
+        <div class="tnode"><span>3</span></div><div class="tnode"><span>9</span></div><div class="tnode"><span>82</span></div>
+      </div>
+      <div class="tree-arrow">▲ &nbsp; JODO (merge) &nbsp; ▲</div>
+      <div class="tree-lvl"><span class="lbl">JODO ↑</span>
+        <div class="tnode sorted"><span>27</span><span>38</span></div>
+        <div class="tnode sorted"><span>43</span></div>
+        <div class="tnode sorted"><span>3</span><span>9</span></div>
+        <div class="tnode sorted"><span>82</span></div>
+      </div>
+      <div class="tree-lvl"><span class="lbl"></span>
+        <div class="tnode sorted"><span>27</span><span>38</span><span>43</span></div>
+        <div class="tnode sorted"><span>3</span><span>9</span><span>82</span></div>
+      </div>
+      <div class="tree-lvl"><span class="lbl">final</span>
+        <div class="tnode hl"><span>3</span><span>9</span><span>27</span><span>38</span><span>43</span><span>82</span></div>
+      </div>
+    </div>
+    <p class="d-note"><b>Dhyan do:</b> neeche jaate waqt kuch bhi sort nahi hota — sirf <b>todte</b> hain. Sorting <b>wapas aate waqt</b> (merge me) hoti hai.</p>
+  </div>
+
+  <div class="sim" id="csSim">
+    <div class="sim-head"><b>⚡ CALL STACK — recursion andar se kaise chalti hai</b><span>— [5, 2, 8, 1] pe step by step</span></div>
+    <div class="sim-body">
+      <div class="grid2" style="align-items:start;margin-top:0">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px">STACK (upar = abhi chal raha)</div>
+          <div class="cs-row" id="csStack"></div>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px">ARRAY</div>
+          <div class="diagram" style="margin:0;padding:14px"><div class="memrow" id="csArr"></div></div>
+        </div>
+      </div>
+      <div class="sim-steps" id="csLog" style="margin-top:14px">STEP dabao — pehle calls stack me chadhengi, phir wapas aayengi (LIFO).</div>
+      <div class="sim-controls">
+        <button class="btn btn--go" id="csStep">STEP →</button>
+        <button class="btn" id="csAuto">▶ AUTO</button>
+        <button class="btn btn--warn" id="csReset">RESET</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim" id="tpSim">
+    <div class="sim-head"><b>⚡ TWO-POINTER MERGE</b><span>— do sorted halves se ek sorted array</span></div>
+    <div class="sim-body">
+      <div class="tp-row"><span class="tp-lbl">LEFT [27,38,43]</span><span id="tpL"></span></div>
+      <div class="tp-row"><span class="tp-lbl">RIGHT [3,9,82]</span><span id="tpR"></span></div>
+      <div class="tp-row" style="margin-top:14px"><span class="tp-lbl">OUTPUT</span><span id="tpOut"></span></div>
+      <div class="sim-controls">
+        <button class="btn btn--go" id="tpStep">STEP →</button>
+        <button class="btn" id="tpAuto">▶ AUTO</button>
+        <button class="btn btn--warn" id="tpReset">RESET</button>
+      </div>
+      <div class="sim-steps" id="tpLog">STEP dabao — dono pointers me se jo chhota hai wo output me jayega.</div>
+    </div>
+  </div>
+
+  <div class="sim" id="mergeStepSim">
+    <div class="sim-head"><b>⚡ MERGE SORT STEPPER</b><span>— bars + code line highlight + variables</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <button class="btn btn--go" id="mPlay">▶ PLAY</button>
+        <button class="btn" id="mStep">STEP →</button>
+        <button class="btn" id="mNew">NEW ARRAY</button>
+        <button class="btn btn--warn" id="mReset">RESET</button>
+      </div>
+      <div class="step-grid" style="margin-top:16px">
+        <div>
+          <div class="step-bars" id="mBars"></div>
+          <div class="step-vars" id="mVars"></div>
+        </div>
+        <div class="step-code" id="mCode"></div>
+      </div>
+      <div class="sim-steps" id="mLog">PLAY dabao — merge hote hue dekho.</div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Fraunces',serif;font-weight:600;font-size:24px;margin:34px 0 8px">Code — har line ka matlab</h3>
+  <pre class="code-block"><span class="cm">/* ============ MERGE: do sorted halves ko jodo ============ */</span>
+<span class="kw">void</span> <span class="fn">merge</span>(<span class="kw">int</span> a[], <span class="kw">int</span> l, <span class="kw">int</span> m, <span class="kw">int</span> r) {   <span class="cm">// l = left, m = beech, r = right</span>
+    <span class="kw">int</span> n1 = m - l + 1;                 <span class="cm">// left half me kitne elements (l se m tak)</span>
+    <span class="kw">int</span> n2 = r - m;                     <span class="cm">// right half me kitne elements (m+1 se r tak)</span>
+    <span class="kw">int</span> L[n1], R[n2];                   <span class="cm">// dono halves ke liye temp arrays</span>
+    <span class="kw">int</span> i, j, k;                        <span class="cm">// i = left pointer, j = right pointer, k = result pointer</span>
+
+    <span class="kw">for</span> (i = 0; i &lt; n1; i++)            <span class="cm">// left half ko copy karo</span>
+        L[i] = a[l + i];                <span class="cm">// a[l]…a[m]  →  L[0]…L[n1-1]</span>
+
+    <span class="kw">for</span> (j = 0; j &lt; n2; j++)            <span class="cm">// right half ko copy karo</span>
+        R[j] = a[m + 1 + j];            <span class="cm">// a[m+1]…a[r]  →  R[0]…R[n2-1]</span>
+
+    i = 0;                              <span class="cm">// left pointer shuru se</span>
+    j = 0;                              <span class="cm">// right pointer shuru se</span>
+    k = l;                              <span class="cm">// result original array me index l se shuru</span>
+
+    <span class="kw">while</span> (i &lt; n1 &amp;&amp; j &lt; n2) {           <span class="cm">// jab tak DONO me kuch bacha hai</span>
+        <span class="kw">if</span> (L[i] &lt;= R[j])               <span class="cm">// left wala chhota (ya barabar) hai?</span>
+            a[k++] = L[i++];            <span class="cm">// → left wala output me, i aage</span>
+        <span class="kw">else</span>                            <span class="cm">// warna right wala chhota hai</span>
+            a[k++] = R[j++];            <span class="cm">// → right wala output me, j aage</span>
+    }
+
+    <span class="kw">while</span> (i &lt; n1)                       <span class="cm">// left me kuch bacha hai?</span>
+        a[k++] = L[i++];                <span class="cm">// → baaki left copy kar do</span>
+
+    <span class="kw">while</span> (j &lt; n2)                       <span class="cm">// right me kuch bacha hai?</span>
+        a[k++] = R[j++];                <span class="cm">// → baaki right copy kar do</span>
+}
+
+<span class="cm">/* ============ MERGE SORT: todo aur merge ============ */</span>
+<span class="kw">void</span> <span class="fn">mergeSort</span>(<span class="kw">int</span> a[], <span class="kw">int</span> l, <span class="kw">int</span> r) {
+    <span class="kw">if</span> (l &gt;= r)                         <span class="cm">// BASE CASE: 0 ya 1 element bacha</span>
+        <span class="kw">return</span>;                         <span class="cm">// → pehle se sorted hai, wapas jao</span>
+
+    <span class="kw">int</span> m = l + (r - l) / 2;            <span class="cm">// beech ka index (l+r)/2 hi hai, par overflow-safe</span>
+    <span class="fn">mergeSort</span>(a, l, m);                 <span class="cm">// LEFT half ko recursively sort karo</span>
+    <span class="fn">mergeSort</span>(a, m + 1, r);             <span class="cm">// RIGHT half ko recursively sort karo</span>
+    <span class="fn">merge</span>(a, l, m, r);                  <span class="cm">// dono sorted halves ko jodo</span>
+}</pre>
+
+  <div class="formula">T(n) = 2·T(n/2) + O(n) &nbsp;⇒&nbsp; <span class="k">O(n log n)</span>
+    <small>2·T(n/2) = do halves ki recursion · O(n) = merge ka kaam · levels = log₂n · har level pe n kaam. Best, average, worst — teeno same.</small>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li><b>Merge = todo, phir jodo.</b> Sorting merge ke waqt hoti hai</li>
+      <li><b>Har case O(n log n)</b> — koi surprise nahi · <b>stable</b> ✔ · space <b>O(n)</b></li>
+      <li>Recursion samajhne ka rule: <b>jaate waqt todo, aate waqt jodo</b> (call stack LIFO)</li>
+      <li>Base case <code>if (l &gt;= r) return;</code> — bhoolna = infinite recursion</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <b>Exam pointer (10 marks):</b> tree diagram + <code>merge()</code> ka logic (do pointers) + <code>T(n) = 2T(n/2) + O(n)</code> + "stable, O(n) space". Yeh chaar cheezein likhne se full marks.
+  </div>
+</section>
+<!-- ============================================================ S2 -->
+<section class="sec" id="s2">
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <h2>Quick Sort — pivot se baanto</h2>
+  </div>
+  <p class="sec-tag">Partition · pivot apni final jagah pe · average O(n log n), worst O(n²)</p>
+
+  <p class="rd" data-dev="क्विक सॉर्ट में एक पिवट चुनते हैं, आम तौर पर आख़िरी एलिमेंट। फिर ऐरे को इस तरह बाँटते हैं कि पिवट से छोटे सब बाईं तरफ़ और बड़े सब दाईं तरफ़ आ जाएँ। इसके बाद पिवट अपनी सही जगह पर पहुँच जाता है और उसे दोबारा छूने की ज़रूरत नहीं।"><b>Analogy — line me khade bachche.</b> Ek bachche ko <b>pivot</b> banao (jaise 5 feet wala). Bolo: "5 se chhote left me, 5 se lambe right me." Ek baar line baant gayi → <b>pivot apni sahi jagah pe</b> (uske left me sab chhote, right me sab lambe). Phir <b>left group</b> aur <b>right group</b> pe wahi kaam dohrao.</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — SCREEN PE LIKHO</span>
+    <p><b>Quick Sort:</b> A divide-and-conquer algorithm that picks a pivot, partitions the array so smaller elements lie left and larger right (pivot reaches its final position), then recursively sorts both parts. Average <b>O(n log n)</b>, worst <b>O(n²)</b>, O(log n) space, <b>unstable</b>.</p>
+  </div>
+
+  <div class="diagram">
+    <div class="d-cap">PARTITION WALK — [10, 7, 8, 9, 1, 5] · pivot = 5 (last)</div>
+    <div class="table-wrap" style="margin:0">
+      <div class="table-scroll"><table class="data-table">
+        <thead><tr><th>j</th><th>A[j]</th><th>≤ 5 ?</th><th>Action</th><th>Array</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>10</td><td>nahi</td><td>—</td><td>10, 7, 8, 9, 1, 5</td></tr>
+          <tr><td>1</td><td>7</td><td>nahi</td><td>—</td><td>10, 7, 8, 9, 1, 5</td></tr>
+          <tr><td>2</td><td>8</td><td>nahi</td><td>—</td><td>10, 7, 8, 9, 1, 5</td></tr>
+          <tr><td>3</td><td>9</td><td>nahi</td><td>—</td><td>10, 7, 8, 9, 1, 5</td></tr>
+          <tr><td>4</td><td><b>1</b></td><td><b>haan</b></td><td>i=0 → 10 ↔ 1 swap</td><td>1, 7, 8, 9, 10, 5</td></tr>
+          <tr><td>—</td><td>—</td><td>loop khatam</td><td>pivot ko i+1 pe: 7 ↔ 5</td><td><b>1, 5, 8, 9, 10, 7</b></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <p class="d-note"><b>5 ab index 1 pe — FINAL.</b> Left me [1], right me [8,9,10,7] — uspe same process.</p>
+  </div>
+
+  <div class="diagram">
+    <div class="d-cap">PARTITION TREE — pivot ke baad left/right</div>
+    <div class="tree">
+      <div class="tree-lvl"><span class="lbl">root</span>
+        <div class="tnode hl"><span>10</span><span>7</span><span>8</span><span>9</span><span>1</span><span class="pv">5</span></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--coral)">pivot 5 → index 1</span>
+      </div>
+      <div class="tree-split" style="margin-left:22px">
+        <div class="tree-node"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint)">left →</span><div class="tnode sorted"><span>1</span></div><span style="font-size:11.5px;color:var(--emerald)">sorted ✔</span></div>
+        <div class="tree-node"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint)">right →</span>
+          <div class="tnode"><span>8</span><span>9</span><span>10</span><span class="pv">7</span></div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--coral)">pivot 7 → index 2</span>
+        </div>
+        <div class="tree-split" style="margin-left:22px">
+          <div class="tree-node"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint)">right →</span>
+            <div class="tnode"><span>9</span><span>10</span><span class="pv">8</span></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--coral)">pivot 8 → index 3</span>
+          </div>
+          <div class="tree-split" style="margin-left:22px">
+            <div class="tree-node"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint)">right →</span>
+              <div class="tnode sorted"><span>9</span><span class="pv">10</span></div>
+              <span style="font-size:11.5px;color:var(--emerald)">final ✔</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tree-lvl" style="margin-top:6px"><span class="lbl">result</span>
+        <div class="tnode hl"><span>1</span><span>5</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+      </div>
+    </div>
+    <p class="d-note">Har node me <b>pivot</b> (coral) apni final jagah pe chala jata hai — isliye usse dobara sort nahi karna padta.</p>
+  </div>
+
+  <h3 style="font-family:'Fraunces',serif;font-weight:600;font-size:24px;margin:34px 0 8px">Code — har line ka matlab</h3>
+  <pre class="code-block"><span class="cm">/* ============ PARTITION: pivot ko sahi jagah pe rakho ============ */</span>
+<span class="kw">int</span> <span class="fn">partition</span>(<span class="kw">int</span> a[], <span class="kw">int</span> low, <span class="kw">int</span> high) {
+    <span class="kw">int</span> pivot = a[high];                <span class="cm">// pivot = aakhri element</span>
+    <span class="kw">int</span> i = low - 1;                     <span class="cm">// i = chhote hisse ka last index (abhi khaali)</span>
+
+    <span class="kw">for</span> (<span class="kw">int</span> j = low; j &lt; high; j++) {   <span class="cm">// har element dekho (pivot chhod ke)</span>
+        <span class="kw">if</span> (a[j] &lt;= pivot) {             <span class="cm">// pivot se chhota ya barabar?</span>
+            i++;                         <span class="cm">// chhote hisse ki jagah ek badhao</span>
+            <span class="kw">int</span> t = a[i];                <span class="cm">// swap shuru — purani value bachao</span>
+            a[i] = a[j];                 <span class="cm">// chhota element left me le jao</span>
+            a[j] = t;                    <span class="cm">// purani value uski jagah</span>
+        }
+    }
+
+    <span class="kw">int</span> t = a[i + 1];                   <span class="cm">// pivot ko uski FINAL jagah pe le jao</span>
+    a[i + 1] = a[high];                  <span class="cm">// jo wahan tha use pivot ki purani jagah</span>
+    a[high] = t;                         <span class="cm">// pivot ab i+1 pe</span>
+    <span class="kw">return</span> i + 1;                        <span class="cm">// pivot ka final index lautao</span>
+}
+
+<span class="cm">/* ============ QUICK SORT: pivot ke left/right pe recursion ============ */</span>
+<span class="kw">void</span> <span class="fn">quickSort</span>(<span class="kw">int</span> a[], <span class="kw">int</span> low, <span class="kw">int</span> high) {
+    <span class="kw">if</span> (low &lt; high) {                    <span class="cm">// 2 ya zyada elements hain?</span>
+        <span class="kw">int</span> pi = <span class="fn">partition</span>(a, low, high); <span class="cm">// pivot ko sahi jagah pe rakho</span>
+        <span class="fn">quickSort</span>(a, low, pi - 1);       <span class="cm">// LEFT part sort karo (pivot se chhote)</span>
+        <span class="fn">quickSort</span>(a, pi + 1, high);      <span class="cm">// RIGHT part sort karo (pivot se bade)</span>
+    }
+}</pre>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Case</th><th>Kab hota hai</th><th>Complexity</th></tr></thead>
+      <tbody>
+        <tr><td>Best</td><td>pivot har baar beech me (balanced)</td><td><b>O(n log n)</b></td></tr>
+        <tr><td>Average</td><td>random data</td><td><b>O(n log n)</b></td></tr>
+        <tr><td><b>Worst</b></td><td><b>array already sorted + pivot = last element</b></td><td><b style="color:var(--coral)">O(n²)</b></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="callout">
+    <b>Worst case kyun?</b> Sorted array me aakhri element sabse bada hota hai → partition me <b>left 0, right n−1</b>. Aadha nahi hota, isliye recursion n, n−1, n−2… = <b>O(n²)</b>. <b>Fix:</b> random pivot ya <b>median-of-three</b>.
+  </div>
+
+  <div class="sim" id="quickStepSim">
+    <div class="sim-head"><b>⚡ QUICK SORT STEPPER</b><span>— partition hote hue, code line ke saath</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <button class="btn btn--go" id="qPlay">▶ PLAY</button>
+        <button class="btn" id="qStep">STEP →</button>
+        <button class="btn" id="qNew">NEW ARRAY</button>
+        <button class="btn btn--warn" id="qReset">RESET</button>
+      </div>
+      <div class="step-grid" style="margin-top:16px">
+        <div>
+          <div class="step-bars" id="qBars"></div>
+          <div class="step-vars" id="qVars"></div>
+        </div>
+        <div class="step-code" id="qCode"></div>
+      </div>
+      <div class="sim-steps" id="qLog">PLAY dabao — pivot coral me dikhega.</div>
+    </div>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li><b>Quick = pivot se baanto</b> · pivot apni final jagah pe, phir left/right recursion</li>
+      <li>Average <b>O(n log n)</b> · worst <b>O(n²)</b> · space O(log n) · <b>unstable</b></li>
+      <li><b>Practically sabse fast</b> (in-place, cache-friendly) · <code>qsort()</code> isi pe based</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ S3 -->
+<section class="sec" id="s3">
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <h2>Merge vs Quick — kaun, kab</h2>
+  </div>
+  <p class="sec-tag">Ek table me poora fark + decision guide</p>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Point</th><th>Merge Sort</th><th>Quick Sort</th></tr></thead>
+      <tbody>
+        <tr><td>Idea</td><td>todo → jodo</td><td>pivot → baanto</td></tr>
+        <tr><td>Best / Average</td><td>O(n log n) / O(n log n)</td><td>O(n log n) / O(n log n)</td></tr>
+        <tr><td><b>Worst</b></td><td><b style="color:var(--emerald)">O(n log n)</b> (guarantee)</td><td><b style="color:var(--coral)">O(n²)</b></td></tr>
+        <tr><td>Space</td><td>O(n)</td><td><b>O(log n)</b></td></tr>
+        <tr><td>Stable</td><td style="color:var(--emerald)">✔</td><td style="color:var(--coral)">✕</td></tr>
+        <tr><td>In-place</td><td>nahi</td><td><b>haan</b></td></tr>
+        <tr><td>Kaam ka</td><td>guarantee + stability</td><td>speed + kam memory</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card card--em">
+      <h4>MERGE KAB</h4>
+      <p>Jab <b>worst case ki guarantee</b> chahiye (real-time systems), ya <b>stability</b> chahiye, ya data <b>linked list</b> me hai.</p>
+    </div>
+    <div class="card card--coral">
+      <h4>QUICK KAB</h4>
+      <p>Jab <b>speed</b> chahiye aur memory kam hai (in-place), aur data random hai (worst case ka risk kam).</p>
+    </div>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Ek line me</span>
+    <p><b>"Guarantee chahiye → Merge · Speed chahiye → Quick."</b> Dono O(n log n) average dete hain, fark <b>worst case</b> aur <b>memory</b> ka hai.</p>
+  </div>
+</section>
+<!-- ============================================================ S4 -->
+<section class="sec" id="s4">
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <h2>Question Round — 19 sawaal</h2>
+  </div>
+  <p class="sec-tag">Ek hi jagah: spin + sawaal + ✓/✕ + scoreboard (alag-alag nahi)</p>
+
+  <div class="sim" style="border-color:var(--gold);background:linear-gradient(165deg,var(--gold-dim),var(--surface) 45%)">
+    <div class="sim-head" style="background:transparent;border-color:var(--border)">
+      <b>🎯 QUESTION ROUND</b>
+      <span id="qrMeta">19 sawaal · 0 poochhe · 19 bache</span>
+    </div>
+    <div class="sim-body">
+      <div class="grid2" style="align-items:start;margin-top:0">
+        <div style="text-align:center">
+          <div class="picker-name" id="qrName">—</div>
+          <div class="sim-controls" style="justify-content:center;margin-top:14px">
+            <button class="btn btn--go" id="qrSpin" style="font-size:14px;padding:11px 26px">🎯 SPIN — naam + sawaal</button>
+            <button class="btn btn--ok" id="qrOk">✓ Sahi</button>
+            <button class="btn btn--bad" id="qrBad">✕ Galat</button>
+            <button class="btn btn--warn" id="qrSkip">↻ Skip</button>
+          </div>
+          <div class="sim-msg" id="qrMsg" style="margin-top:12px">SPIN dabao — naam aur sawaal dono aayenge.</div>
+        </div>
+        <div>
+          <div style="border:1px solid var(--blue);border-radius:12px;background:var(--surface2);padding:16px 18px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+              <span class="chip chip--blue" id="qrCount">SAWAAL —</span>
+              <span class="chip chip--em" id="qrTopic">TOPIC</span>
+            </div>
+            <div id="qrText" style="font-size:16px;font-weight:600;line-height:1.55;min-height:54px">Sawaal yahan aayega.</div>
+            <div id="qrAns" style="font-size:14px;color:var(--emerald);border-top:1px dashed var(--border2);padding-top:11px;margin-top:11px;display:none"></div>
+            <div class="sim-controls" style="margin-top:12px">
+              <button class="btn btn--go" id="qrShow">Jawab dekho</button>
+            </div>
+          </div>
+          <div class="lf-meter" style="margin-top:14px"><div class="lf-fill" id="qrBar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="sim-controls">
+        <label>NAAM LIST <input id="qrNames" style="width:220px" value="Harsh, Aryan, Khusi"></label>
+        <button class="btn" id="qrSave">SAVE</button>
+        <button class="btn btn--go" id="qrResult">🏆 RESULT DIKHAO</button>
+        <button class="btn btn--warn" id="qrReset">SCORE RESET</button>
+      </div>
+
+      <div class="table-wrap" style="margin:18px 0 0">
+        <div class="table-scroll"><table class="score-tbl">
+          <thead><tr><th>Student</th><th>Poocha gaya</th><th>Sahi</th><th>Score</th></tr></thead>
+          <tbody id="qrBoard"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Kaise chalayein:</b> har 3-4 minute me ek SPIN. Pool me <b>19 sawaal</b> hain (merge, quick, aur rapid yes/no) — koi repeat nahi hota, jab tak pool khatam na ho. Aakhir me <b>🏆 RESULT</b> dikhao.
+  </div>
+</section>
+
+<!-- ============================================================ S5 -->
+<section class="sec" id="s5">
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <h2>Homework + aage kya</h2>
+  </div>
+  <p class="sec-tag">Ghar pe yeh karo, next session me revise karenge</p>
+
+  <div class="memo">
+    <span class="memo-label">📝 Homework</span>
+    <ul>
+      <li><b>Merge sort</b> se [8, 3, 5, 1] sort karo — poora tree banao (todo + jodo)</li>
+      <li><b>Quick sort</b> se [7, 2, 9, 4, 6] — pehla partition step-by-step likho</li>
+      <li>Dono ke programs khud type karo — <b>har line ka comment</b> khud likho (isse concept pakka hota hai)</li>
+      <li>Yaad karo: merge <b>O(n log n) har case</b> · quick worst <b>O(n²)</b> (sorted + last pivot)</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <b>Agla session:</b> Unit 3 revision — master comparison table, heap &amp; radix (chhote me), exam corner (definitions + one-liners + mock questions).
+  </div>
+
+  <p class="foot">TEAM DEVDoots · UNIT 3 · SESSION 3 — MERGE + QUICK SORT</p>
+</section>
+
+</div><!-- /main -->
+</div><!-- /wrap -->
+
+<!-- ============================================================ PLAYER (chhupa hua) -->
+<div class="player" id="player">
+  <button class="pbtn pbtn--main" id="btnPlay" title="Play / Pause">▶</button>
+  <button class="pbtn" id="btnStop" title="Stop">■</button>
+  <button class="pbtn" id="btnPrev" title="Pichla section">⏮</button>
+  <button class="pbtn" id="btnNext" title="Agla section">⏭</button>
+  <select id="rateSel" title="Speed">
+    <option value="0.75">0.75×</option>
+    <option value="1" selected>1×</option>
+    <option value="1.25">1.25×</option>
+    <option value="1.5">1.5×</option>
+  </select>
+  <select id="voiceSel" title="Voice"><option>Loading voices…</option></select>
+  <div class="p-meta">
+    <div class="p-now" id="pNow">Player ready — Play dabao</div>
+    <div class="p-voice" id="pVoice">Voices check kar rahe hain…</div>
+  </div>
+</div>
+
+<div class="timeup-banner" id="tuBanner">⏰ TIME UP — agla block!</div>
+
+<div class="result-overlay" id="resOverlay">
+  <div class="result-card">
+    <h3>🏆 Team Devdoots — Score</h3>
+    <div class="sub" id="resSub">Aaj ke session ke sawaalon ka hisaab</div>
+    <div id="resBody"></div>
+    <div class="win" id="resWin"></div>
+    <div class="sim-controls">
+      <button class="btn btn--go" id="resClose">Band karo</button>
+      <button class="btn btn--warn" id="resReset">SCORE RESET</button>
+    </div>
+  </div>
+</div>
+<script>
+/* ================= 30-MIN CLASS PAGE — ENGINE ================= */
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+
+/* ---------- THEME ---------- */
+var root = document.documentElement;
+try { var sv = localStorage.getItem('u3s1-theme'); if (sv === 'light' || sv === 'dark') root.setAttribute('data-theme', sv); } catch (e) {}
+if ($('themeToggle')) $('themeToggle').addEventListener('click', function () {
+  var nx = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', nx);
+  try { localStorage.setItem('u3s1-theme', nx); } catch (e) {}
+});
+
+/* ---------- SIDEBAR + AUDIO ---------- */
+var sideOff = false, audioOn = false;
+try { sideOff = localStorage.getItem('u3s1-side') === '1'; } catch (e) {}
+function applySide() { document.body.classList.toggle('noside', sideOff); if ($('dkSide')) $('dkSide').textContent = sideOff ? '⇥ SIDEBAR' : '⇤ SIDEBAR'; }
+if ($('dkSide')) $('dkSide').addEventListener('click', function () { sideOff = !sideOff; try { localStorage.setItem('u3s1-side', sideOff ? '1' : '0'); } catch (e) {} applySide(); });
+applySide();
+function applyAudio() { document.body.classList.toggle('audio-off', !audioOn); if ($('dkAudio')) $('dkAudio').textContent = audioOn ? '🎧 ON' : '🎧 AUDIO'; }
+if ($('dkAudio')) $('dkAudio').addEventListener('click', function () { audioOn = !audioOn; applyAudio(); });
+applyAudio();
+
+/* ---------- SCROLL SPY ---------- */
+(function () {
+  var toc = $('toc'); if (!toc) return;
+  var links = toc.querySelectorAll('a'), secs = [];
+  links.forEach(function (l) { var el = $(l.getAttribute('href').slice(1)); if (el) secs.push({ el: el, link: l }); });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        links.forEach(function (l) { l.classList.remove('active'); });
+        var m = secs.find(function (s) { return s.el === en.target; });
+        if (m) { m.link.classList.add('active'); if (window.innerWidth <= 1000) m.link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  secs.forEach(function (s) { obs.observe(s.el); });
+})();
+
+/* ================= NEON PEN (page ke saath scroll hota hai) ================= */
+var PEN = (function () {
+  var cv = $('penCanvas'); if (!cv || !cv.getContext) return null;
+  var ctx = cv.getContext('2d');
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  var strokes = [], cur = null, color = '#39ff14', width = 4, on = false, eraser = false;
+  var raf = null;
+  function resize() {
+    cv.width = Math.floor(window.innerWidth * dpr);
+    cv.height = Math.floor(window.innerHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  function draw() {
+    var sx = window.scrollX || 0, sy = window.scrollY || 0;
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    strokes.forEach(function (st) {
+      if (!st.pts.length) return;
+      var pass = function (w, blur, alpha) {
+        ctx.globalAlpha = alpha; ctx.lineWidth = w;
+        ctx.strokeStyle = st.color; ctx.shadowColor = st.color; ctx.shadowBlur = blur;
+        ctx.beginPath();
+        if (st.pts.length === 1) {
+          ctx.arc(st.pts[0][0] - sx, st.pts[0][1] - sy, Math.max(1, w / 2), 0, Math.PI * 2);
+          ctx.fillStyle = st.color; ctx.fill();
+          return;
+        }
+        for (var i = 0; i < st.pts.length; i++) {
+          var p = st.pts[i], x = p[0] - sx, y = p[1] - sy;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      };
+      pass(st.w * 2.8, 18, 0.28);   /* outer glow */
+      pass(st.w * 1.5, 10, 0.55);   /* mid glow */
+      pass(st.w, 6, 1);             /* core */
+    });
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+  }
+  function schedule() { if (raf) return; raf = requestAnimationFrame(function () { raf = null; draw(); }); }
+  function pt(e) { return [e.clientX + (window.scrollX || 0), e.clientY + (window.scrollY || 0)]; }
+  function eraseAt(x, y) {
+    var keep = [];
+    strokes.forEach(function (st) {
+      var hit = st.pts.some(function (p) { var dx = p[0] - x, dy = p[1] - y; return dx * dx + dy * dy < 22 * 22; });
+      if (!hit) keep.push(st);
+    });
+    strokes = keep;
+  }
+  cv.addEventListener('pointerdown', function (e) {
+    if (!on) return;
+    try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+    if (eraser) { eraseAt.apply(null, pt(e)); schedule(); e.preventDefault(); return; }
+    cur = { color: color, w: width, pts: [pt(e)] };
+    strokes.push(cur); schedule();
+    e.preventDefault();
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (!on) return;
+    if (eraser) { eraseAt.apply(null, pt(e)); schedule(); e.preventDefault(); return; }
+    if (!cur) return;
+    cur.pts.push(pt(e)); schedule();
+    e.preventDefault();
+  });
+  ['pointerup', 'pointercancel', 'pointerleave', 'pointerout'].forEach(function (ev) {
+    cv.addEventListener(ev, function () { cur = null; });
+  });
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', resize);
+  resize();
+  function setOn(v) {
+    on = v;
+    document.body.classList.toggle('pen-on', on);
+    if ($('dkPen')) $('dkPen').textContent = on ? '✏️ PEN ON' : '✏️ PEN';
+    schedule();
+  }
+  window.__penDbg = { count: function () { return strokes.length; }, draw: draw, pts: function () { return strokes.map(function (s) { return s.pts.length; }); } };
+  return {
+    setOn: setOn, isOn: function () { return on; },
+    setColor: function (c) { color = c; eraser = false; },
+    setWidth: function (w) { width = w; },
+    setEraser: function (v) { eraser = v; },
+    undo: function () { strokes.pop(); schedule(); },
+    clear: function () { strokes = []; schedule(); },
+    count: function () { return strokes.length; }
+  };
+})();
+
+/* pen toolbar wiring */
+(function () {
+  if (!PEN) return;
+  var sws = document.querySelectorAll('.pen-bar .sw');
+  sws.forEach(function (s) {
+    s.addEventListener('click', function () {
+      sws.forEach(function (x) { x.classList.remove('sel'); });
+      s.classList.add('sel');
+      PEN.setColor(s.getAttribute('data-c'));
+      if ($('penErase')) $('penErase').classList.remove('on');
+    });
+  });
+  function widthBtn(id, w) {
+    if (!$(id)) return;
+    $(id).addEventListener('click', function () {
+      ['penThin', 'penMed', 'penThick'].forEach(function (k) { if ($(k)) $(k).classList.remove('on'); });
+      $(id).classList.add('on');
+      PEN.setWidth(w);
+    });
+  }
+  widthBtn('penThin', 2.5); widthBtn('penMed', 4); widthBtn('penThick', 7);
+  if ($('penErase')) $('penErase').addEventListener('click', function () {
+    var on = $('penErase').classList.toggle('on');
+    PEN.setEraser(on);
+  });
+  if ($('penUndo')) $('penUndo').addEventListener('click', function () { PEN.undo(); });
+  if ($('penClear')) $('penClear').addEventListener('click', function () { PEN.clear(); });
+  if ($('dkPen')) $('dkPen').addEventListener('click', function () { PEN.setOn(!PEN.isOn()); });
+  /* keyboard: P = pen toggle, Z = undo, E = eraser */
+  document.addEventListener('keydown', function (e) {
+    if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === 'p' || e.key === 'P') { PEN.setOn(!PEN.isOn()); }
+    if (e.key === 'z' || e.key === 'Z') { PEN.undo(); }
+    if (e.key === 'e' || e.key === 'E') { PEN.setEraser(true); if ($('penErase')) $('penErase').classList.add('on'); }
+  });
+})();
+
+/* ================= AUDIO ENGINE ================= */
+var synth = window.speechSynthesis;
+var SEC_IDS = ['s0', 's1', 's2', 's3', 's4', 's5'];
+var SEC_NAMES = { s0: 'Aaj ka plan', s1: 'Merge sort', s2: 'Quick sort', s3: 'Comparison', s4: 'Question round', s5: 'Homework' };
+var units = [], cur = -1, endSec = null, stopFlag = false, keepAlive = null, activeSection = 's0';
+var btnPlay = $('btnPlay'), btnStop = $('btnStop'), btnPrev = $('btnPrev'), btnNext = $('btnNext');
+var rateSel = $('rateSel'), voiceSel = $('voiceSel'), pNow = $('pNow'), pVoice = $('pVoice');
+var allVoices = [], hindiVoice = null;
+SEC_IDS.forEach(function (sid) { var sec = $(sid); if (!sec) return; var n = 0; sec.querySelectorAll('.rd').forEach(function (el) { units.push({ el: el, sec: sid, inSec: n++ }); }); });
+function firstIndexOfSection(sid) { for (var k = 0; k < units.length; k++) if (units[k].sec === sid) return k; return -1; }
+function isHindi(v) { if (!v) return false; var l = (v.lang || '').toLowerCase(); return l.indexOf('hi') === 0 || /hindi|swara|hemant|kalpana|madhur|lekha|prabhat/i.test(v.name || ''); }
+function refreshVoices() {
+  if (!synth) return;
+  var vs = synth.getVoices() || []; if (!vs.length) return;
+  allVoices = vs; hindiVoice = null;
+  var hindi = [], others = [];
+  vs.forEach(function (v) { (isHindi(v) ? hindi : others).push(v); });
+  hindiVoice = hindi[0] || null;
+  var opts = '';
+  hindi.forEach(function (v) { opts += '<option value="' + encodeURIComponent(v.voiceURI) + '">★ ' + v.name + ' (' + v.lang + ')</option>'; });
+  if (hindi.length && others.length) opts += '<option disabled>— — —</option>';
+  others.forEach(function (v) { opts += '<option value="' + encodeURIComponent(v.voiceURI) + '">' + v.name + ' (' + v.lang + ')</option>'; });
+  voiceSel.innerHTML = opts;
+  voiceSel.value = encodeURIComponent((hindiVoice || others[0]).voiceURI);
+  if (allVoices.length) {
+    var v = getSelVoice();
+    pVoice.innerHTML = isHindi(v) ? '<span class="on">★ ' + v.name + ' — Hindi voice active</span>' : '<span class="off">⚠ Hindi voice nahi mili</span> · using ' + v.name;
+  }
+}
+function getSelVoice() { var uri = decodeURIComponent(voiceSel.value || ''); for (var k = 0; k < allVoices.length; k++) if (allVoices[k].voiceURI === uri) return allVoices[k]; return null; }
+if (synth) { refreshVoices(); synth.onvoiceschanged = refreshVoices; setTimeout(refreshVoices, 700); }
+else { btnPlay.disabled = btnStop.disabled = btnPrev.disabled = btnNext.disabled = true; }
+voiceSel.addEventListener('change', refreshVoices);
+function clearHi() { document.querySelectorAll('.rd.speaking').forEach(function (e) { e.classList.remove('speaking'); }); }
+function highlight(u) { clearHi(); u.el.classList.add('speaking'); try { u.el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }
+function snippet(el, len) { var t = (el.innerText || '').replace(/\s+/g, ' ').trim(); return t.length > len ? t.slice(0, len) + '…' : t; }
+function updateNow(u) {
+  if (!u) { pNow.textContent = 'Player ready'; return; }
+  var per = units.filter(function (x) { return x.sec === u.sec; }).length;
+  pNow.textContent = '▶ ' + SEC_NAMES[u.sec] + ' — para ' + (u.inSec + 1) + '/' + per + ' · ' + snippet(u.el, 52);
+}
+function speakUnit(i) {
+  if (stopFlag) return;
+  if (i >= units.length) { finishAll(); return; }
+  var u = units[i];
+  if (endSec !== null && u.sec !== endSec) { finishAll(); return; }
+  cur = i;
+  var v = getSelVoice();
+  var text = isHindi(v) ? (u.el.getAttribute('data-dev') || u.el.innerText) : u.el.innerText;
+  var utt = new SpeechSynthesisUtterance(text);
+  if (v) { utt.voice = v; utt.lang = v.lang; } else { utt.lang = 'hi-IN'; }
+  utt.rate = parseFloat(rateSel.value) || 1;
+  utt.onstart = function () { highlight(u); updateNow(u); btnPlay.textContent = '❚❚'; };
+  utt.onend = function () { if (!stopFlag) speakUnit(cur + 1); };
+  utt.onerror = function (ev) { if (ev && (ev.error === 'interrupted' || ev.error === 'canceled')) return; if (!stopFlag) setTimeout(function () { if (!stopFlag) speakUnit(cur + 1); }, 400); };
+  synth.speak(utt);
+}
+function finishAll() { stopKeepAlive(); clearHi(); btnPlay.textContent = '▶'; pNow.textContent = 'Khatam ✓'; endSec = null; cur = -1; }
+function hardStop() { stopFlag = true; try { synth.cancel(); } catch (e) {} stopKeepAlive(); clearHi(); btnPlay.textContent = '▶'; setTimeout(function () { stopFlag = false; }, 60); }
+function startKeepAlive() {
+  if (keepAlive) return;
+  var ua = navigator.userAgent || '';
+  if (/Chrome/.test(ua) && !/Edg|Android|iPhone|iPad/.test(ua)) keepAlive = setInterval(function () { if (synth.speaking && !synth.paused) { synth.pause(); synth.resume(); } }, 12000);
+}
+function stopKeepAlive() { if (keepAlive) { clearInterval(keepAlive); keepAlive = null; } }
+function startFrom(sid) {
+  if (!synth) return;
+  hardStop();
+  setTimeout(function () { var idx = firstIndexOfSection(sid); if (idx < 0) { finishAll(); return; } endSec = null; cur = idx - 1; startKeepAlive(); speakUnit(idx); }, 80);
+}
+btnPlay.addEventListener('click', function () {
+  if (!synth) return;
+  if (synth.speaking && !synth.paused) { synth.pause(); btnPlay.textContent = '▶'; return; }
+  if (synth.speaking && synth.paused) { synth.resume(); btnPlay.textContent = '❚❚'; return; }
+  startFrom(activeSection);
+});
+btnStop.addEventListener('click', function () { hardStop(); cur = -1; updateNow(null); });
+function curSection() { return (cur >= 0 && units[cur]) ? units[cur].sec : activeSection; }
+btnPrev.addEventListener('click', function () { var i = SEC_IDS.indexOf(curSection()); startFrom(SEC_IDS[Math.max(0, i - 1)]); });
+btnNext.addEventListener('click', function () { var i = SEC_IDS.indexOf(curSection()); startFrom(SEC_IDS[Math.min(SEC_IDS.length - 1, i + 1)]); });
+document.querySelectorAll('.sec-play').forEach(function (b) {
+  b.addEventListener('click', function () { if (b.textContent === '■') { hardStop(); return; } startFrom(b.getAttribute('data-sec')); });
+});
+(function () {
+  var obs = new IntersectionObserver(function (entries) { entries.forEach(function (en) { if (en.isIntersecting) activeSection = en.target.id; }); }, { rootMargin: '-15% 0px -75% 0px' });
+  SEC_IDS.forEach(function (sid) { var el = $(sid); if (el) obs.observe(el); });
+})();
+
+/* ================= 30-MIN AGENDA + TIMER ================= */
+var BLOCKS = [
+  { m: 2, t: 'Recall + hook', d: '"Selection/insertion ki complexity?" → O(n²). Aaj O(n log n) wale.', n: 'Students se poochho' },
+  { m: 5, t: 'Merge — concept + tree', d: 'Do patton ke dher wali analogy, phir tree diagram.', n: 'Merge sawaal 1' },
+  { m: 6, t: 'CALL STACK trace', d: 'Yeh sabse zaroori hai — recursion andar se kaise chalti hai. STEP dabao.', n: 'Har step pe poochho "ab kya hoga?"' },
+  { m: 4, t: 'Two-pointer merge + code', d: 'Merge ka visual, phir commented code line by line.', n: 'Merge sawaal 2-3' },
+  { m: 3, t: 'Quick — concept + partition', d: 'Line me khade bachche wali analogy, partition walk.', n: 'Quick sawaal 1' },
+  { m: 5, t: 'QUICK STEPPER', d: 'Pivot final jagah pe aata dikhao.', n: 'Quick sawaal 2-3' },
+  { m: 2, t: 'Worst case + comparison', d: 'Sorted + last pivot = O(n²). Phir merge vs quick table.', n: 'Quick sawaal 4' },
+  { m: 2, t: 'Question round', d: 'SPIN se 3-4 sawaal, score dikhao.', n: '🏆 RESULT' },
+  { m: 1, t: 'Homework', d: 'Tree + partition khud likho. Next: revision + exam corner.', n: 'Aaj ka takeaway' }
+];
+var tcur = -1, left = 0, ticker = null;
+function fmt(s) { var m = Math.floor(s / 60), x = s % 60; return (m < 10 ? '0' : '') + m + ':' + (x < 10 ? '0' : '') + x; }
+function paintTimer() {
+  var t = fmt(left), warn = left <= 30 && tcur >= 0;
+  ['dkTimer', 'tkTimer'].forEach(function (id) { var e = $(id); if (e) { e.textContent = t; e.classList.toggle('warn', warn); } });
+}
+function paintPlan() {
+  if (!$('planSteps')) return;
+  var html = '';
+  BLOCKS.forEach(function (b, i) {
+    html += '<div class="plan-step' + (i === tcur ? ' on' : '') + '" data-i="' + i + '" style="cursor:pointer' + (i === tcur ? ';border-color:var(--gold);background:var(--gold-dim)' : '') + '">' +
+      '<span class="tm">' + b.m + ' min</span><span class="tx"><b>' + b.t + '</b>' + b.d + '</span></div>';
+  });
+  $('planSteps').innerHTML = html;
+  $('planSteps').querySelectorAll('.plan-step').forEach(function (el) { el.addEventListener('click', function () { selectBlock(+el.getAttribute('data-i')); }); });
+}
+function selectBlock(i) {
+  tcur = i; left = BLOCKS[i].m * 60; paintTimer();
+  var label = 'Block ' + (i + 1) + '/' + BLOCKS.length + ' — ' + BLOCKS[i].t;
+  if ($('tkBlkName')) $('tkBlkName').textContent = label;
+  if ($('dkBlk')) $('dkBlk').textContent = label;
+  if ($('tkNote')) $('tkNote').innerHTML = '<b style="color:var(--blue)">' + BLOCKS[i].n + '</b>';
+  paintPlan();
+}
+function beep() {
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    var ac = new AC(), o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination); o.type = 'sine'; o.frequency.value = 900; g.gain.value = 0.1;
+    o.start(); setTimeout(function () { o.frequency.value = 640; }, 190); setTimeout(function () { o.stop(); try { ac.close(); } catch (e) {} }, 430);
+  } catch (e) {}
+}
+function timeUpAlert(msg) {
+  document.body.classList.add('timeup');
+  if ($('dock')) $('dock').classList.add('timeup');
+  var b = $('tuBanner'); if (b) { b.textContent = msg; b.classList.add('show'); }
+  beep();
+  setTimeout(function () { document.body.classList.remove('timeup'); if ($('dock')) $('dock').classList.remove('timeup'); if (b) b.classList.remove('show'); }, 3600);
+}
+function tickFn() {
+  left--;
+  if (left <= 0) {
+    left = 0; paintTimer();
+    var nx = tcur + 1;
+    if (nx < BLOCKS.length) { timeUpAlert('⏰ Block khatam — ab: ' + BLOCKS[nx].t); selectBlock(nx); }
+    else { timeUpAlert('⏰ Class poora! 🎉'); stopTimer(); }
+    return;
+  }
+  paintTimer();
+}
+function startTimer() {
+  if (ticker) { stopTimer(); return; }
+  if (tcur < 0) selectBlock(0);
+  ticker = setInterval(tickFn, 1000);
+  if ($('dkStart')) $('dkStart').textContent = '⏸';
+  if ($('tkStart')) $('tkStart').textContent = '⏸ PAUSE';
+}
+function stopTimer() { if (ticker) { clearInterval(ticker); ticker = null; } if ($('dkStart')) $('dkStart').textContent = '▶'; if ($('tkStart')) $('tkStart').textContent = '▶ START'; }
+function nextBlock() { var i = (tcur < 0 ? 0 : tcur + 1); if (i >= BLOCKS.length) { stopTimer(); return; } selectBlock(i); }
+if ($('dkStart')) $('dkStart').addEventListener('click', startTimer);
+if ($('dkNext')) $('dkNext').addEventListener('click', nextBlock);
+if ($('tkStart')) $('tkStart').addEventListener('click', startTimer);
+if ($('tkNext')) $('tkNext').addEventListener('click', nextBlock);
+if ($('tkReset')) $('tkReset').addEventListener('click', function () {
+  stopTimer(); tcur = -1; left = 0; paintTimer();
+  if ($('tkBlkName')) $('tkBlkName').textContent = 'Block select karo →';
+  if ($('dkBlk')) $('dkBlk').textContent = 'Block select karo (neeche plan se)';
+  if ($('tkNote')) $('tkNote').innerHTML = '';
+  paintPlan();
+});
+paintPlan();
+window.__cls = { setSeconds: function (v) { left = v; paintTimer(); }, timeUp: function (m) { timeUpAlert(m || '⏰ TIME UP'); }, state: function () { return { cur: tcur, left: left, running: !!ticker }; } };
+
+/* ================= QUESTION BANK ================= */
+var TOPICS = { mrg: 'Merge sort', qck: 'Quick sort' };
+var Q = [
+  { t: 'mrg', keep: 1, q: 'Merge sort me sort kab hota hai — todte waqt ya jodte waqt?', a: '<b>Jodte waqt (merge me)</b> — todne me sirf halves banti hain, sorting merge step me hoti hai.', w: 'Tree diagram pe' },
+  { t: 'mrg', keep: 1, q: 'Merge sort ki complexity har case me kya hai?', a: '<b>O(n log n)</b> — log₂n levels, har level pe n ka merge.', w: 'Stepper ke baad' },
+  { t: 'mrg', keep: 1, q: 'Do sorted halves merge kaise karte hain?', a: 'Dono ke shuru me <b>pointer</b> — jo chhota hai wo pehle output me, phir wahi pointer aage.', w: 'Two-pointer sim me' },
+  { t: 'mrg', keep: 1, q: 'Merge sort ka space aur stability?', a: 'Space <b>O(n)</b> (extra arrays) · <b>stable</b> ✔', w: 'Section ke end me' },
+  { t: 'mrg', q: 'Merge sort linked list ke liye kyun better hai?', a: 'Merge wahan <b>O(1) space</b> me hota hai (pointers), aur random access a[mid] ki zaroorat nahi.', w: 'Bonus sawaal' },
+  { t: 'qck', keep: 1, q: 'Quick sort me pivot ka kya role hai?', a: 'Pivot ke hisaab se array baantte hain — <b>chhote left, bade right</b> — aur pivot apni <b>final jagah</b> pe pahunch jata hai.', w: 'Partition table pe' },
+  { t: 'qck', keep: 1, q: 'Quick sort ka worst case O(n²) kab hota hai?', a: 'Jab array <b>already sorted</b> ho aur pivot <b>last element</b> ho — partition 0 aur n−1 me bant jata hai.', w: 'Worst case card pe' },
+  { t: 'qck', keep: 1, q: 'Quick sort ka average complexity aur space?', a: 'Average <b>O(n log n)</b> · space <b>O(log n)</b> (recursion stack) · <b>unstable</b>.', w: 'Comparison table pe' },
+  { t: 'qck', keep: 1, q: 'Worst case ka fix kya hai?', a: '<b>Random pivot</b> ya <b>median-of-three</b> — phir sorted data pe bhi balanced partitions milte hain.', w: 'Section ke end me' },
+  { t: 'qck', q: 'Quick sort in-place hai ya nahi?', a: '<b>Haan</b> (sirf recursion stack O(log n)) — isliye memory kam lagti hai.', w: 'Comparison me' },
+  { t: 'qck', q: 'Partition ke baad pivot ko dobara sort karna padta hai?', a: '<b>Nahi</b> — wo apni final jagah pe hai, isliye pi-1 aur pi+1 pe hi recursion chalti hai.', w: 'Stepper me dikhane pe' }
+];
+var RAPID = [
+  { q: 'Merge sort stable hai — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Merge sort ki worst case O(n²) hai — sahi ya galat?', a: 'Galat — har case O(n log n).' },
+  { q: 'Merge sort ko O(n) extra space chahiye — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Quick sort average me O(n log n) hai — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Quick sort stable hai — sahi ya galat?', a: 'Galat — unstable.' },
+  { q: 'Sorted array + last pivot = quick sort ka worst case — sahi ya galat?', a: 'Sahi — O(n²).' },
+  { q: 'Merge sort in-place hai — sahi ya galat?', a: 'Galat — O(n) extra space.' },
+  { q: 'Pivot partition ke baad apni final jagah pe hota hai — sahi ya galat?', a: 'Sahi.' }
+];
+var SEC_TOPICS = { s0: ['mrg', 'qck'], s1: ['mrg'], s2: ['qck'], s3: ['mrg', 'qck'], s4: ['mrg', 'qck'], s5: ['mrg', 'qck'] };
+function qsFor(sec) { var keys = SEC_TOPICS[sec] || ['search']; var l = Q.filter(function (q) { return keys.indexOf(q.t) > -1; }); return l.length ? l : Q; }
+
+/* ================= CALL STACK TRACE (merge sort recursion) ================= */
+(function () {
+  if (!$('csStack')) return;
+  var STEPS = [
+    { stack: ['mergeSort(0,3)'], arr: ['5', '2', '8', '1'], note: '4 elements — inko sort karna hai. m = (0+3)/2 = 1.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(0,1)'], arr: ['5', '2', '8', '1'], note: 'Left half (0..1) pe recursion gayi. m = 0.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(0,1)', 'mergeSort(0,0)'], arr: ['5', '2', '8', '1'], note: 'Ab sirf 1 element (index 0) — BASE CASE!' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(0,1)'], arr: ['5', '2', '8', '1'], note: 'l >= r tha → return. Stack se pop ho gaya.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(0,1)', 'mergeSort(1,1)'], arr: ['5', '2', '8', '1'], note: 'Right half (1..1) — phir 1 element, base case.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(0,1)'], arr: ['5', '2', '8', '1'], note: 'Return. Ab dono halves ready hain.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(0,1)'], arr: ['2', '5', '8', '1'], hl: [0, 1], note: 'MERGE! [5] + [2] → [2, 5]. Yahin pehli baar sorting hui.' },
+    { stack: ['mergeSort(0,3)'], arr: ['2', '5', '8', '1'], note: 'Left half sorted. Wapas parent call pe.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(2,3)'], arr: ['2', '5', '8', '1'], note: 'Ab RIGHT half (2..3) pe recursion.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(2,3)', 'mergeSort(2,2)'], arr: ['2', '5', '8', '1'], note: '1 element — base case.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(2,3)'], arr: ['2', '5', '8', '1'], note: 'Return.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(2,3)', 'mergeSort(3,3)'], arr: ['2', '5', '8', '1'], note: '1 element — base case.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(2,3)'], arr: ['2', '5', '8', '1'], note: 'Return. Dono halves ready.' },
+    { stack: ['mergeSort(0,3)', 'mergeSort(2,3)'], arr: ['2', '5', '1', '8'], hl: [2, 3], note: 'MERGE! [8] + [1] → [1, 8].' },
+    { stack: ['mergeSort(0,3)'], arr: ['2', '5', '1', '8'], note: 'Right half sorted.' },
+    { stack: ['mergeSort(0,3)'], arr: ['1', '2', '5', '8'], hl: [0, 1, 2, 3], note: 'FINAL MERGE! [2,5] + [1,8] → [1,2,5,8].' },
+    { stack: [], arr: ['1', '2', '5', '8'], hl: [0, 1, 2, 3], note: 'Sab return ho gaya — stack khaali, array sorted ✔' }
+  ];
+  var i = 0, timer = null;
+  function paint() {
+    var st = STEPS[i], html = '';
+    for (var k = st.stack.length - 1; k >= 0; k--) {
+      var cls = 'cs-frame' + (k === st.stack.length - 1 ? ' on' : '');
+      html += '<div class="' + cls + '"><span class="ind">' + (st.stack.length - k) + '</span>' + st.stack[k] + '</div>';
+    }
+    if (!st.stack.length) html = '<div class="cs-frame done">— stack khaali — kaam khatam ✔</div>';
+    $('csStack').innerHTML = html;
+    var ah = '';
+    st.arr.forEach(function (v, k) {
+      var on = st.hl && st.hl.indexOf(k) > -1;
+      ah += '<div class="memcol"><div class="cell' + (on ? ' cell--hl' : '') + '">' + v + '</div><span class="idx">' + k + '</span></div>';
+    });
+    $('csArr').innerHTML = ah;
+    $('csLog').innerHTML = '<b>Step ' + (i + 1) + '/' + STEPS.length + '</b> · ' + st.note;
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } if ($('csAuto')) $('csAuto').textContent = '▶ AUTO'; }
+  function step() {
+    if (i < STEPS.length - 1) { i++; paint(); }
+    else { stop(); }
+  }
+  if ($('csStep')) $('csStep').addEventListener('click', function () { stop(); step(); });
+  if ($('csAuto')) $('csAuto').addEventListener('click', function () {
+    if (timer) { stop(); return; }
+    $('csAuto').textContent = '⏸ PAUSE';
+    timer = setInterval(function () { step(); if (i >= STEPS.length - 1) stop(); }, 1400);
+  });
+  if ($('csReset')) $('csReset').addEventListener('click', function () { stop(); i = 0; paint(); });
+  paint();
+})();
+
+/* ================= QUESTION ROUND (combined: topic + rapid) ================= */
+var names = ['Harsh', 'Aryan', 'Khusi'], scores = {}, current = null, curQ = null, spinTimer = null;
+var pool = [], poolIdx = 0, askedTotal = 0;
+try { var sn = localStorage.getItem('u3s3-names'); if (sn) names = JSON.parse(sn); } catch (e) {}
+try { var sc = localStorage.getItem('u3s3-scores'); if (sc) scores = JSON.parse(sc); } catch (e) {}
+names.forEach(function (n) { if (!scores[n]) scores[n] = { a: 0, c: 0 }; });
+function saveScore() { try { localStorage.setItem('u3s3-names', JSON.stringify(names)); localStorage.setItem('u3s3-scores', JSON.stringify(scores)); } catch (e) {} }
+function pct(o) { return o.a ? Math.round(o.c * 100 / o.a) : 0; }
+function buildPool() {
+  pool = [];
+  Q.forEach(function (q) { pool.push({ q: q.q, a: q.a, t: TOPICS[q.t] || 'Concept', kind: 'concept' }); });
+  RAPID.forEach(function (q) { pool.push({ q: q.q, a: q.a, t: 'Rapid (yes/no)', kind: 'rapid' }); });
+  for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+  poolIdx = 0;
+  paintMeta();
+}
+function paintMeta() {
+  var total = pool.length, left = Math.max(0, total - poolIdx);
+  if ($('qrMeta')) $('qrMeta').textContent = total + ' sawaal · ' + poolIdx + ' poochhe · ' + left + ' bache';
+  if ($('qrBar')) $('qrBar').style.width = (total ? (poolIdx / total) * 100 : 0) + '%';
+}
+function nextQ() { if (poolIdx >= pool.length) buildPool(); return pool[poolIdx++]; }
+function paintBoard() {
+  if (!$('qrBoard')) return;
+  var minA = Math.min.apply(null, names.map(function (n) { return scores[n].a; }));
+  var best = -1;
+  names.forEach(function (n) { if (scores[n].a && pct(scores[n]) > best) best = pct(scores[n]); });
+  var rows = names.map(function (n) { return { n: n, o: scores[n] }; }).sort(function (x, y) { var d = pct(y.o) - pct(x.o); return d ? d : y.o.c - x.o.c; });
+  var html = '';
+  rows.forEach(function (r) {
+    var cls = (r.o.a && pct(r.o) === best) ? 'top' : '';
+    var least = (r.o.a === minA) ? ' <span style="color:var(--emerald);font-size:11px">· kam poocha</span>' : '';
+    html += '<tr class="' + cls + '"><td><b>' + r.n + '</b>' + least + '</td><td class="num">' + r.o.a + '</td><td class="num">' + r.o.c + '</td><td class="num">' + pct(r.o) + '%</td></tr>';
+  });
+  $('qrBoard').innerHTML = html;
+}
+function showQ(where) {
+  if (!curQ) return;
+  var q = curQ, nm = current || '—';
+  var num = 'SAWAAL ' + poolIdx + '/' + pool.length;
+  if (where === 'dock' || where === 'both') {
+    if ($('dkQWho')) $('dkQWho').textContent = current ? '🎯 ' + nm + ' — ' + num : '🎲 ' + num;
+    if ($('dkQText')) $('dkQText').innerHTML = q.q;
+    if ($('dkQAns')) { $('dkQAns').innerHTML = q.a; $('dkQAns').classList.remove('show'); }
+    if ($('dkQShow')) $('dkQShow').textContent = 'Jawab dekho';
+    if ($('dkQCard')) $('dkQCard').classList.add('show');
+  }
+  if (where === 'tool' || where === 'both') {
+    if ($('qrCount')) $('qrCount').textContent = num;
+    if ($('qrTopic')) $('qrTopic').textContent = q.t;
+    if ($('qrText')) $('qrText').innerHTML = q.q;
+    if ($('qrAns')) { $('qrAns').innerHTML = q.a; $('qrAns').style.display = 'none'; }
+    if ($('qrShow')) $('qrShow').textContent = 'Jawab dekho';
+  }
+  paintMeta();
+}
+function doSpin() {
+  if (spinTimer) return;
+  var minA = Math.min.apply(null, names.map(function (n) { return scores[n].a; }));
+  var poolN = names.filter(function (n) { return scores[n].a === minA; });
+  var chosen = poolN[Math.floor(Math.random() * poolN.length)];
+  curQ = nextQ();
+  var targets = [$('dkName'), $('qrName')].filter(Boolean);
+  var i = 0;
+  targets.forEach(function (t) { t.classList.add('spinning'); });
+  spinTimer = setInterval(function () { targets.forEach(function (t) { t.textContent = names[i % names.length]; }); i++; }, 80);
+  setTimeout(function () {
+    clearInterval(spinTimer); spinTimer = null;
+    current = chosen;
+    targets.forEach(function (t) { t.classList.remove('spinning'); t.textContent = current; });
+    showQ('both');
+    if ($('qrMsg')) $('qrMsg').innerHTML = '<b>' + current + '</b> — sawaal dikh raha hai. Jawab suno, phir ✓ ya ✕ dabao.';
+  }, 1300);
+}
+function mark(ok) {
+  if (!current) { if ($('qrMsg')) $('qrMsg').textContent = 'Pehle SPIN karo.'; return; }
+  scores[current].a++; if (ok) scores[current].c++;
+  askedTotal++;
+  saveScore(); paintBoard(); paintMeta();
+  if ($('qrMsg')) $('qrMsg').innerHTML = '<b>' + current + '</b> → ' + (ok ? '✓ sahi (+1)' : '✕ galat') + ' · ab agla SPIN.';
+  current = null; curQ = null;
+  [$('dkName'), $('qrName')].filter(Boolean).forEach(function (t) { t.textContent = '—'; });
+  if ($('dkQCard')) $('dkQCard').classList.remove('show');
+}
+if ($('dkSpin')) $('dkSpin').addEventListener('click', doSpin);
+if ($('qrSpin')) $('qrSpin').addEventListener('click', doSpin);
+[['dkOk', true], ['qrOk', true], ['dkQOk', true], ['dkBad', false], ['qrBad', false], ['dkQBad', false]].forEach(function (p) { if ($(p[0])) $(p[0]).addEventListener('click', function () { mark(p[1]); }); });
+if ($('qrSkip')) $('qrSkip').addEventListener('click', function () {
+  [$('dkName'), $('qrName')].filter(Boolean).forEach(function (t) { t.textContent = '—'; });
+  current = null; curQ = null;
+  if ($('dkQCard')) $('dkQCard').classList.remove('show');
+  if ($('qrMsg')) $('qrMsg').textContent = 'Skip — dobara SPIN.';
+});
+if ($('dkQShow')) $('dkQShow').addEventListener('click', function () { var el = $('dkQAns'); var on = el.classList.toggle('show'); $('dkQShow').textContent = on ? 'Jawab chhupao' : 'Jawab dekho'; });
+if ($('qrShow')) $('qrShow').addEventListener('click', function () { var el = $('qrAns'); var on = el.style.display === 'block'; el.style.display = on ? 'none' : 'block'; $('qrShow').textContent = on ? 'Jawab dekho' : 'Jawab chhupao'; });
+if ($('dkQ')) $('dkQ').addEventListener('click', function () { curQ = nextQ(); current = null; showQ('dock'); });
+if ($('dkQNext')) $('dkQNext').addEventListener('click', function () { curQ = nextQ(); current = null; showQ('dock'); });
+if ($('dkQClose')) $('dkQClose').addEventListener('click', function () { $('dkQCard').classList.remove('show'); });
+if ($('qrSave')) $('qrSave').addEventListener('click', function () {
+  var arr = $('qrNames').value.split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s.length; });
+  if (!arr.length) { $('qrMsg').textContent = 'Kam se kam ek naam likho.'; return; }
+  names = arr; names.forEach(function (n) { if (!scores[n]) scores[n] = { a: 0, c: 0 }; });
+  saveScore(); paintBoard(); $('qrMsg').innerHTML = 'List save: <b>' + names.join(', ') + '</b>';
+});
+if ($('qrReset')) $('qrReset').addEventListener('click', function () { names.forEach(function (n) { scores[n] = { a: 0, c: 0 }; }); saveScore(); paintBoard(); buildPool(); $('qrMsg').textContent = 'Score aur sawaal reset.'; });
+function showResult() {
+  var rows = names.map(function (n) { return { n: n, o: scores[n] }; });
+  var asked = rows.reduce(function (s, r) { return s + r.o.a; }, 0);
+  rows.sort(function (x, y) { var d = pct(y.o) - pct(x.o); return d ? d : y.o.c - x.o.c; });
+  var html = '<table class="score-tbl"><thead><tr><th>#</th><th>Student</th><th>Poocha gaya</th><th>Sahi</th><th>Score</th></tr></thead><tbody>';
+  var best = null;
+  rows.forEach(function (r, i) {
+    if (i === 0 && r.o.a > 0) best = r;
+    html += '<tr class="' + ((i === 0 && r.o.a > 0) ? 'top' : '') + '"><td class="num">' + (i + 1) + '</td><td><b>' + r.n + '</b></td><td class="num">' + r.o.a + '</td><td class="num">' + r.o.c + '</td><td class="num">' + pct(r.o) + '%</td></tr>';
+  });
+  html += '</tbody></table>';
+  if ($('resBody')) $('resBody').innerHTML = html;
+  if ($('resSub')) $('resSub').innerHTML = 'Aaj kul <b>' + asked + '</b> sawaal poochhe gaye · pool me <b>' + pool.length + '</b> the';
+  if ($('resWin')) {
+    if (best && asked) {
+      var msg = pct(best.o) >= 75 ? 'Shandaar kaam! 🚩' : pct(best.o) >= 50 ? 'Achha kiya — thoda aur practice.' : 'Practice chahiye — concepts dobara dekh lo.';
+      $('resWin').innerHTML = '🏆 Sabse achha: <b>' + best.n + '</b> — ' + best.o.c + '/' + best.o.a + ' sahi (' + pct(best.o) + '%). ' + msg;
+    } else $('resWin').innerHTML = 'Abhi koi sawaal nahi poochha gaya — SPIN karke shuru karo.';
+  }
+  if ($('resOverlay')) $('resOverlay').classList.add('show');
+}
+if ($('qrResult')) $('qrResult').addEventListener('click', showResult);
+if ($('resClose')) $('resClose').addEventListener('click', function () { $('resOverlay').classList.remove('show'); });
+if ($('resReset')) $('resReset').addEventListener('click', function () { names.forEach(function (n) { scores[n] = { a: 0, c: 0 }; }); saveScore(); paintBoard(); showResult(); });
+if ($('qrNames')) $('qrNames').value = names.join(', ');
+buildPool(); paintBoard();
+
+/* ================= TWO-POINTER MERGE ================= */
+(function () {
+  if (!$('tpL')) return;
+  var L = [27, 38, 43], R = [3, 9, 82], i = 0, j = 0, out = [], timer = null;
+  function paint() {
+    var lh = '', rh = '', oh = '';
+    L.forEach(function (v, k) { lh += '<span class="tp-cell' + (k < i ? ' taken' : '') + (k === i ? ' ptr' : '') + '">' + v + '</span>'; });
+    R.forEach(function (v, k) { rh += '<span class="tp-cell' + (k < j ? ' taken' : '') + (k === j ? ' ptr' : '') + '">' + v + '</span>'; });
+    out.forEach(function (v) { oh += '<span class="tp-cell out">' + v + '</span>'; });
+    if (!out.length) oh = '<span class="tp-cell null">— khaali —</span>';
+    $('tpL').innerHTML = lh; $('tpR').innerHTML = rh; $('tpOut').innerHTML = oh;
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } if ($('tpAuto')) $('tpAuto').textContent = '▶ AUTO'; }
+  function step() {
+    if (i >= L.length && j >= R.length) { stop(); $('tpLog').innerHTML = '<b style="color:var(--emerald)">Merge complete: [' + out.join(', ') + '] ✔</b>'; return; }
+    if (i >= L.length) { out.push(R[j]); $('tpLog').innerHTML = 'left khatam → right se <b>' + R[j] + '</b> copy'; j++; paint(); return; }
+    if (j >= R.length) { out.push(L[i]); $('tpLog').innerHTML = 'right khatam → left se <b>' + L[i] + '</b> copy'; i++; paint(); return; }
+    if (L[i] <= R[j]) { out.push(L[i]); $('tpLog').innerHTML = 'compare <b>' + L[i] + '</b> vs ' + R[j] + ' → ' + L[i] + ' chhota → output me'; i++; }
+    else { out.push(R[j]); $('tpLog').innerHTML = 'compare ' + L[i] + ' vs <b>' + R[j] + '</b> → ' + R[j] + ' chhota → output me'; j++; }
+    paint();
+  }
+  function reset() { stop(); i = 0; j = 0; out = []; paint(); $('tpLog').innerHTML = 'STEP dabao — dono pointers me se jo chhota hai wo output me jayega.'; }
+  if ($('tpStep')) $('tpStep').addEventListener('click', function () { stop(); step(); });
+  if ($('tpAuto')) $('tpAuto').addEventListener('click', function () {
+    if (timer) { stop(); return; }
+    $('tpAuto').textContent = '⏸ PAUSE';
+    timer = setInterval(function () { step(); if (i >= L.length && j >= R.length) stop(); }, 900);
+  });
+  if ($('tpReset')) $('tpReset').addEventListener('click', reset);
+  paint();
+})();
+
+/* ================= STEPPER FACTORY (merge / quick, code-sync) ================= */
+var CODES = {
+  merge: ['mergeSort(a, l, r) {', '    if (l >= r) return;        // base case', '    m = (l + r) / 2;', '    mergeSort(a, l, m);        // left', '    mergeSort(a, m+1, r);      // right', '    merge(a, l, m, r);         // jodo', '}', 'merge(a, l, m, r) {', '    // dono halves se chhota pehle uthao', '    // bacha hua hissa copy karo', '}'],
+  quick: ['partition(a, low, high) {', '    pivot = a[high];', '    i = low - 1;', '    for (j = low; j < high; j++) {', '        if (a[j] <= pivot) {', '            i++; swap(a[i], a[j]);', '        }', '    }', '    swap(a[i+1], a[high]);  // pivot final', '    return i+1;', '}']
+};
+function genFrames(algo, base) {
+  var a = base.slice(), n = a.length, out = [], done = new Array(n).fill(false);
+  function snap(msg, o) { o = o || {}; out.push({ arr: a.slice(), done: done.slice(), cmp: o.cmp || [], swp: o.swp || [], piv: o.piv || [], line: (o.line === undefined ? -1 : o.line), vars: o.vars || {}, msg: msg }); }
+  if (algo === 'merge') {
+    (function ms(l, r) {
+      if (l >= r) return;
+      var mid = Math.floor((l + r) / 2);
+      snap('mergeSort [' + l + '..' + r + '] → m = ' + mid, { line: 2, vars: { l: l, r: r, m: mid } });
+      ms(l, mid); ms(mid + 1, r);
+      var Lh = a.slice(l, mid + 1), Rh = a.slice(mid + 1, r + 1);
+      snap('merge: [' + l + '..' + mid + '] + [' + (mid + 1) + '..' + r + ']', { line: 7, vars: { l: l, r: r } });
+      var i = 0, j = 0, k = l;
+      while (i < Lh.length && j < Rh.length) {
+        snap('compare ' + Lh[i] + ' vs ' + Rh[j] + ' → chhota pehle', { cmp: [k], line: 8, vars: { left: Lh[i], right: Rh[j] } });
+        a[k++] = (Lh[i] <= Rh[j]) ? Lh[i++] : Rh[j++];
+        snap('index ' + (k - 1) + ' pe ' + a[k - 1] + ' rakha', { swp: [k - 1], line: 8 });
+      }
+      while (i < Lh.length) { a[k++] = Lh[i++]; snap('bacha hua left ' + a[k - 1], { swp: [k - 1], line: 9, vars: { i: i, j: j, k: k } }); }
+      while (j < Rh.length) { a[k++] = Rh[j++]; snap('bacha hua right ' + a[k - 1], { swp: [k - 1], line: 9, vars: { i: i, j: j, k: k } }); }
+    })(0, n - 1);
+  } else {
+    (function qs(low, high) {
+      if (low >= high) { if (low === high) done[low] = true; return; }
+      var pivot = a[high];
+      snap('partition [' + low + '..' + high + '], pivot = ' + pivot, { piv: [high], line: 1, vars: { low: low, high: high, pivot: pivot } });
+      var i = low - 1;
+      for (var j = low; j < high; j++) {
+        snap('a[' + j + ']=' + a[j] + ' ≤ pivot ' + pivot + '?', { cmp: [j], piv: [high], line: 4, vars: { low: low, high: high, j: j, i: i } });
+        if (a[j] <= pivot) { i++; if (i !== j) { var t = a[i]; a[i] = a[j]; a[j] = t; snap('swap → chhota left me', { swp: [i, j], piv: [high], line: 5, vars: { i: i, j: j } }); } }
+      }
+      var t2 = a[i + 1]; a[i + 1] = a[high]; a[high] = t2;
+      var pi = i + 1; done[pi] = true;
+      snap('pivot ' + a[pi] + ' FINAL position ' + pi + ' pe ✔', { swp: [pi], line: 8, vars: { pi: pi } });
+      qs(low, pi - 1); qs(pi + 1, high);
+    })(0, n - 1);
+  }
+  for (var z = 0; z < n; z++) done[z] = true;
+  snap('SORTED! 🎉 — ' + a.join(', '), { line: -1 });
+  return out;
+}
+function makeStepper(pfx, algo) {
+  var P = function (s) { return $(pfx + s); };
+  if (!P('Bars')) return;
+  var base = [], frames = [], fi = 0, timer = null;
+  function newArr() { base = []; for (var i = 0; i < 8; i++) base.push(5 + Math.floor(Math.random() * 45)); }
+  function paint() {
+    var f = frames[fi]; if (!f) return;
+    var mx = Math.max.apply(null, base), html = '';
+    f.arr.forEach(function (v, k) {
+      var cls = 'step-bar';
+      if (f.swp.indexOf(k) > -1) cls += ' swp';
+      else if (f.piv.indexOf(k) > -1) cls += ' piv';
+      else if (f.cmp.indexOf(k) > -1) cls += ' cmp';
+      if (f.done[k]) cls += ' fix';
+      html += '<div class="' + cls + '" style="height:' + Math.max(10, Math.round(v / mx * 100)) + '%"><i>' + v + '</i></div>';
+    });
+    P('Bars').innerHTML = html;
+    var code = CODES[algo] || [], ch = '';
+    code.forEach(function (ln, k) {
+      var esc = ln.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      ch += '<span class="ln' + (k === f.line ? ' on' : '') + '">' + esc + '</span>';
+    });
+    P('Code').innerHTML = ch;
+    var vh = '';
+    Object.keys(f.vars).forEach(function (k) { vh += '<div class="chg">' + k + ' = <b>' + f.vars[k] + '</b></div>'; });
+    if (!vh) vh = '<div>vars: —</div>';
+    P('Vars').innerHTML = vh;
+    P('Log').innerHTML = '<b>Step ' + (fi + 1) + '/' + frames.length + '</b> · ' + f.msg;
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } P('Play').textContent = '▶ PLAY'; }
+  function rebuild() { stop(); frames = genFrames(algo, base); fi = 0; paint(); }
+  function step() {
+    if (fi < frames.length - 1) { fi++; paint(); }
+    else { stop(); P('Log').innerHTML = '<b style="color:var(--emerald)">Sorted ho gaya! 🎉</b> NEW ARRAY dabao.'; }
+  }
+  P('Play').addEventListener('click', function () {
+    if (timer) { stop(); return; }
+    if (fi >= frames.length - 1) { fi = 0; paint(); }
+    P('Play').textContent = '⏸ PAUSE';
+    timer = setInterval(function () { step(); if (fi >= frames.length - 1) stop(); }, 520);
+  });
+  P('Step').addEventListener('click', function () { stop(); step(); });
+  P('New').addEventListener('click', function () { newArr(); rebuild(); });
+  P('Reset').addEventListener('click', function () { stop(); fi = 0; paint(); });
+  newArr(); rebuild();
+}
+makeStepper('m', 'merge');
+makeStepper('q', 'quick');
+
+/* ================= AMBIENT ================= */
+(function () {
+  var cv = document.getElementById('ambient');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
+  var N = 40, nodes = [], t = 0;
+  function seed() { nodes = []; for (var i = 0; i < N; i++) nodes.push({ x: Math.random(), y: Math.random(), vx: (Math.random() - .5) * 0.00055, vy: (Math.random() - .5) * 0.00055, r: 1.4 + Math.random() * 2, hot: Math.random() < 0.15 }); }
+  function resize() { W = window.innerWidth; H = window.innerHeight; cv.width = Math.floor(W * dpr); cv.height = Math.floor(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); draw(); }
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    var px = [], py = [];
+    for (var i = 0; i < N; i++) { px.push(nodes[i].x * W); py.push(nodes[i].y * H); }
+    for (var a = 0; a < N; a++) for (var b = a + 1; b < N; b++) {
+      var dx = px[a] - px[b], dy = py[a] - py[b], d2 = dx * dx + dy * dy, lim = Math.min(W, H) * 0.19;
+      if (d2 < lim * lim) { var al = (1 - Math.sqrt(d2) / lim) * 0.18; ctx.strokeStyle = 'rgba(232,180,74,' + al.toFixed(3) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(px[a], py[a]); ctx.lineTo(px[b], py[b]); ctx.stroke(); }
+    }
+    for (var k = 0; k < N; k++) {
+      var pulse = 0.75 + 0.25 * Math.sin(t * 0.02 + k);
+      ctx.fillStyle = nodes[k].hot ? 'rgba(232,180,74,' + (0.5 * pulse).toFixed(3) + ')' : 'rgba(79,163,209,0.28)';
+      ctx.beginPath(); ctx.arc(px[k], py[k], nodes[k].r * pulse, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  function step() { t++; for (var i = 0; i < N; i++) { var n = nodes[i]; n.x += n.vx; n.y += n.vy; if (n.x < 0.02 || n.x > 0.98) n.vx *= -1; if (n.y < 0.02 || n.y > 0.98) n.vy *= -1; } draw(); }
+  seed(); resize();
+  window.addEventListener('resize', resize);
+  if (reduce) { draw(); return; }
+  setInterval(function () { if (!document.hidden) step(); }, 60);
+})();
+
+})();
+</script>
+
+<div class="dsnav" role="navigation" aria-label="Page navigation">
+  <a class="dsnav-b" href="DS_Unit3_Session2.html" title="Pichla page (←)">←</a>
+  <a class="dsnav-b" href="../index.html" title="Sab pages (Home)">⌂</a>
+  <a class="dsnav-b" href="DS_Unit3_Session4.html" title="Agla page (→)">→</a>
+</div>
+<style>
+/* ===== DS page nav (auto-injected) ===== */
+.dsnav{position:fixed;right:14px;bottom:78px;z-index:650;display:flex;gap:6px;align-items:center;
+  background:rgba(10,14,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:6px 8px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);opacity:.6;transition:opacity .2s ease, transform .2s ease;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.dsnav:hover{opacity:1;transform:translateY(-2px)}
+.dsnav-b{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:15px;line-height:1;
+  transition:background .15s ease,color .15s ease}
+.dsnav-b:hover{background:#ff9f45;color:#101820}
+.dsnav-b.dsnav-off{opacity:.25;pointer-events:none}
+.dsnav-tip{font-size:10px;letter-spacing:.8px;color:rgba(255,255,255,.45);padding:0 4px;white-space:nowrap}
+@media (max-width:640px){.dsnav-tip{display:none}.dsnav{right:10px;bottom:70px;padding:5px 6px}.dsnav-b{width:30px;height:30px;font-size:14px}}
+@media print{.dsnav{display:none!important}}
+</style>
+<script>
+(function(){
+  var PREV="DS_Unit3_Session2.html", NEXT="DS_Unit3_Session4.html";
+  document.addEventListener('keydown', function(e){
+    var t=e.target||{};
+    if(/INPUT|TEXTAREA|SELECT/.test(t.tagName||'')) return;
+    if(e.key==='ArrowRight' && NEXT) window.location.href=NEXT;
+    else if(e.key==='ArrowLeft' && PREV) window.location.href=PREV;
+    else if(e.key==='Home') window.location.href='../index.html';
+  });
+})();
+</script>
+
+</body>
+</html>

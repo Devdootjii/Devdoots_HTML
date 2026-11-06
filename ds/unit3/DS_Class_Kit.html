@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class Kit — Interactive Teaching Cockpit · Team Devdoots · DS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Azeret+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root, [data-theme="dark"] {
+  --bg: #0c1210;
+  --surface: #131b18;
+  --surface2: #182420;
+  --surface3: #1e2d27;
+  --border: rgba(255,255,255,0.09);
+  --border2: rgba(255,255,255,0.18);
+  --text: #e7efe9;
+  --dim: #94a89d;
+  --faint: #65786d;
+  --teal: #3ecfa5;
+  --teal-dim: rgba(62,207,165,0.12);
+  --sky: #6db3e8;
+  --sky-dim: rgba(109,179,232,0.12);
+  --gold: #ffd166;
+  --gold-dim: rgba(255,209,102,0.12);
+  --orange: #ff9f6e;
+  --orange-dim: rgba(255,159,110,0.13);
+  --red: #ff8071;
+  --shadow: 0 10px 34px rgba(0,0,0,0.42);
+}
+[data-theme="light"] {
+  --bg: #f1f5f2;
+  --surface: #ffffff;
+  --surface2: #f6faf7;
+  --surface3: #e9f1ec;
+  --border: rgba(18,38,28,0.11);
+  --border2: rgba(18,38,28,0.2);
+  --text: #17211c;
+  --dim: #55685e;
+  --faint: #85988d;
+  --teal: #0d8f68;
+  --teal-dim: rgba(13,143,104,0.1);
+  --sky: #2c76b8;
+  --sky-dim: rgba(44,118,184,0.1);
+  --gold: #9a6b06;
+  --gold-dim: rgba(154,107,6,0.1);
+  --orange: #cf5a24;
+  --orange-dim: rgba(207,90,36,0.1);
+  --red: #c94434;
+  --shadow: 0 10px 30px rgba(20,40,30,0.1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.72;
+  overflow-wrap: break-word;
+  padding-bottom: 150px;
+  background-image:
+    radial-gradient(ellipse 900px 420px at 70% -80px, var(--teal-dim), transparent 65%),
+    radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: auto, 26px 26px;
+}
+::selection { background: var(--teal-dim); }
+
+/* ============ LAYOUT ============ */
+.wrap {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 225px minmax(0,1fr);
+  gap: 0 56px;
+  padding: 0 32px;
+}
+.main { min-width: 0; padding: 40px 0 80px; }
+
+/* ============ TOC ============ */
+.toc {
+  position: sticky; top: 20px; align-self: start;
+  max-height: calc(100dvh - 60px);
+  overflow-y: auto;
+  padding: 26px 0 30px;
+  grid-row: 1 / -1;
+}
+.toc::-webkit-scrollbar { width: 3px; }
+.toc::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+.toc-title {
+  font-family: 'Azeret Mono', monospace;
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2.2px; color: var(--faint);
+  padding-bottom: 12px; margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.toc a {
+  display: flex; align-items: baseline; gap: 8px;
+  font-size: 12.5px; color: var(--dim);
+  text-decoration: none; padding: 5px 10px;
+  border-radius: 6px; border-left: 2px solid transparent;
+  transition: all .15s; line-height: 1.45; margin-bottom: 1px;
+}
+.toc a .n { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--faint); }
+.toc a:hover { color: var(--text); background: var(--surface); }
+.toc a.active { color: var(--teal); border-left-color: var(--teal); background: var(--teal-dim); }
+.toc a.active .n { color: var(--teal); }
+
+/* ============ HERO ============ */
+.hero { padding: 44px 0 8px; }
+.hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.chip {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 500;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  padding: 5px 12px; border-radius: 5px;
+  border: 1px solid var(--border2);
+}
+.chip--teal { color: var(--teal); border-color: var(--teal); background: var(--teal-dim); }
+.chip--sky  { color: var(--sky); border-color: var(--sky); background: var(--sky-dim); }
+.chip--gold { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+h1 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400; font-size: clamp(40px, 5.4vw, 62px);
+  line-height: 1.04; letter-spacing: -0.5px;
+}
+h1 em { font-style: italic; color: var(--teal); }
+.hero-sub { font-size: 17px; color: var(--dim); max-width: 60ch; margin-top: 14px; }
+.hero-hr { height: 1px; background: linear-gradient(90deg, var(--teal), transparent 70%); border: none; margin: 30px 0 0; opacity: .55; }
+
+/* ============ SECTION HEAD ============ */
+.sec { scroll-margin-top: 56px; }
+.sec-head { display: flex; align-items: center; gap: 16px; margin: 74px 0 8px; flex-wrap: wrap; }
+.sec-num {
+  font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 600;
+  color: var(--bg); background: var(--teal);
+  border-radius: 6px; padding: 4px 9px; letter-spacing: 1px;
+  flex-shrink: 0;
+}
+h2 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400; font-size: clamp(29px, 3.3vw, 40px); line-height: 1.1;
+  letter-spacing: -0.3px; flex: 1; min-width: 200px;
+}
+.sec-play {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--teal); background: var(--teal-dim);
+  color: var(--teal); font-size: 13px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all .15s; flex-shrink: 0; font-family: 'Azeret Mono', monospace;
+}
+.sec-play:hover { background: var(--teal); color: var(--bg); transform: scale(1.06); }
+.sec-tag {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--faint);
+  text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 24px 0;
+}
+
+/* ============ READING TEXT ============ */
+.rd {
+  font-size: 16.5px; line-height: 1.78; color: var(--text);
+  max-width: 72ch; margin: 18px 0;
+  padding: 4px 14px 4px 16px; border-left: 3px solid transparent;
+  border-radius: 0 8px 8px 0;
+  transition: background .35s, border-color .35s;
+}
+.rd.speaking {
+  background: var(--teal-dim);
+  border-left-color: var(--teal);
+}
+.rd b, .rd strong { color: var(--teal); font-weight: 700; }
+.rd i { color: var(--sky); }
+.rd code {
+  font-family: 'Azeret Mono', monospace; font-size: 0.86em;
+  background: var(--surface3); color: var(--gold);
+  padding: 1px 6px; border-radius: 4px;
+}
+
+/* ============ DEFINITION BOX (exam verbatim) ============ */
+.def {
+  background: var(--gold-dim);
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  padding: 16px 20px 14px;
+  margin: 22px 0;
+  max-width: 76ch;
+  position: relative;
+}
+.def-label {
+  font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--gold);
+  display: block; margin-bottom: 7px;
+}
+.def p { font-size: 15.5px; line-height: 1.65; color: var(--text); }
+.def p b { color: var(--gold); }
+
+/* ============ CALLOUT ============ */
+.callout {
+  border-radius: 10px; padding: 14px 18px; margin: 22px 0;
+  max-width: 76ch; font-size: 15px; line-height: 1.65;
+  border: 1px solid var(--orange);
+  background: var(--orange-dim);
+}
+.callout b { color: var(--orange); }
+.callout--info { border-color: var(--sky); background: var(--sky-dim); }
+.callout--info b { color: var(--sky); }
+
+/* ============ CARDS / GRIDS ============ */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin: 22px 0; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin: 22px 0; }
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px; min-width: 0;
+}
+.card h4 {
+  font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 9px;
+  color: var(--teal); display: flex; align-items: center; gap: 8px;
+}
+.card h4::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.card p, .card li { font-size: 14px; line-height: 1.6; color: var(--dim); }
+.card p b, .card li b { color: var(--text); }
+.card ul { padding-left: 1.2em; }
+.card--sky h4 { color: var(--sky); }
+.card--gold h4 { color: var(--gold); }
+.card--orange h4 { color: var(--orange); }
+
+/* ============ DIAGRAM ============ */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 20px 18px;
+  margin: 24px 0;
+  overflow-x: auto;
+}
+.d-cap {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 500;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--faint);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.d-cap::before { content: ''; width: 7px; height: 7px; background: var(--teal); border-radius: 50%; }
+
+/* memory row (array cells) */
+.memrow { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+.memcol { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.idx { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--sky); }
+.cell {
+  min-width: 64px; padding: 14px 10px; text-align: center;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 7px; font-family: 'Azeret Mono', monospace;
+  font-size: 15px; font-weight: 600; color: var(--text);
+}
+.cell--hl { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); }
+.cell--zero { color: var(--faint); opacity: .55; }
+.addr { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--faint); }
+.d-note {
+  margin-top: 16px; font-size: 13.5px; color: var(--dim); line-height: 1.6;
+  border-top: 1px dashed var(--border2); padding-top: 12px;
+}
+.d-note b { color: var(--teal); }
+.d-note code { font-family: 'Azeret Mono', monospace; color: var(--gold); font-size: 0.9em; }
+
+/* formula card */
+.formula {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 14px 18px; margin: 14px 0;
+  font-family: 'Azeret Mono', monospace; font-size: 14.5px;
+  color: var(--teal); overflow-x: auto; line-height: 1.7;
+  max-width: 76ch;
+}
+.formula small { display: block; color: var(--faint); font-size: 12px; margin-top: 6px; line-height: 1.6; }
+.formula .k { color: var(--sky); }
+
+/* linked list node */
+.ll-row { display: flex; align-items: center; gap: 0; flex-wrap: wrap; row-gap: 14px; }
+.node {
+  display: flex; border: 1px solid var(--border2); border-radius: 8px;
+  overflow: hidden; background: var(--surface3); flex-shrink: 0;
+}
+.node .nd {
+  padding: 13px 16px; font-family: 'Azeret Mono', monospace;
+  font-size: 14px; font-weight: 600; text-align: center; min-width: 52px;
+}
+.node .nd--data { color: var(--text); border-right: 1px dashed var(--border2); }
+.node .nd--next { color: var(--teal); }
+.node .nd--prev { color: var(--sky); border-right: 1px dashed var(--border2); }
+.node .nd small { display: block; font-size: 8.5px; font-weight: 500; color: var(--faint); letter-spacing: 1px; margin-top: 3px; }
+.arrow {
+  padding: 0 8px; color: var(--teal); font-size: 19px; font-weight: 700;
+  flex-shrink: 0; font-family: 'Azeret Mono', monospace;
+}
+.null-tag { font-family: 'Azeret Mono', monospace; font-size: 12px; color: var(--red); padding: 0 6px; flex-shrink: 0; align-self: center; }
+.head-tag {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--gold);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;
+}
+
+/* stack visual */
+.stackwrap { display: flex; gap: 26px; align-items: flex-end; flex-wrap: wrap; }
+.stackcol { display: flex; flex-direction: column-reverse; gap: 7px; align-items: stretch; min-width: 130px; }
+.scell {
+  background: var(--surface3); border: 1px solid var(--border2); border-radius: 7px;
+  padding: 11px 16px; text-align: center; font-family: 'Azeret Mono', monospace;
+  font-size: 15px; font-weight: 600;
+}
+.scell--top { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); }
+.scell--empty { border-style: dashed; color: var(--faint); font-size: 12px; }
+.stackside { font-size: 13.5px; color: var(--dim); line-height: 1.9; min-width: 180px; }
+.stackside b { font-family: 'Azeret Mono', monospace; color: var(--teal); font-size: 14px; }
+.stackside .op { color: var(--sky); font-family: 'Azeret Mono', monospace; font-size: 12px; }
+
+/* queue visual */
+.qwrap { display: flex; flex-direction: column; gap: 8px; }
+.qrow { display: flex; gap: 6px; align-items: stretch; flex-wrap: wrap; }
+.qrow .cell { min-width: 58px; padding: 13px 8px; }
+.qptr { display: flex; gap: 6px; }
+.qptr span {
+  font-family: 'Azeret Mono', monospace; font-size: 11px; min-width: 58px;
+  text-align: center; padding: 3px 8px; flex: 1;
+}
+.qptr .p-front { color: var(--teal); }
+.qptr .p-rear { color: var(--gold); }
+.qptr .p-none { color: transparent; }
+
+/* ============ TABLES ============ */
+.table-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 22px 0; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.55; }
+.data-table thead { position: sticky; top: 0; z-index: 2; }
+.data-table th {
+  background: var(--surface3); font-family: 'Azeret Mono', monospace;
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.3px;
+  color: var(--dim); text-align: left; padding: 11px 15px;
+  border-bottom: 2px solid var(--border2); white-space: nowrap;
+}
+.data-table td { padding: 11px 15px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text); }
+.data-table tbody tr:nth-child(even) { background: var(--surface2); }
+.data-table tbody tr { transition: background .15s; }
+.data-table tbody tr:hover { background: var(--teal-dim); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table td b { color: var(--teal); }
+.data-table td code { font-family: 'Azeret Mono', monospace; font-size: 12px; background: var(--surface3); color: var(--gold); padding: 1px 5px; border-radius: 4px; }
+
+/* ============ CODE ============ */
+.code-block {
+  font-family: 'Azeret Mono', monospace; font-size: 13px; line-height: 1.62;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px; margin: 20px 0;
+  overflow-x: auto; white-space: pre-wrap; word-break: break-word;
+  color: var(--text); max-width: 76ch;
+}
+.code-block .cm { color: var(--faint); }
+.code-block .kw { color: var(--sky); }
+.code-block .st { color: var(--gold); }
+.code-block .fn { color: var(--teal); }
+
+/* ============ COMPARISON CARDS ============ */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+.cmp-card {
+  border: 1px solid var(--border2); border-radius: 12px; overflow: hidden;
+  min-width: 0; background: var(--surface);
+}
+.cmp-card h5 {
+  font-family: 'Azeret Mono', monospace; font-size: 11.5px; font-weight: 600;
+  letter-spacing: 1.6px; text-transform: uppercase; padding: 12px 18px;
+}
+.cmp-card--arr h5 { background: var(--sky-dim); color: var(--sky); border-bottom: 2px solid var(--sky); }
+.cmp-card--ll h5 { background: var(--teal-dim); color: var(--teal); border-bottom: 2px solid var(--teal); }
+.cmp-card ul { list-style: none; padding: 14px 18px; }
+.cmp-card li { font-size: 13.5px; line-height: 1.62; color: var(--dim); padding: 4px 0 4px 16px; position: relative; }
+.cmp-card li::before { content: '›'; position: absolute; left: 0; color: var(--faint); font-weight: 700; }
+.cmp-card li b { color: var(--text); }
+
+/* ============ Q&A ============ */
+.qa {
+  border: 1px solid var(--border); border-radius: 12px; background: var(--surface);
+  margin: 18px 0; overflow: hidden;
+}
+.qa summary {
+  padding: 16px 20px; cursor: pointer; list-style: none;
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  font-size: 15.5px; font-weight: 600; transition: background .15s;
+}
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary:hover { background: var(--surface2); }
+.qa summary::after { content: '+'; font-family: 'Azeret Mono', monospace; color: var(--teal); margin-left: auto; font-size: 17px; }
+.qa[open] summary::after { content: '−'; }
+.mark {
+  font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 600;
+  padding: 3px 9px; border-radius: 5px; letter-spacing: 1px; white-space: nowrap;
+  flex-shrink: 0;
+}
+.mark--2 { background: var(--sky-dim); color: var(--sky); }
+.mark--5 { background: var(--gold-dim); color: var(--gold); }
+.mark--10 { background: var(--orange-dim); color: var(--orange); }
+.qa-body { padding: 4px 20px 18px; border-top: 1px solid var(--border); }
+.qa-body p { font-size: 14.5px; line-height: 1.7; color: var(--dim); margin: 12px 0; max-width: 76ch; }
+.qa-body p b { color: var(--text); }
+.qa-body code { font-family: 'Azeret Mono', monospace; font-size: 0.86em; background: var(--surface3); color: var(--gold); padding: 1px 5px; border-radius: 4px; }
+
+/* ============ SUMMARY / EXAM ============ */
+.one-liners { counter-reset: ol; display: grid; gap: 9px; margin: 22px 0; max-width: 82ch; }
+.one-liners li {
+  list-style: none; counter-increment: ol; position: relative;
+  padding: 9px 14px 9px 46px; font-size: 14.5px; line-height: 1.6;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--dim);
+}
+.one-liners li::before {
+  content: counter(ol, decimal-leading-zero);
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 600;
+  color: var(--teal);
+}
+.one-liners li b { color: var(--text); }
+.defgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; margin: 24px 0; }
+.defcard {
+  background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 10px; padding: 15px 17px; min-width: 0;
+}
+.defcard h6 {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 7px;
+}
+.defcard p { font-size: 13.5px; line-height: 1.62; color: var(--dim); }
+.defcard p b { color: var(--text); }
+
+/* ============ SIMULATOR ============ */
+.sim {
+  border: 1px solid var(--teal); border-radius: 12px; overflow: hidden;
+  margin: 26px 0; background: linear-gradient(160deg, var(--teal-dim), var(--surface) 45%);
+}
+.sim-head {
+  padding: 13px 20px; border-bottom: 1px solid var(--border2);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--surface2);
+}
+.sim-head b { font-family: 'Azeret Mono', monospace; font-size: 12px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--teal); }
+.sim-head span { font-size: 12.5px; color: var(--faint); }
+.sim-body { padding: 20px; }
+.sim-controls { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+.btn {
+  font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 500;
+  padding: 8px 15px; border-radius: 7px; cursor: pointer;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--text);
+  transition: all .15s;
+}
+.btn:hover { border-color: var(--teal); color: var(--teal); }
+.btn--go { background: var(--teal); border-color: var(--teal); color: var(--bg); font-weight: 600; }
+.btn--go:hover { filter: brightness(1.12); color: var(--bg); }
+.btn--warn { border-color: var(--orange); color: var(--orange); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.sim input, .sim select {
+  font-family: 'Azeret Mono', monospace; font-size: 13px;
+  background: var(--surface); border: 1px solid var(--border2); color: var(--text);
+  border-radius: 7px; padding: 8px 10px; width: 88px;
+}
+.sim select { width: auto; }
+.sim input:focus, .sim select:focus { outline: none; border-color: var(--teal); }
+.sim label {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--faint);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.sim-steps {
+  font-family: 'Azeret Mono', monospace; font-size: 13px; line-height: 1.9;
+  background: var(--surface); border: 1px dashed var(--border2); border-radius: 8px;
+  padding: 14px 18px; margin-top: 16px; color: var(--dim); min-height: 20px;
+}
+.sim-steps b { color: var(--teal); font-weight: 600; }
+.sim-steps .fin { color: var(--gold); font-weight: 600; }
+.sim-msg { font-size: 13.5px; margin-top: 12px; color: var(--dim); }
+.sim-msg b { color: var(--teal); }
+
+/* ============ PLAYER BAR ============ */
+.player {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border2);
+  padding: 10px 18px 12px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.pbtn {
+  font-family: 'Azeret Mono', monospace; font-size: 13px; cursor: pointer;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--text);
+  border-radius: 8px; padding: 8px 12px; transition: all .15s; min-width: 42px;
+  text-align: center;
+}
+.pbtn:hover { border-color: var(--teal); color: var(--teal); }
+.pbtn--main {
+  width: 52px; height: 52px; border-radius: 50%; font-size: 17px;
+  background: var(--teal); border-color: var(--teal); color: var(--bg); font-weight: 700;
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+}
+.pbtn--main:hover { filter: brightness(1.15); color: var(--bg); transform: scale(1.05); }
+.player select {
+  font-family: 'Azeret Mono', monospace; font-size: 12px;
+  background: var(--surface3); color: var(--text);
+  border: 1px solid var(--border2); border-radius: 7px; padding: 7px 8px; max-width: 190px;
+}
+.player select:focus { outline: none; border-color: var(--teal); }
+.p-meta {
+  flex: 1; min-width: 220px; line-height: 1.5;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.p-now {
+  font-size: 13px; color: var(--text); font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.p-voice { font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--faint); letter-spacing: .4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice .on { color: var(--teal); }
+.p-voice .off { color: var(--orange); }
+
+/* ============ THEME TOGGLE ============ */
+.theme-toggle {
+  position: fixed; top: 18px; right: 20px; z-index: 600;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid var(--border2); background: var(--surface);
+  color: var(--text); cursor: pointer; font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; box-shadow: var(--shadow);
+}
+.theme-toggle:hover { border-color: var(--teal); color: var(--teal); }
+[data-theme="dark"] .tt-sun { display: block; }
+[data-theme="dark"] .tt-moon { display: none; }
+[data-theme="light"] .tt-sun { display: none; }
+[data-theme="light"] .tt-moon { display: block; }
+
+/* ============ FOOTER ============ */
+.foot { margin-top: 90px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--faint); font-size: 12.5px; font-family: 'Azeret Mono', monospace; letter-spacing: .5px; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1000px) {
+  .wrap { grid-template-columns: 1fr; padding: 0 18px; }
+  .toc {
+    position: sticky; top: 0; z-index: 300; grid-row: auto;
+    display: flex; gap: 6px; align-items: center;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    margin: 0 -18px; padding: 10px 60px 10px 18px; max-height: none;
+  }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc-title { display: none; }
+  .toc a { white-space: nowrap; flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; border-radius: 5px; padding: 6px 11px; font-size: 11.5px; }
+  .toc a.active { border-bottom-color: var(--teal); background: var(--teal-dim); }
+  .main { padding-top: 26px; }
+  .sec-head { margin-top: 56px; }
+  .compare { grid-template-columns: 1fr; }
+  body { padding-bottom: 190px; }
+  .player { gap: 8px; padding: 10px 14px; }
+  .p-meta { min-width: 100%; order: 5; }
+  .theme-toggle { top: 12px; right: 14px; width: 38px; height: 38px; }
+  .hero { padding-top: 30px; }
+}
+@media (max-width: 480px) {
+  .memrow { gap: 4px; }
+  .cell { min-width: 52px; padding: 11px 6px; font-size: 13px; }
+  .rd { font-size: 15.5px; }
+  h1 { font-size: 38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ==== UNIT 3 ADDITIONS ==== */
+/* ---- sorting visualizer ---- */
+.viz {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 16px; margin: 18px 0;
+}
+.viz-bars {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 5px; height: 190px; padding: 26px 4px 0;
+}
+.viz-bar {
+  flex: 1 1 0; max-width: 62px; min-width: 14px;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-bottom: none; border-radius: 5px 5px 0 0;
+  position: relative; transition: height .22s ease, background .18s ease, border-color .18s ease;
+}
+.viz-bar i {
+  position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-style: normal;
+  color: var(--dim); white-space: nowrap;
+}
+.viz-bar.cmp  { background: var(--sky-dim); border-color: var(--sky); }
+.viz-bar.cmp i { color: var(--sky); }
+.viz-bar.swap { background: var(--gold-dim); border-color: var(--gold); }
+.viz-bar.swap i { color: var(--gold); }
+.viz-bar.done { background: var(--teal-dim); border-color: var(--teal); }
+.viz-bar.piv  { background: var(--orange-dim); border-color: var(--orange); }
+.viz-legend { display: flex; gap: 16px; flex-wrap: wrap; font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--faint); margin-top: 14px; }
+.viz-legend span { display: flex; align-items: center; gap: 6px; }
+.viz-legend em { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid var(--border2); }
+
+/* ---- binary search visualizer ---- */
+.bs-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.bs-cell {
+  min-width: 56px; padding: 13px 6px; text-align: center;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 8px; font-family: 'Azeret Mono', monospace; font-size: 15px; font-weight: 600;
+  transition: all .2s;
+}
+.bs-cell .tag { display: block; font-size: 9px; font-weight: 500; letter-spacing: 1px; color: var(--faint); margin-top: 4px; }
+.bs-cell.in-range { border-color: var(--border2); }
+.bs-cell.out { opacity: .3; }
+.bs-cell.low { border-color: var(--sky); color: var(--sky); }
+.bs-cell.high { border-color: var(--sky); color: var(--sky); }
+.bs-cell.mid { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.bs-cell.found { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); }
+
+/* ---- hash table ---- */
+.ht { display: flex; flex-direction: column; gap: 5px; margin: 14px 0; }
+.ht-row { display: flex; align-items: center; gap: 10px; min-height: 38px; }
+.ht-idx {
+  font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--faint);
+  min-width: 44px; text-align: right;
+}
+.ht-slot {
+  flex: 1; min-width: 0; border: 1px solid var(--border2); border-radius: 7px;
+  padding: 7px 10px; background: var(--surface3); display: flex; align-items: center;
+  gap: 7px; flex-wrap: wrap; font-family: 'Azeret Mono', monospace; font-size: 13px;
+}
+.ht-slot.hit { border-color: var(--gold); background: var(--gold-dim); }
+.ht-slot.coll { border-color: var(--orange); }
+.ht-empty { color: var(--faint); font-size: 12px; }
+.ht-chain { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.ht-key {
+  background: var(--teal-dim); border: 1px solid var(--teal); color: var(--teal);
+  border-radius: 5px; padding: 2px 8px; font-size: 12px;
+}
+.ht-key.probe { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+.ht-arrow { color: var(--faint); font-size: 12px; }
+
+/* ---- misc ---- */
+.pill {
+  display: inline-block; font-family: 'Azeret Mono', monospace; font-size: 10.5px;
+  padding: 2px 8px; border-radius: 5px; letter-spacing: .8px;
+  background: var(--teal-dim); color: var(--teal); border: 1px solid var(--teal);
+}
+.pill--gold { background: var(--gold-dim); color: var(--gold); border-color: var(--gold); }
+.pill--sky  { background: var(--sky-dim); color: var(--sky); border-color: var(--sky); }
+.pill--orange { background: var(--orange-dim); color: var(--orange); border-color: var(--orange); }
+
+
+/* ---- call stack (recursion) ---- */
+.cs-wrap { display:grid; grid-template-columns: 1fr 1fr; gap:20px; align-items:start; }
+@media (max-width:760px){ .cs-wrap { grid-template-columns:1fr; } }
+.cs-stack { display:flex; flex-direction:column; gap:7px; }
+.cs-frame {
+  border:1px solid var(--border2); border-radius:9px; padding:11px 15px;
+  background:var(--surface3); font-family:'Azeret Mono',monospace; font-size:13.5px;
+  transition:all .25s ease;
+}
+.cs-frame b { color:var(--sky); }
+.cs-frame.cur { border-color:var(--gold); background:var(--gold-dim); box-shadow:0 0 0 1px var(--gold); }
+.cs-frame.ret { border-color:var(--teal); background:var(--teal-dim); }
+.cs-frame.ret b { color:var(--teal); }
+.cs-empty { border:1px dashed var(--border2); border-radius:9px; padding:16px; text-align:center; color:var(--faint); font-size:12.5px; font-family:'Azeret Mono',monospace; }
+.cs-note { font-size:13.5px; color:var(--dim); line-height:1.7; }
+.cs-note b { color:var(--teal); }
+
+/* ---- loop tracer ---- */
+.trace-wrap { display:grid; grid-template-columns: 1.1fr 1fr; gap:18px; align-items:start; }
+@media (max-width:820px){ .trace-wrap { grid-template-columns:1fr; } }
+.trace-code { font-family:'Azeret Mono',monospace; font-size:13px; line-height:1.75; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto; }
+.trace-code .ln { display:block; padding:1px 8px; border-radius:5px; border-left:3px solid transparent; white-space:pre; }
+.trace-code .ln.on { background:var(--gold-dim); border-left-color:var(--gold); }
+.trace-code .cm { color:var(--faint); }
+.trace-code .kw { color:var(--sky); }
+.trace-code .st { color:var(--gold); }
+.varbox { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.varbox div {
+  font-family:'Azeret Mono',monospace; font-size:13px; padding:8px 13px; border-radius:8px;
+  border:1px solid var(--border2); background:var(--surface3); color:var(--dim);
+}
+.varbox div b { color:var(--teal); font-size:15px; }
+.varbox div.changed { border-color:var(--gold); background:var(--gold-dim); }
+.varbox div.changed b { color:var(--gold); }
+
+/* ---- quiz ---- */
+.q-item { border:1px solid var(--border); border-radius:12px; background:var(--surface); padding:16px 18px; margin:14px 0; }
+.q-item h5 { font-size:15px; font-weight:600; margin-bottom:12px; line-height:1.5; }
+.q-item h5 span { font-family:'Azeret Mono',monospace; font-size:11px; color:var(--teal); margin-right:8px; }
+.q-opts { display:flex; flex-direction:column; gap:7px; }
+.q-opt {
+  text-align:left; font-family:'Poppins',sans-serif; font-size:14px; cursor:pointer;
+  border:1px solid var(--border2); background:var(--surface2); color:var(--text);
+  border-radius:8px; padding:9px 14px; transition:all .15s; font-family:'Plus Jakarta Sans',sans-serif;
+}
+.q-opt:hover { border-color:var(--teal); }
+.q-opt.ok { border-color:var(--teal); background:var(--teal-dim); color:var(--teal); font-weight:600; }
+.q-opt.bad { border-color:var(--red); background:var(--orange-dim); color:var(--red); }
+.q-opt:disabled { cursor:default; }
+.q-fb { font-size:13.5px; margin-top:10px; color:var(--dim); line-height:1.6; display:none; }
+.q-fb.show { display:block; }
+.q-fb b { color:var(--teal); }
+.q-score { font-family:'Azeret Mono',monospace; font-size:13px; color:var(--gold); }
+
+/* ---- slider ---- */
+input[type=range] { -webkit-appearance:none; appearance:none; height:6px; border-radius:4px; background:var(--surface3); outline:none; border:1px solid var(--border2); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--teal); cursor:pointer; border:2px solid var(--bg); }
+input[type=range]::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--teal); cursor:pointer; border:2px solid var(--bg); }
+
+
+/* ---- timer / cockpit ---- */
+.cockpit { display:grid; grid-template-columns: 1.15fr 1fr; gap:20px; align-items:start; }
+@media (max-width:880px){ .cockpit { grid-template-columns:1fr; } }
+.blk { display:flex; gap:12px; align-items:flex-start; padding:11px 14px; border:1px solid var(--border); border-radius:10px; background:var(--surface); margin-bottom:8px; cursor:pointer; transition:all .15s; }
+.blk:hover { border-color:var(--teal); }
+.blk.on { border-color:var(--teal); background:var(--teal-dim); box-shadow:0 0 0 1px var(--teal); }
+.blk.done { opacity:.5; }
+.blk .t { font-family:'Azeret Mono',monospace; font-size:11px; color:var(--gold); min-width:58px; }
+.blk .d { font-size:13.5px; line-height:1.5; color:var(--dim); }
+.blk .d b { color:var(--text); display:block; font-size:14.5px; }
+.timerbox { text-align:center; border:1px solid var(--border2); border-radius:14px; background:linear-gradient(160deg,var(--teal-dim),var(--surface) 55%); padding:20px 16px; }
+.timer-big { font-family:'Azeret Mono',monospace; font-size:62px; font-weight:600; letter-spacing:2px; color:var(--teal); line-height:1; }
+.timer-big.warn { color:var(--orange); }
+.timer-lbl { font-family:'Azeret Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:2px; color:var(--faint); margin-top:8px; }
+.timer-blk { font-size:14px; color:var(--text); font-weight:600; margin-top:10px; min-height:20px; }
+
+/* ---- student picker ---- */
+.picker { text-align:center; border:1px solid var(--gold); border-radius:14px; background:linear-gradient(160deg,var(--gold-dim),var(--surface) 55%); padding:22px 18px; }
+.picker-name { font-family:'Instrument Serif',serif; font-size:52px; line-height:1.1; color:var(--gold); min-height:60px; }
+.picker-name.spinning { opacity:.55; }
+.tally { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:16px; }
+.tally div { font-family:'Azeret Mono',monospace; font-size:12px; border:1px solid var(--border2); background:var(--surface); border-radius:8px; padding:7px 12px; color:var(--dim); }
+.tally div b { color:var(--teal); }
+.tally div.least { border-color:var(--gold); color:var(--gold); }
+.tally div.least b { color:var(--gold); }
+
+/* ---- question cards ---- */
+.qgrid { display:grid; grid-template-columns: repeat(auto-fill, minmax(330px,1fr)); gap:14px; margin:20px 0; }
+.qcard { border:1px solid var(--border); border-left:3px solid var(--sky); border-radius:11px; background:var(--surface); padding:15px 17px; min-width:0; display:flex; flex-direction:column; }
+.qcard .meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:9px; }
+.qcard .qt { font-size:14.5px; line-height:1.6; font-weight:600; }
+.qcard .when { font-family:'Azeret Mono',monospace; font-size:10.5px; color:var(--faint); margin-top:8px; line-height:1.5; }
+.qcard .ans { margin-top:11px; font-size:13.5px; line-height:1.6; color:var(--teal); border-top:1px dashed var(--border2); padding-top:10px; display:none; }
+.qcard .ans.show { display:block; }
+.qcard .ans b { color:var(--gold); }
+.qcard--warm { border-left-color: var(--gold); }
+.qcard--rec { border-left-color: var(--orange); }
+.qcard--rapid { border-left-color: var(--teal); }
+
+/* ---- checklist ---- */
+.chk { display:flex; gap:11px; align-items:flex-start; padding:10px 14px; border:1px solid var(--border); border-radius:9px; background:var(--surface); margin-bottom:7px; cursor:pointer; transition:all .15s; }
+.chk:hover { border-color:var(--teal); }
+.chk input { margin-top:3px; accent-color:var(--teal); width:16px; height:16px; flex-shrink:0; cursor:pointer; }
+.chk span { font-size:14px; line-height:1.55; color:var(--dim); }
+.chk.on { border-color:var(--teal); background:var(--teal-dim); }
+.chk.on span { color:var(--text); }
+
+</style>
+</head><body>
+<button class="theme-toggle" id="themeToggle" aria-label="Light / dark toggle" title="Theme badlo">
+  <span class="tt-sun">☀</span><span class="tt-moon">☾</span>
+</button>
+
+<div class="wrap">
+
+<nav class="toc" id="toc">
+  <div class="toc-title">CLASS KIT</div>
+  <a href="#s0"><span class="n">00</span>Class cockpit</a>
+  <a href="#s1"><span class="n">01</span>Sawaal bank</a>
+  <a href="#s2"><span class="n">02</span>Student picker</a>
+  <a href="#s3"><span class="n">03</span>Quick-fire round</a>
+  <a href="#s4"><span class="n">04</span>Lean 30-min plan</a>
+  <a href="#s5"><span class="n">05</span>Facilitation tips</a>
+</nav>
+
+<div class="main">
+
+<header class="hero">
+  <div class="hero-badges">
+    <span class="chip chip--teal">TEACHER'S COCKPIT</span>
+    <span class="chip chip--gold">INTERACTIVE · QUESTION-DRIVEN</span>
+    <span class="chip chip--sky">SCREEN SHARE KE LIYE</span>
+  </div>
+  <h1>Class Kit — <em>poochho, suno, padhao</em></h1>
+  <p class="hero-sub">Yeh page class ke waqt <b>screen pe khula rakho</b>. Isme 30-min ka <b>agenda + countdown timer</b>, topic-wise <b>ready-made sawaal</b> (jawab chhupa hua — pehle students se poochho, phir reveal karo), <b>student picker</b> (spin karke chuno, participation tally bhi), aur ek <b>quick-fire round</b> hai. Rule simple hai: <b>har 5 minute me ek sawaal</b> — koi bore nahi hoga.</p>
+  <hr class="hero-hr">
+</header>
+
+<!-- ============================================================ S0 -->
+<section class="sec" id="s0">
+  <div class="sec-head">
+    <span class="sec-num">00</span>
+    <h2>Class Cockpit — agenda + timer</h2>
+  </div>
+  <p class="sec-tag">Session chuno, block pe click karo, timer chalao</p>
+
+  <p class="rd" data-dev="यह आपका कंट्रोल पैनल है। दो सेशन हैं — पहला सेशन सी और रिकर्शन के लिए, दूसरा बिग ओ और सर्चिंग के लिए। किसी भी ब्लॉक पर क्लिक करो, टाइमर उसी ब्लॉक की अवधि पर सेट हो जाएगा, और स्टार्ट दबाकर चला दो। जब टाइमर ख़त्म हो तो अगले ब्लॉक पर चले जाओ।">Yeh tumhara <b>control panel</b> hai. Do session hain — Session 1 (C + recursion) aur Session 2 (Big-O + searching). Kisi bhi <b>block pe click</b> karo → timer usi block ki duration pe set ho jayega → <b>START</b> dabao. Timer khatam hone pe next block pe jaao. Screen share pe yeh dikhta rehna chahiye — students ko pata rahega "ab kya ho raha hai, kitna time bacha hai".</p>
+
+  <div class="sim" id="cockpit">
+    <div class="sim-head"><b>⚡ CLASS COCKPIT</b><span>— agenda + live countdown</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0;margin-bottom:16px">
+        <label>SESSION <select id="ckSession"><option value="1">Session 1 — C + Recursion</option><option value="2">Session 2 — Big-O + Searching</option></select></label>
+        <span class="sim-msg" id="ckHint">Block pe click karo, phir START.</span>
+      </div>
+      <div class="cockpit">
+        <div id="ckBlocks"></div>
+        <div>
+          <div class="timerbox">
+            <div class="timer-big" id="ckTimer">30:00</div>
+            <div class="timer-lbl">BAACHA HUA TIME</div>
+            <div class="timer-blk" id="ckBlockName">Block select karo →</div>
+            <div class="sim-controls" style="justify-content:center;margin-top:16px">
+              <button class="btn btn--go" id="ckStart">▶ START</button>
+              <button class="btn" id="ckNext">⏭ NEXT BLOCK</button>
+              <button class="btn btn--warn" id="ckReset">RESET</button>
+            </div>
+            <div class="sim-msg" id="ckNote" style="margin-top:12px;font-size:12.5px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Timer ka trick:</b> jab timer 0 pe pahunche, page orange ho jayega aur "agla block" ka signal milega — tum bas 15 second me transition maar do. <b>Block ka poora time mat bharo</b> — 30 min ke session me 2-3 min buffer chhod do, warna last ka homework rush me chala jayega.
+  </div>
+</section>
+
+<!-- ============================================================ S1 -->
+<section class="sec" id="s1">
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <h2>Sawaal Bank — poochho, phir reveal karo</h2>
+  </div>
+  <p class="sec-tag">Topic chuno · sawaal poochho · "Jawab dekho" se reveal karo</p>
+
+  <p class="rd" data-dev="यहाँ तैयार सवाल हैं, टॉपिक के हिसाब से। तरीक़ा यह है — सवाल पढ़कर पूछो, तीन-चार सेकंड रुको, और फिर जवाब देखो बटन दबाकर सही उत्तर दिखाओ। हर सवाल के नीचे यह भी लिखा है कि यह सवाल कब पूछना है, जैसे लूप ट्रेसर के तीन स्टेप के बाद। इससे क्लास का हर हिस्सा जुड़ा रहेगा और बीच में कोई सो नहीं पाएगा।">Yahan <b>taiyaar sawaal</b> hain, topic ke hisaab se. Tareeka: <b>sawaal padh ke poochho → 3-4 second ruko → phir "Jawab dekho"</b> dabao. Har sawaal ke neeche likha hai ki <b>kab poochhna hai</b> (jaise "Loop Tracer ke 3 steps ke baad") — isse class ka har hissa juda rahega.
+
+<b>Golden rule: har 5 minute me ek sawaal.</b> Neeche filter se topic chuno, ya "Random sawaal" dabao — surprise element bana rehta hai.</p>
+
+  <div class="sim" id="qbank">
+    <div class="sim-head"><b>⚡ QUESTION BANK</b><span>— <span id="qCount">0</span> sawaal ready</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <span id="qFilters"></span>
+      </div>
+      <div class="sim-controls">
+        <button class="btn btn--go" id="qRandom">🎲 RANDOM SAWAAL</button>
+        <button class="btn" id="qRevealAll">SAARE JAWAB CHHUPAO</button>
+        <span class="sim-msg" id="qMsg"></span>
+      </div>
+      <div class="qgrid" id="qGrid"></div>
+    </div>
+  </div>
+</section>
+<!-- ============================================================ S2 -->
+<section class="sec" id="s2">
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <h2>Student Picker — kaun jawab dega?</h2>
+  </div>
+  <p class="sec-tag">Spin karo · naam aaye · jawab milne pe ✓ dabao (fair distribution)</p>
+
+  <p class="rd">Yeh page ka sabse practical tool. <b>SPIN</b> dabao — Harsh, Aryan ya Khusi me se ek naam aayega. Sawaal usi se poochho. Jawab mil jaye toh <b>✓ Jawab mila</b> dabao — us student ka count badh jayega. Neeche tally me dikhta rahega ki kis se kitni baar poocha gaya, aur jisse sabse kam poocha gaya wo <b>gold</b> me highlight hoga — isse koi peeche nahi chhootega.
+
+<b>Kyun spin se?</b> Kyunki isse koi personally target nahi hota — "sir ne mujhe hi uthaya" wali feeling nahi aati, aur maza bhi aata hai. Naam list <b>editable</b> hai — naye members add kar sakte ho.</p>
+
+  <div class="sim" id="picker">
+    <div class="sim-head"><b>⚡ STUDENT PICKER</b><span>— random + fair</span></div>
+    <div class="sim-body">
+      <div class="picker">
+        <div class="picker-name" id="pkName">—</div>
+        <div class="sim-controls" style="justify-content:center;margin-top:14px">
+          <button class="btn btn--go" id="pkSpin" style="font-size:14px;padding:11px 26px">🎯 SPIN</button>
+          <button class="btn" id="pkGot">✓ Jawab mila</button>
+          <button class="btn btn--warn" id="pkSkip">↻ Dobara spin</button>
+        </div>
+        <div class="tally" id="pkTally"></div>
+      </div>
+      <div class="sim-controls">
+        <label>NAAM LIST <input id="pkNames" style="width:260px" value="Harsh, Aryan, Khusi"></label>
+        <button class="btn" id="pkSave">SAVE LIST</button>
+        <button class="btn btn--warn" id="pkReset">TALLY RESET</button>
+        <span class="sim-msg" id="pkMsg">Comma se separate karke naam likho (apna naam bhi add kar sakte ho).</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>Cold-calling ka sahi tareeka:</b> pehle sawaal poochho, <b>3-4 second ruko</b>, phir spin karo. Ulta karoge (pehle naam, phir sawaal) toh baaki log soch hi nahi paayenge — unhe lagega "mera naam nahi aaya, chill". <b>Pause sabse zaroori cheez hai.</b>
+  </div>
+</section>
+
+<!-- ============================================================ S3 -->
+<section class="sec" id="s3">
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <h2>Quick-Fire Round — 30 second per sawaal</h2>
+  </div>
+  <p class="sec-tag">Class ke aakhir me 3 minute — energy wapas aa jaati hai</p>
+
+  <p class="rd">Class ke end me jab dimaag thak jata hai, tab <b>quick-fire</b> chalao. Ek sawaal aayega, 30 second ka timer chalega — jo pehle haath uthaye (ya spin se) wahi jawab dega. Haan/nahi wale sawaal hain, isliye koi jhijhak nahi karega. <b>3 minute me 5-6 sawaal</b> ho jate hain, aur revision bhi ho jata hai.</p>
+
+  <div class="sim" id="rapid">
+    <div class="sim-head"><b>⚡ QUICK-FIRE</b><span>— 30s per sawaal</span></div>
+    <div class="sim-body">
+      <div style="border:1px solid var(--teal);border-radius:12px;padding:18px 20px;background:var(--surface2)">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+          <span class="pill" id="rpCount">SAWAAL 1</span>
+          <span class="timer-big" id="rpTimer" style="font-size:34px">30</span>
+        </div>
+        <div id="rpQ" style="font-size:17px;font-weight:600;line-height:1.55;min-height:52px">START dabao — pehla sawaal aayega.</div>
+        <div class="ans" id="rpA" style="font-size:14px;color:var(--teal);border-top:1px dashed var(--border2);padding-top:12px;margin-top:12px;display:none"></div>
+      </div>
+      <div class="sim-controls">
+        <button class="btn btn--go" id="rpStart">▶ START / NEXT</button>
+        <button class="btn" id="rpShow">JAWAB DEKHO</button>
+        <button class="btn btn--warn" id="rpStop">■ RUKO</button>
+        <span class="sim-msg" id="rpMsg"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ S4 -->
+<section class="sec" id="s4">
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <h2>Lean 30-Min Plan — sirf 3 demo, baaki homework</h2>
+  </div>
+  <p class="sec-tag">Itna content live me nahi jayega — isliye chhaanto</p>
+
+  <p class="rd">Yeh sabse important baat hai. Foundation page me <b>bahut</b> content hai — 30 min me poora live padhana <b>impossible</b> hai, aur agar try karoge toh rush me kuch bhi samajh nahi aayega. <b>Live me sirf 3 cheezein demo karo</b> (jo animation wali hain), baaki page unhe ghar pe padhne ke liye de do, aur programs homework me.
+
+Yaad rakho: <b>class ka kaam hai samajhna aur sawaal poochhna</b> — padhna wo ghar pe karenge, aur tumhare paas Foundation page hai hi jo unhe ghar pe padha dega.</p>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Time</th><th>Live me kya karo</th><th>Page ka section</th><th>Sawaal</th></tr></thead>
+      <tbody>
+        <tr><td><b>0–3</b></td><td>Hook: "list me se cheez dhoondhne ka tez tareeka?" + aaj ka plan board pe</td><td>Foundation · 00</td><td>Warm-up 1-2</td></tr>
+        <tr><td><b>3–8</b></td><td><b>DEMO 1:</b> Loop Tracer — 4 step chalao, phir ruk ke poochho "ab sum kya hoga?"</td><td>Foundation · 01</td><td>C/loop 1-3</td></tr>
+        <tr><td><b>8–13</b></td><td><b>DEMO 2:</b> Array Playground — SWAP karo, phir SHIFT. Bolo: "yahi swap sorting me lagega"</td><td>Foundation · 02</td><td>Arrays 1-2, swap 1</td></tr>
+        <tr><td><b>13–18</b></td><td>Recursion ka concept + factorial code (sirf code padho, chalao nahi)</td><td>Foundation · 03 (top)</td><td>Recursion 1-2</td></tr>
+        <tr><td><b>18–25</b></td><td><b>DEMO 3:</b> Recursion Stepper — yeh "wow" moment hai, poora chalao. Har step pe ruk ke poochho</td><td>Foundation · 03 (stepper)</td><td>Recursion 3-5</td></tr>
+        <tr><td><b>25–29</b></td><td>Quick-fire round (4-5 sawaal)</td><td>Class Kit · 03</td><td>Rapid-fire</td></tr>
+        <tr><td><b>29–30</b></td><td>Homework: page link + program 1,2,3,6 + quiz 10 sawaal</td><td>Foundation · 06, 07</td><td>—</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card card--gold">
+      <h4>✔ LIVE ME KARO</h4>
+      <p>Loop Tracer · Array Playground (SWAP) · Recursion Stepper · har 5 min me ek sawaal · aakhir me quick-fire. <b>Bas yahi.</b> Big-O aur searching Session 2 me.</p>
+    </div>
+    <div class="card card--orange">
+      <h4>✘ LIVE ME MAT KARO (homework)</h4>
+      <p>Poora cheat sheet padhana · 10 practice programs karwana · quiz karwana · Big-O ki detail (Session 2 me) · sorting ka koi bhi topic (wo Unit 3 me). <b>Ye sab ghar pe, page se.</b></p>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:24px;margin:34px 0 6px">Session 2 — Big-O + Searching (Unit 3 ka darwaza)</h3>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Time</th><th>Live me kya karo</th><th>Page ka section</th></tr></thead>
+      <tbody>
+        <tr><td><b>0–3</b></td><td>Homework check — kisi ek se poochho "program 2 ka logic kya tha?" (spin se)</td><td>—</td></tr>
+        <tr><td><b>3–9</b></td><td><b>DEMO 1:</b> Big-O Growth Visualizer — slider n=10 se 10,000. Poochho: "kaun sabse tez bacha?"</td><td>Foundation · 04</td></tr>
+        <tr><td><b>9–16</b></td><td><b>DEMO 2:</b> Linear vs Binary compare — target badal-badal ke. "9 comparisons vs 3 — kyun?"</td><td>Foundation · 05</td></tr>
+        <tr><td><b>16–24</b></td><td>Binary search ka dry run <b>board pe</b> (low/mid/high) — yeh haath se karna, screen se nahi</td><td>Unit 3 page · 00</td></tr>
+        <tr><td><b>24–28</b></td><td><b>DEMO 3:</b> Unit 3 page kholo — binary stepper + sorting visualizer ka bubble sort demo. Bolo "aage yeh sab hai"</td><td>DS_Unit3 · 00, 02</td></tr>
+        <tr><td><b>28–30</b></td><td>Homework: bubble sort khud likho + Unit 3 page ka Q&A</td><td>DS_Unit3 · 02, 06</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h3 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:24px;margin:34px 0 6px">Class Checklist (live tick karo)</h3>
+  <div id="chkBox"></div>
+</section>
+
+<!-- ============================================================ S5 -->
+<section class="sec" id="s5">
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <h2>Facilitation Tips — bore hone hi nahi dena</h2>
+  </div>
+  <p class="sec-tag">Chhote tricks jo class ko zinda rakhte hain</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>3-SECOND RULE</h4>
+      <p>Sawaal poochhne ke baad <b>kam se kam 3 second chup raho</b>. Silence uncomfortable lagta hai, par wahi sochne ka time hai. Isse pehle jawab de diya toh sawaal ka koi faayda nahi.</p>
+    </div>
+    <div class="card card--sky">
+      <h4>"AAGE KYA HOGA?" — PREDICTION</h4>
+      <p>Animation chalane se <b>pehle</b> poochho: "agla step me kya hoga?" — phir chalao. Prediction maangna sabse strong engagement trick hai; dimaag automatically active ho jata hai.</p>
+    </div>
+    <div class="card card--gold">
+      <h4>JAWAB NA AAYE TOH?</h4>
+      <p>Seedha jawab mat do. Pehle <b>hint</b> do ("socho, temp variable ki zaroorat kyun padi?"), phir 3 second ruko, phir kisi aur se poochho. <b>Reveal sabse aakhir me</b> — warna sab seekhne ki koshish chhod denge.</p>
+    </div>
+    <div class="card card--orange">
+      <h4>"PATA NAHI" KO TODNA</h4>
+      <p>Jab koi "pata nahi" bole toh bolo: <b>"guess karo, galat bhi bilkul theek hai"</b> — 90% baar sahi guess aata hai. Aur galat jawab pe kabhi mat ruko, bolo "achha socha, isi ke aas-paas hai".</p>
+    </div>
+    <div class="card">
+      <h4>SHANT WALE KO KAISE LAO</h4>
+      <p>Jo member kam bolta hai, uske liye <b>pair-share</b> karo: "20 second me ek dusre se baat karo, phir batao". Pehle partner se discuss karne se confidence aa jata hai, phir poore group me bolna aasan ho jata hai.</p>
+    </div>
+    <div class="card card--sky">
+      <h4>ENERGY CHECK (10 second)</h4>
+      <p>Beech me kabhi poochho: "1 se 5 tak ungli dikhao — samajh aaya?" Sab 1-2 dikhayein toh <b>wahin ruk ke dobara</b> samjhao. Aage badhna nahi — warna backlog ban jayega.</p>
+    </div>
+    <div class="card card--gold">
+      <h4>HAR 5 MIN ME EK SAWAAL</h4>
+      <p>Yeh ek niyam pakka karo. 30 min = <b>kam se kam 6 sawaal</b>. Isse class interactive rahegi aur tumhe pata chalega kaun samajh raha hai. Sawaal bank me ready hain — bas filter karke poochho.</p>
+    </div>
+    <div class="card">
+      <h4>END ME "AAJ KA TAKEAWAY"</h4>
+      <p>Class ke last 30 second me ek line bolo: "aaj ka takeaway — <b>swap se sorting banti hai, recursion se merge sort</b>". Students ko ek line yaad rehti hai; 30 lines nahi. Homework bhi usi line se jodo.</p>
+    </div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Sabse bada secret:</b> tumhe perfect padhna nahi hai — tumhe <b>sawaal poochhne wala</b> banna hai. Jo padhata hai wo bolta hai; jo samjhata hai wo poochhta hai. Students khud bolenge toh samajh apne aap ban jayegi — aur tumhara kaam aasaan ho jayega. 🚩
+  </div>
+
+  <p class="foot">TEAM DEVDoots · CLASS KIT · INTERACTIVE TEACHING COCKPIT · DS FOUNDATION + UNIT 3</p>
+</section>
+
+</div><!-- /main -->
+</div><!-- /wrap -->
+<script>
+(function () {
+'use strict';
+
+/* ============ THEME ============ */
+var root = document.documentElement;
+try { var sv = localStorage.getItem('dsk-theme'); if (sv === 'light' || sv === 'dark') root.setAttribute('data-theme', sv); } catch (e) {}
+document.getElementById('themeToggle').addEventListener('click', function () {
+  var nx = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', nx);
+  try { localStorage.setItem('dsk-theme', nx); } catch (e) {}
+});
+
+/* ============ SCROLL SPY ============ */
+(function () {
+  var toc = document.getElementById('toc');
+  var links = toc.querySelectorAll('a');
+  var secs = [];
+  links.forEach(function (l) { var el = document.getElementById(l.getAttribute('href').slice(1)); if (el) secs.push({ el: el, link: l }); });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        links.forEach(function (l) { l.classList.remove('active'); });
+        var m = secs.find(function (s) { return s.el === en.target; });
+        if (m) { m.link.classList.add('active'); if (window.innerWidth <= 1000) m.link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  secs.forEach(function (s) { obs.observe(s.el); });
+})();
+
+/* ============ COCKPIT (agenda + timer) ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var SESSIONS = {
+    '1': [
+      { m: 3, t: 'Hook + plan', d: 'Sawaal: "list me se dhoondhne ka tez tareeka?" Aaj ka plan board pe likho.', n: 'Warm-up sawaal 1-2 poochho' },
+      { m: 5, t: 'DEMO 1 — Loop Tracer', d: '4 step chalao, phir ruk ke poochho "ab sum kya hoga?"', n: 'Sawaal: C/loop 1-3' },
+      { m: 5, t: 'DEMO 2 — Array Playground', d: 'SWAP karo, phir SHIFT. Bolo: "yahi swap sorting me lagega."', n: 'Sawaal: Arrays + swap' },
+      { m: 5, t: 'Recursion — concept', d: 'Factorial code padho. Stepper se pehle concept clear karo (base case + recursive case).', n: 'Sawaal: Recursion 1-2' },
+      { m: 7, t: 'DEMO 3 — Recursion Stepper', d: 'Poora chalao — stack bharna aur khali hona. Har step pe ruk ke poochho.', n: 'Sawaal: Recursion 3-5' },
+      { m: 4, t: 'Quick-fire round', d: '4-5 sawaal, 30 second each — kit ka section 03', n: 'Energy wapas aa jayegi' },
+      { m: 1, t: 'Homework', d: 'Foundation page link + program 1, 2, 3, 6 + quiz (10 sawaal)', n: 'Ek line me aaj ka takeaway bolo' }
+    ],
+    '2': [
+      { m: 3, t: 'Homework check', d: 'Spin se kisi ek se poochho: "program 2 ka logic kya tha?"', n: 'Jo galat hua, uspe 1 min do' },
+      { m: 6, t: 'DEMO 1 — Big-O slider', d: 'n = 10 se 10,000 tak. Poochho: "kaun sabse tez bacha?"', n: 'Sawaal: Big-O 1-3' },
+      { m: 7, t: 'DEMO 2 — Linear vs Binary', d: 'Target badal-badal ke. Poochho: "9 comparisons vs 3 — kyun itna fark?"', n: 'Sawaal: Sorted/searching' },
+      { m: 8, t: 'Binary search dry run (board)', d: 'Haath se likho: low, mid, high. Screen se nahi — board pe karo.', n: 'Yeh exam me sabse zyada aata hai' },
+      { m: 4, t: 'DEMO 3 — Unit 3 page preview', d: 'DS_Unit3.html kholo: binary stepper + bubble sort visualizer. "Aage yeh sab hai."', n: 'Motivation + roadmap' },
+      { m: 2, t: 'Homework', d: 'Bubble sort khud likho + Unit 3 page ka Q&A dekho', n: 'Aaj ka takeaway ek line me' }
+    ]
+  };
+  var cur = -1, left = 0, timer = null, sess = '1';
+  function fmt(s) { var m = Math.floor(s / 60), x = s % 60; return (m < 10 ? '0' : '') + m + ':' + (x < 10 ? '0' : '') + x; }
+  function render() {
+    var list = SESSIONS[sess], html = '';
+    list.forEach(function (b, i) {
+      html += '<div class="blk' + (i === cur ? ' on' : '') + '" data-i="' + i + '">' +
+        '<span class="t">' + b.m + ' min</span>' +
+        '<span class="d"><b>' + b.t + '</b>' + b.d + '</span></div>';
+    });
+    $('ckBlocks').innerHTML = html;
+    $('ckBlocks').querySelectorAll('.blk').forEach(function (el) {
+      el.addEventListener('click', function () { select(+el.getAttribute('data-i')); });
+    });
+  }
+  function select(i) {
+    stop(); cur = i;
+    var b = SESSIONS[sess][i];
+    left = b.m * 60;
+    $('ckTimer').textContent = fmt(left);
+    $('ckTimer').classList.remove('warn');
+    $('ckBlockName').textContent = 'Block ' + (i + 1) + '/' + SESSIONS[sess].length + ' — ' + b.t;
+    $('ckNote').innerHTML = '<b style="color:var(--gold)">' + b.n + '</b>';
+    $('ckHint').textContent = 'Ready — START dabao.';
+    render();
+  }
+  function tick() {
+    if (left <= 0) { stop(); $('ckTimer').classList.add('warn'); $('ckHint').innerHTML = '<b style="color:var(--orange)">Time up! Next block pe jao ⏭</b>'; return; }
+    left--;
+    $('ckTimer').textContent = fmt(left);
+    if (left <= 30) $('ckTimer').classList.add('warn');
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; $('ckStart').textContent = '▶ START'; } }
+  $('ckStart').addEventListener('click', function () {
+    if (timer) { stop(); $('ckHint').textContent = 'Paused.'; return; }
+    if (cur < 0) { select(0); }
+    timer = setInterval(tick, 1000);
+    $('ckStart').textContent = '⏸ PAUSE';
+    $('ckHint').textContent = 'Chal raha hai…';
+  });
+  $('ckNext').addEventListener('click', function () {
+    var i = (cur < 0 ? 0 : cur + 1);
+    if (i >= SESSIONS[sess].length) { stop(); $('ckHint').innerHTML = '<b style="color:var(--teal)">Session poora! 🎉</b>'; return; }
+    select(i);
+  });
+  $('ckReset').addEventListener('click', function () { stop(); cur = -1; left = 0; $('ckTimer').textContent = '30:00'; $('ckTimer').classList.remove('warn'); $('ckBlockName').textContent = 'Block select karo →'; $('ckNote').innerHTML = ''; render(); });
+  $('ckSession').addEventListener('change', function () { sess = $('ckSession').value; $('ckReset').click(); });
+  render();
+})();
+
+/* ============ QUESTION BANK ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var TOPICS = [
+    { k: 'warm', n: 'Warm-up' }, { k: 'c', n: 'C & loops' }, { k: 'arr', n: 'Arrays' },
+    { k: 'swap', n: 'Functions & swap' }, { k: 'rec', n: 'Recursion' }, { k: 'bigo', n: 'Big-O' }, { k: 'srch', n: 'Sorted & searching' }
+  ];
+  var Q = [
+    { t: 'warm', q: 'Kisi list me se ek cheez dhoondhne ka sabse tez tareeka kya hoga — tumhare hisaab se?', a: 'Agar list <b>sorted</b> ho, toh beech se check karo aur aadha hissa hata do — yeh <b>binary search</b> hai. Unsorted ho toh ek-ek dekhna padta hai (linear search). Aaj yahi seekhenge.', w: 'Class shuru karte hi (hook)' },
+    { t: 'warm', q: 'Phone ke Contacts me naam dhoondhte waqt tum kya karte ho — shuru se scroll?', a: 'Nahi — pehle letter pe <b>jump</b> karte ho. Yeh <b>index</b> ka idea hai — data ko organized rakhne se search tez ho jati hai.', w: 'Hook ke baad, C shuru karne se pehle' },
+    { t: 'warm', q: 'Do numbers ki values aapas me badalni ho toh kya karoge?', a: 'Ek <b>temp</b> variable: temp = a; a = b; b = temp. Yeh aaj har sorting me lagega — isliye yaad rakhna.', w: 'Array section se thoda pehle' },
+    { t: 'c', q: 'int a[5] — is array ka last valid index kya hai?', a: '<b>4</b> — kyunki index 0 se shuru hota hai: 0,1,2,3,4. a[5] likhna out of bounds hai.', w: 'Loop Tracer dikhane ke baad' },
+    { t: 'c', q: 'for (i = 0; i < 5; i++) loop kitni baar chalta hai?', a: '<b>5 baar</b> — i = 0,1,2,3,4. Jab i = 5 hota hai toh condition false ho jaati hai.', w: 'Loop Tracer ke 3 steps ke baad' },
+    { t: 'c', q: 'sum = 0 kyun likhte hain shuru me?', a: 'Warna <b>garbage value</b> se jodna shuru ho jata — answer galat aa jata. Har accumulator ko 0 se initialise karna zaroori hai.', w: 'Loop Tracer ke pehle step pe' },
+    { t: 'c', q: 'Agar galti se i <= 5 likh diya (i < 5 ki jagah), toh kya hoga?', a: 'Loop <b>6 baar</b> chalega aur a[5] access karega — jo array ke bahar hai (<b>out of bounds</b>). Galat/garbage value aayegi.', w: 'Loop Tracer ke baad' },
+    { t: 'c', q: 'printf me %d kis type ke liye use hota hai?', a: '<b>int</b> ke liye. Float ke liye %f, char ke liye %c.', w: 'Kisi bhi code dikhane se pehle' },
+    { t: 'arr', q: 'a[3] ko access karne me kitna time lagta hai?', a: '<b>O(1)</b> — constant. Base address + index formula se seedha address nikal jata hai, chahe array kitna bhi bada ho.', w: 'Array diagram dikhane ke baad' },
+    { t: 'arr', q: '5th element ko aise kaise likhoge?', a: '<b>a[4]</b> — 5th element ka index 4 hota hai.', w: 'Array diagram pe' },
+    { t: 'arr', q: 'Array ka size function me alag se kyun bhejna padta hai?', a: 'Kyunki array <b>apna size saath nahi laata</b> — sirf pehla element ka address jata hai. Isliye n alag se bhejna padta hai.', w: 'linearSearch function dikhane ke baad' },
+    { t: 'arr', q: 'Function ke andar array ko sort kiya — bahar bhi sorted milega ya nahi?', a: '<b>Haan</b> — array <b>by reference</b> jata hai, isliye andar ka change bahar bhi dikhta hai. Isi liye bubbleSort(a, n) ke baad a sorted milta hai.', w: 'Function section me' },
+    { t: 'arr', q: '100 elements wale array ka maximum dhoondhne ka logic batao.', a: 'max = a[0] maan lo, phir loop me har element se compare karo — bada mila toh max update kar do. Loop khatam, max ready.', w: 'Array Playground se pehle' },
+    { t: 'swap', q: 'Swap ke teen steps kya hain?', a: 'temp = a; &nbsp; a = b; &nbsp; b = temp; — <b>teen lines</b>. Sorting me har swap pe yahi chalta hai.', w: 'SWAP dabane se pehle poochho' },
+    { t: 'swap', q: 'temp ke bina swap karne se kya hoga?', a: 'a = b karne se <b>a ki purani value kho jayegi</b> — usko bachane ke liye temp chahiye.', w: 'SWAP ke baad' },
+    { t: 'swap', q: 'linearSearch function ka return type kya hoga?', a: '<b>int</b> — kyunki index return karega (0, 1, 2...) ya −1 agar nahi mila.', w: 'linearSearch code dikhane ke baad' },
+    { t: 'swap', q: 'Search me element na mile toh kya return karte hain aur kyun?', a: '<b>−1</b> — kyunki valid index kabhi negative nahi hota, isliye "nahi mila" batane ke liye −1 perfect hai.', w: 'Search function ke baad' },
+    { t: 'rec', q: 'Recursion me do zaroori cheezein kya hain?', a: '<b>1. Base case</b> (rukhne ki shart) aur <b>2. Recursive case</b> (khud ko chhote input ke saath call karna).', w: 'Recursion concept ke shuru me' },
+    { t: 'rec', q: 'Base case na ho toh kya hoga?', a: 'Function kabhi rukega nahi → <b>infinite recursion</b> → <b>stack overflow</b> → program crash.', w: 'Base case samjhane ke baad' },
+    { t: 'rec', q: 'factorial(3) recursion se trace karo?', a: '3 × fact(2) → 2 × fact(1) → <b>1</b> (base case), phir wapas: 2 × 1 = 2, 3 × 2 = <b>6</b>.', w: 'Stepper chalane se pehle (prediction!)' },
+    { t: 'rec', q: 'Stepper me dekha — stack me calls kis order me wapas aati hain?', a: '<b>LIFO</b> — jo last me gayi thi (fact(1)) wo pehle wapas aayi, phir upar wali ek-ek karke.', w: 'Stepper ke 5 steps ke baad' },
+    { t: 'rec', q: 'Fibonacci me function khud ko kitni baar call karta hai?', a: '<b>Do baar</b> — fib(n-1) aur fib(n-2). Isse tree jaisa branching banta hai, isliye plain recursive Fibonacci slow hota hai (O(2ⁿ)).', w: 'Fibonacci mention karne pe' },
+    { t: 'rec', q: 'Recursion aur loop — memory kisme zyada lagti hai?', a: '<b>Recursion me</b> — har call stack me ek frame leti hai (space O(n)). Loop me sirf kuch variables (O(1)).', w: 'Recursion section ke end me' },
+    { t: 'bigo', q: 'O(1) ka matlab kya hai?', a: 'Input kitna bhi bada ho, kaam <b>same</b> rehta hai. Jaise a[3] dekhna — seedha jump, koi loop nahi.', w: 'Big-O section ke shuru me' },
+    { t: 'bigo', q: 'O(log n) me har step me kya hota hai?', a: 'Kaam <b>aadha</b> ho jata hai. 1000 elements me sirf ~10 steps — isliye binary search O(log n) hai.', w: 'Slider dikhane ke baad' },
+    { t: 'bigo', q: 'O(n²) me input 10 guna badha toh kaam kitna badhega?', a: '<b>100 guna!</b> Isliye bubble/selection/insertion sort bade data pe slow padte hain.', w: 'Slider pe n bada karke poochho' },
+    { t: 'bigo', q: 'Kaun tez hai — O(n log n) ya O(n²)?', a: '<b>O(n log n)</b> — merge/quick/heap sort. O(n²) wale (bubble/selection/insertion) bade data pe peeche chhoot jate hain.', w: 'Ladder dikhane ke baad' },
+    { t: 'bigo', q: 'Bubble sort ki worst case complexity kya hai?', a: '<b>O(n²)</b> — nested loop hai: n-1 passes, har pass me comparisons.', w: 'Sorting ka zikr aane pe' },
+    { t: 'srch', q: 'Binary search ke liye array kaisa hona chahiye?', a: '<b>Sorted</b> (ascending ya descending). Unsorted pe binary search kaam nahi karta — wahan linear search chalta hai.', w: 'Sorted vs unsorted diagram pe' },
+    { t: 'srch', q: 'Unsorted array me kaun si search chalegi?', a: '<b>Linear (sequential) search</b> — ek-ek karke dekhni padegi, O(n).', w: 'Usi diagram pe' },
+    { t: 'srch', q: '1000 elements me binary search ko worst case me ~kitne steps lagte hain?', a: '<b>~10 steps</b> — log₂(1000) ≈ 10. Linear search me average 500 lagte!', w: 'Comparison tool dikhane ke baad' },
+    { t: 'srch', q: 'Binary search me mid kaise nikalte hain?', a: 'mid = (low + high) / 2 — beech ka index. Phir compare karke aadha hissa hata dete hain.', w: 'Binary search ke dry run me' },
+    { t: 'srch', q: 'Data sorted hone ka faayda kya hai?', a: 'Search <b>bahut tez</b> ho jati hai (O(n) se O(log n)) — aur isi liye sorting padhte hain. Searching aur sorting ki jodi yahi hai.', w: 'Section 05 ke end me' }
+  ];
+  var RAPID = [
+    { q: 'Array ka index 1 se shuru hota hai — sahi ya galat?', a: 'Galat — 0 se shuru hota hai.' },
+    { q: 'Recursion me base case optional hai — sahi ya galat?', a: 'Galat — base case zaroori hai, warna stack overflow.' },
+    { q: 'Binary search unsorted array pe chalti hai — sahi ya galat?', a: 'Galat — sorted array chahiye.' },
+    { q: 'O(1) sabse tez growth rate hai — sahi ya galat?', a: 'Sahi — input badhe toh bhi kaam same.' },
+    { q: 'Insertion sort nearly-sorted data pe tez hota hai — sahi ya galat?', a: 'Sahi — best case O(n).' },
+    { q: 'Swap ke liye temp variable chahiye — sahi ya galat?', a: 'Sahi — warna ek value kho jayegi.' },
+    { q: 'Merge sort recursion use karta hai — sahi ya galat?', a: 'Sahi — array ko aadha todta hai aur dono halves pe khud ko call karta hai.' },
+    { q: '10 elements me binary search 10 steps leta hai — sahi ya galat?', a: 'Galat — ~4 steps (log₂10 ≈ 3.3).' },
+    { q: 'Array ka access O(1) hota hai — sahi ya galat?', a: 'Sahi — index formula se seedha address.' },
+    { q: 'Bubble sort ki complexity O(n log n) hai — sahi ya galat?', a: 'Galat — O(n²) hai.' }
+  ];
+  var filter = 'all', revealed = {};
+  function chipHtml() {
+    var h = '<span class="pill' + (filter === 'all' ? '' : ' pill--gold') + '" data-k="all" style="cursor:pointer">Sab (' + Q.length + ')</span> ';
+    TOPICS.forEach(function (t) {
+      var c = Q.filter(function (x) { return x.t === t.k; }).length;
+      h += '<span class="pill' + (filter === t.k ? '' : ' pill--gold') + '" data-k="' + t.k + '" style="cursor:pointer;margin-left:6px">' + t.n + ' (' + c + ')</span> ';
+    });
+    $('qFilters').innerHTML = h;
+    $('qFilters').querySelectorAll('.pill').forEach(function (el) {
+      el.addEventListener('click', function () { filter = el.getAttribute('data-k'); render(); });
+    });
+  }
+  function render() {
+    chipHtml();
+    var list = Q.map(function (q, i) { return { q: q, i: i }; }).filter(function (o) { return filter === 'all' || o.q.t === filter; });
+    var html = '';
+    list.forEach(function (o) {
+      var q = o.q;
+      var cls = 'qcard' + (q.t === 'warm' ? ' qcard--warm' : (q.t === 'rec' ? ' qcard--rec' : ''));
+      var tn = (TOPICS.filter(function (t) { return t.k === q.t; })[0] || { n: q.t }).n;
+      html += '<div class="' + cls + '" id="qc' + o.i + '">' +
+        '<div class="meta"><span class="pill pill--sky">' + tn + '</span></div>' +
+        '<div class="qt">' + q.q + '</div>' +
+        '<div class="when">⏱ KAB: ' + q.w + '</div>' +
+        '<div class="ans' + (revealed[o.i] ? ' show' : '') + '" id="qa' + o.i + '">' + q.a + '</div>' +
+        '<div style="margin-top:10px"><button class="btn" data-rev="' + o.i + '">' + (revealed[o.i] ? 'Jawab chhupao' : 'Jawab dekho') + '</button></div>' +
+        '</div>';
+    });
+    $('qGrid').innerHTML = html;
+    $('qCount').textContent = list.length;
+    $('qGrid').querySelectorAll('[data-rev]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = +b.getAttribute('data-rev');
+        revealed[i] = !revealed[i];
+        document.getElementById('qa' + i).classList.toggle('show', revealed[i]);
+        b.textContent = revealed[i] ? 'Jawab chhupao' : 'Jawab dekho';
+      });
+    });
+  }
+  $('qRandom').addEventListener('click', function () {
+    var pool = Q.map(function (q, i) { return i; }).filter(function (i) { return filter === 'all' || Q[i].t === filter; });
+    var i = pool[Math.floor(Math.random() * pool.length)];
+    revealed[i] = false;
+    if (filter !== 'all' && Q[i].t !== filter) { filter = 'all'; }
+    render();
+    var el = document.getElementById('qc' + i);
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.outline = '2px solid var(--gold)'; setTimeout(function () { el.style.outline = 'none'; }, 2200); }
+    $('qMsg').innerHTML = '<b>Yeh poochho:</b> ' + Q[i].q.slice(0, 60) + '…';
+  });
+  $('qRevealAll').addEventListener('click', function () { revealed = {}; render(); $('qMsg').textContent = 'Saare jawab chhup gaye — dobara poochho.'; });
+  render();
+  window.__RAPID = RAPID;
+})();
+
+/* ============ STUDENT PICKER ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var names = ['Harsh', 'Aryan', 'Khusi'], tally = {}, current = null, spinTimer = null;
+  try { var sn = localStorage.getItem('dsk-names'); if (sn) names = JSON.parse(sn); } catch (e) {}
+  try { var st = localStorage.getItem('dsk-tally'); if (st) tally = JSON.parse(st); } catch (e) {}
+  names.forEach(function (n) { if (tally[n] === undefined) tally[n] = 0; });
+  function save() { try { localStorage.setItem('dsk-names', JSON.stringify(names)); localStorage.setItem('dsk-tally', JSON.stringify(tally)); } catch (e) {} }
+  function renderTally() {
+    var min = Math.min.apply(null, names.map(function (n) { return tally[n] || 0; }));
+    var html = '';
+    names.forEach(function (n) {
+      var c = tally[n] || 0;
+      html += '<div class="' + (c === min ? 'least' : '') + '">' + n + ': <b>' + c + '</b>' + (c === min ? ' · kam poocha' : '') + '</div>';
+    });
+    $('pkTally').innerHTML = html;
+  }
+  $('pkSpin').addEventListener('click', function () {
+    if (spinTimer) return;
+    var i = 0;
+    $('pkName').classList.add('spinning');
+    spinTimer = setInterval(function () {
+      $('pkName').textContent = names[i % names.length];
+      i++;
+    }, 80);
+    setTimeout(function () {
+      clearInterval(spinTimer); spinTimer = null;
+      $('pkName').classList.remove('spinning');
+      current = names[Math.floor(Math.random() * names.length)];
+      $('pkName').textContent = current;
+      $('pkMsg').innerHTML = '<b>' + current + '</b> se poochho — 3 second ruko, phir jawab suno.';
+    }, 1300);
+  });
+  $('pkGot').addEventListener('click', function () {
+    if (!current) { $('pkMsg').textContent = 'Pehle SPIN karo.'; return; }
+    tally[current] = (tally[current] || 0) + 1;
+    save(); renderTally();
+    $('pkMsg').innerHTML = '<b>' + current + '</b> ka count badh gaya ✓ — ab agla sawaal, naya spin.';
+    current = null;
+  });
+  $('pkSkip').addEventListener('click', function () { $('pkName').textContent = '—'; current = null; $('pkMsg').textContent = 'Skip — dobara SPIN karo.'; });
+  $('pkSave').addEventListener('click', function () {
+    var arr = $('pkNames').value.split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s.length; });
+    if (!arr.length) { $('pkMsg').textContent = 'Kam se kam ek naam likho.'; return; }
+    names = arr;
+    names.forEach(function (n) { if (tally[n] === undefined) tally[n] = 0; });
+    save(); renderTally();
+    $('pkMsg').innerHTML = 'List save ho gayi: <b>' + names.join(', ') + '</b>';
+  });
+  $('pkReset').addEventListener('click', function () {
+    names.forEach(function (n) { tally[n] = 0; });
+    save(); renderTally();
+    $('pkMsg').textContent = 'Tally reset ho gaya.';
+  });
+  $('pkNames').value = names.join(', ');
+  renderTally();
+})();
+
+/* ============ QUICK-FIRE ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var RAPID = window.__RAPID || [], idx = -1, t = 30, timer = null, last = -1;
+  function fmt(s) { return (s < 10 ? '0' : '') + s; }
+  function show() {
+    if (idx < 0) idx = 0;
+    var q = RAPID[idx % RAPID.length];
+    $('rpQ').textContent = q.q;
+    $('rpA').textContent = q.a;
+    $('rpA').style.display = 'none';
+    $('rpCount').textContent = 'SAWAAL ' + ((idx % RAPID.length) + 1) + '/' + RAPID.length;
+    t = 30; $('rpTimer').textContent = fmt(t);
+    $('rpTimer').classList.remove('warn');
+    clearInterval(timer);
+    timer = setInterval(function () {
+      t--;
+      $('rpTimer').textContent = fmt(Math.max(0, t));
+      if (t <= 5) $('rpTimer').classList.add('warn');
+      if (t <= 0) { clearInterval(timer); timer = null; $('rpMsg').innerHTML = '<b style="color:var(--orange)">Time up! Jawab dekho aur agla sawaal.</b>'; }
+    }, 1000);
+    $('rpMsg').textContent = 'Chalo — jaldi jawab do!';
+  }
+  $('rpStart').addEventListener('click', function () { idx++; show(); });
+  $('rpShow').addEventListener('click', function () {
+    var el = $('rpA');
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  });
+  $('rpStop').addEventListener('click', function () { clearInterval(timer); timer = null; $('rpMsg').textContent = 'Ruk gaya. START/NEXT se agla sawaal.'; });
+  $('rpQ').textContent = RAPID.length + ' rapid sawaal ready — START dabao.';
+})();
+
+/* ============ CHECKLIST ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var ITEMS = [
+    'Foundation page screen share pe khula hai',
+    'Timer chalu kiya aur pehla block select kiya',
+    'Warm-up sawaal poocha (hook ke saath)',
+    'DEMO 1 — Loop Tracer chala ke dikhaya',
+    'DEMO 2 — Array SWAP live kiya',
+    'Recursion ka concept (base case + recursive case) samjhaya',
+    'DEMO 3 — Recursion Stepper poora chala',
+    'Kam se kam 6 sawaal poochhe (har 5 min me ek)',
+    'Quick-fire round hua (4+ sawaal)',
+    'Homework diya: page link + programs + quiz',
+    'Aaj ka takeaway ek line me bataya'
+  ];
+  var done = {};
+  try { var s = localStorage.getItem('dsk-chk'); if (s) done = JSON.parse(s); } catch (e) {}
+  function render() {
+    var html = '';
+    ITEMS.forEach(function (it, i) {
+      html += '<label class="chk' + (done[i] ? ' on' : '') + '"><input type="checkbox" data-i="' + i + '"' + (done[i] ? ' checked' : '') + '><span>' + it + '</span></label>';
+    });
+    $('chkBox').innerHTML = html;
+    $('chkBox').querySelectorAll('input').forEach(function (cb) {
+      cb.addEventListener('change', function () {
+        done[+cb.getAttribute('data-i')] = cb.checked;
+        try { localStorage.setItem('dsk-chk', JSON.stringify(done)); } catch (e) {}
+        cb.closest('.chk').classList.toggle('on', cb.checked);
+      });
+    });
+  }
+  render();
+})();
+
+})();
+</script>
+
+<div class="dsnav" role="navigation" aria-label="Page navigation">
+  <a class="dsnav-b" href="DS_Foundation.html" title="Pichla page (←)">←</a>
+  <a class="dsnav-b" href="../index.html" title="Sab pages (Home)">⌂</a>
+  <a class="dsnav-b" href="DS_Unit3_Class1.html" title="Agla page (→)">→</a>
+</div>
+<style>
+/* ===== DS page nav (auto-injected) ===== */
+.dsnav{position:fixed;right:14px;bottom:78px;z-index:650;display:flex;gap:6px;align-items:center;
+  background:rgba(10,14,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:6px 8px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);opacity:.6;transition:opacity .2s ease, transform .2s ease;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.dsnav:hover{opacity:1;transform:translateY(-2px)}
+.dsnav-b{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:15px;line-height:1;
+  transition:background .15s ease,color .15s ease}
+.dsnav-b:hover{background:#ff9f45;color:#101820}
+.dsnav-b.dsnav-off{opacity:.25;pointer-events:none}
+.dsnav-tip{font-size:10px;letter-spacing:.8px;color:rgba(255,255,255,.45);padding:0 4px;white-space:nowrap}
+@media (max-width:640px){.dsnav-tip{display:none}.dsnav{right:10px;bottom:70px;padding:5px 6px}.dsnav-b{width:30px;height:30px;font-size:14px}}
+@media print{.dsnav{display:none!important}}
+</style>
+<script>
+(function(){
+  var PREV="DS_Foundation.html", NEXT="DS_Unit3_Class1.html";
+  document.addEventListener('keydown', function(e){
+    var t=e.target||{};
+    if(/INPUT|TEXTAREA|SELECT/.test(t.tagName||'')) return;
+    if(e.key==='ArrowRight' && NEXT) window.location.href=NEXT;
+    else if(e.key==='ArrowLeft' && PREV) window.location.href=PREV;
+    else if(e.key==='Home') window.location.href='../index.html';
+  });
+})();
+</script>
+
+</body>
+</html>

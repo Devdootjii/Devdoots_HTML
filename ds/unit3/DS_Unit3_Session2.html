@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 3 · Session 2 — Hashing + Selection + Insertion (commented code) | Team Devdoots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ================= TOKENS ================= */
+:root, [data-theme="dark"] {
+  --bg: #150c12;
+  --surface: #1f121a;
+  --surface2: #291823;
+  --surface3: #35202d;
+  --border: rgba(255,235,245,0.10);
+  --border2: rgba(255,235,245,0.20);
+  --text: #fbeef5;
+  --dim: #c3a8b6;
+  --faint: #93707f;
+  --gold: #ff9e6d;
+  --gold-dim: rgba(255,158,109,0.15);
+  --blue: #7fd1c1;
+  --blue-dim: rgba(127,209,193,0.15);
+  --coral: #ff6b8a;
+  --coral-dim: rgba(255,107,138,0.15);
+  --emerald: #ffe066;
+  --emerald-dim: rgba(255,224,102,0.14);
+  --shadow: 0 12px 36px rgba(0,0,0,0.52);
+}
+[data-theme="light"] {
+  --bg: #fdf6fa;
+  --surface: #ffffff;
+  --surface2: #fdf8fb;
+  --surface3: #f6e9f1;
+  --border: rgba(60,25,45,0.12);
+  --border2: rgba(60,25,45,0.22);
+  --text: #2a1220;
+  --dim: #6f4c60;
+  --faint: #9c7b8e;
+  --gold: #c25a26;
+  --gold-dim: rgba(194,90,38,0.12);
+  --blue: #227f6f;
+  --blue-dim: rgba(34,127,111,0.12);
+  --coral: #c02c50;
+  --coral-dim: rgba(192,44,80,0.12);
+  --emerald: #96700a;
+  --emerald-dim: rgba(150,112,10,0.14);
+  --shadow: 0 12px 30px rgba(70,30,55,0.14);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  font-size: 16px; line-height: 1.72;
+  overflow-wrap: break-word;
+  padding-bottom: 150px;
+  background-image:
+    radial-gradient(ellipse 900px 420px at 75% -90px, var(--gold-dim), transparent 62%),
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: auto, 44px 44px, 44px 44px;
+}
+body.audio-off { padding-bottom: 44px; }
+::selection { background: var(--gold-dim); }
+
+/* ================= LAYOUT ================= */
+.wrap { max-width: 1460px; margin: 0 auto; display: grid; grid-template-columns: 232px minmax(0,1fr); gap: 0 54px; padding: 0 30px; position: relative; z-index: 1; }
+.main { min-width: 0; padding: 26px 0 70px; }
+body.noside .toc { display: none !important; }
+body.noside .wrap { grid-template-columns: minmax(0,1fr); }
+body.noside .main { max-width: 1180px; margin: 0 auto; }
+
+/* ================= TOC ================= */
+.toc { position: sticky; top: 22px; align-self: start; max-height: calc(100dvh - 70px); overflow-y: auto; padding: 22px 0 26px; grid-row: 1 / -1; }
+.toc::-webkit-scrollbar { width: 3px; }
+.toc::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+.toc-title { font-family: 'Fira Code', monospace; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--faint); padding-bottom: 11px; margin-bottom: 9px; border-bottom: 1px solid var(--border); }
+.toc a { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; color: var(--dim); text-decoration: none; padding: 5px 10px; border-radius: 6px; border-left: 2px solid transparent; transition: all .15s; line-height: 1.45; margin-bottom: 1px; }
+.toc a .n { font-family: 'Fira Code', monospace; font-size: 10px; color: var(--faint); }
+.toc a:hover { color: var(--text); background: var(--surface); }
+.toc a.active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-dim); }
+.toc a.active .n { color: var(--gold); }
+
+/* ================= DOCK ================= */
+.dock {
+  position: sticky; top: 10px; z-index: 420;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border2); border-radius: 13px;
+  padding: 8px 12px; margin: 0 0 22px; box-shadow: var(--shadow);
+}
+.dock-timer { font-family: 'Fira Code', monospace; font-size: 22px; font-weight: 600; color: var(--gold); min-width: 76px; letter-spacing: 1px; }
+.dock-timer.warn { color: var(--coral); }
+.dock-blk { font-size: 12.5px; color: var(--dim); max-width: 270px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dock-name { font-family: 'Sora', system-ui, sans-serif; font-weight: 800; font-size: 19px; color: var(--blue); min-width: 74px; letter-spacing: .3px; }
+.dock-name.spinning { opacity: .5; }
+.dbtn { font-family: 'Fira Code', monospace; font-size: 12px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 7px 11px; transition: all .15s; }
+.dbtn:hover { border-color: var(--gold); color: var(--gold); }
+.dbtn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.dbtn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.dbtn--blue { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+.dbtn--ok { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-dim); }
+.dbtn--bad { border-color: var(--coral); color: var(--coral); background: var(--coral-dim); }
+.dock-sep { width: 1px; height: 24px; background: var(--border2); margin: 0 3px; }
+.dock-spacer { flex: 1 1 16px; min-width: 0; }
+.dock-q { display: none; margin: -12px 0 22px; border: 1px solid var(--blue); border-left: 3px solid var(--blue); border-radius: 0 0 13px 13px; background: color-mix(in srgb, var(--blue-dim) 70%, var(--surface)); padding: 14px 18px; }
+.dock-q.show { display: block; }
+.dock-q .who { font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.dock-q .dq { font-size: 15px; font-weight: 600; line-height: 1.55; }
+.dock-q .da { font-size: 13.5px; line-height: 1.65; color: var(--emerald); margin-top: 9px; display: none; }
+.dock-q .da.show { display: block; }
+@media (max-width: 1000px) {
+  .dock { top: 50px; padding: 7px 9px; gap: 6px; }
+  .dock-blk { display: none; }
+  .dock-timer { font-size: 18px; min-width: 64px; }
+  .dock-name { font-size: 16px; min-width: 56px; }
+  .dock-sep { display: none; }
+}
+.timeup-banner { position: fixed; bottom: 118px; left: 50%; transform: translate(-50%, 420%); z-index: 950; background: var(--coral); color: #240b06; font-family: 'Fira Code', monospace; font-weight: 600; font-size: 15px; letter-spacing: .8px; padding: 12px 24px; border-radius: 11px; box-shadow: 0 12px 36px rgba(0,0,0,.45); transition: transform .32s cubic-bezier(.2,.9,.3,1.4); white-space: nowrap; }
+.timeup-banner.show { transform: translate(-50%, 0); }
+@keyframes tuPulse { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+body.timeup::after { content: ''; position: fixed; inset: 0; z-index: 900; pointer-events: none; background: radial-gradient(ellipse at center, rgba(255,122,107,0.28), rgba(255,122,107,0.08) 60%, transparent 80%); animation: tuPulse .5s ease-in-out 7; }
+@keyframes tuShake { 0%,100%{transform:translateX(0)} 15%{transform:translateX(-7px)} 30%{transform:translateX(7px)} 45%{transform:translateX(-5px)} 60%{transform:translateX(5px)} 80%{transform:translateX(-3px)} }
+.dock.timeup { animation: tuShake .55s ease-in-out 4; border-color: var(--coral) !important; }
+@media (max-width: 1000px) { .timeup-banner { bottom: 170px; } }
+
+/* ================= HERO ================= */
+.hero { padding: 30px 0 6px; }
+.hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { font-family: 'Fira Code', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 12px; border-radius: 5px; border: 1px solid var(--border2); }
+.chip--gold { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+.chip--blue { color: var(--blue); border-color: var(--blue); background: var(--blue-dim); }
+.chip--em { color: var(--emerald); border-color: var(--emerald); background: var(--emerald-dim); }
+h1 { font-family: 'Sora', system-ui, sans-serif; font-weight: 800; font-size: clamp(38px, 5.2vw, 60px); line-height: 1.02; letter-spacing: -1.4px; }
+h1 em { font-style: normal; color: var(--gold); }
+.hero-sub { font-size: 17px; color: var(--dim); max-width: 62ch; margin-top: 14px; }
+.hero-hr { height: 1px; background: linear-gradient(90deg, var(--gold), transparent 72%); border: none; margin: 28px 0 0; opacity: .5; }
+
+/* ================= SECTION HEAD ================= */
+.sec { scroll-margin-top: 54px; }
+.sec-head { display: flex; align-items: center; gap: 15px; margin: 70px 0 8px; flex-wrap: wrap; }
+.sec-num { font-family: 'Fira Code', monospace; font-size: 12px; font-weight: 600; color: #1b1405; background: var(--gold); border-radius: 6px; padding: 4px 9px; letter-spacing: 1px; flex-shrink: 0; }
+h2 { font-family: 'Sora', system-ui, sans-serif; font-weight: 800; font-size: clamp(28px, 3.2vw, 38px); line-height: 1.1; letter-spacing: -0.8px; flex: 1; min-width: 200px; }
+.sec-play { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--gold); background: var(--gold-dim); color: var(--gold); font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; font-family: 'Fira Code', monospace; }
+.sec-play:hover { background: var(--gold); color: #1b1405; }
+.sec-tag { font-family: 'Fira Code', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 22px; }
+
+/* ================= READING TEXT ================= */
+.rd { font-size: 16.5px; line-height: 1.78; color: var(--text); max-width: 74ch; margin: 18px 0; padding: 4px 14px 4px 16px; border-left: 3px solid transparent; border-radius: 0 8px 8px 0; transition: background .35s, border-color .35s; }
+.rd.speaking { background: var(--gold-dim); border-left-color: var(--gold); }
+.rd b, .rd strong { color: var(--gold); font-weight: 600; }
+.rd i { color: var(--blue); font-style: normal; }
+.rd code { font-family: 'Fira Code', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 6px; border-radius: 4px; }
+
+/* ================= BOXES ================= */
+.def { background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 11px; padding: 16px 20px 14px; margin: 22px 0; max-width: 78ch; }
+.def-label { font-family: 'Fira Code', monospace; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 7px; }
+.def p { font-size: 15.5px; line-height: 1.66; }
+.def p b { color: var(--gold); }
+.memo { background: linear-gradient(150deg, var(--emerald-dim), var(--surface) 60%); border: 1px solid var(--emerald); border-left: 4px solid var(--emerald); border-radius: 11px; padding: 15px 19px; margin: 22px 0; max-width: 78ch; }
+.memo-label { font-family: 'Fira Code', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--emerald); display: block; margin-bottom: 7px; }
+.memo p, .memo li { font-size: 14.5px; line-height: 1.68; }
+.memo b { color: var(--emerald); }
+.memo ul, .memo ol { padding-left: 1.25em; }
+.callout { border-radius: 11px; padding: 14px 18px; margin: 22px 0; max-width: 78ch; font-size: 15px; line-height: 1.66; border: 1px solid var(--coral); background: var(--coral-dim); }
+.callout b { color: var(--coral); }
+.callout--info { border-color: var(--blue); background: var(--blue-dim); }
+.callout--info b { color: var(--blue); }
+
+/* ================= CARDS ================= */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(252px,1fr)); gap: 14px; margin: 22px 0; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(212px,1fr)); gap: 14px; margin: 22px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 16px 18px; min-width: 0; }
+.card h4 { font-family: 'Fira Code', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 9px; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+.card h4::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.card p, .card li { font-size: 14px; line-height: 1.62; color: var(--dim); }
+.card p b, .card li b { color: var(--text); }
+.card ul { padding-left: 1.2em; }
+.card--blue h4 { color: var(--blue); }
+.card--em h4 { color: var(--emerald); }
+.card--coral h4 { color: var(--coral); }
+
+/* ================= DIAGRAM ================= */
+.diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 22px 20px 18px; margin: 24px 0; overflow-x: auto; }
+.d-cap { font-family: 'Fira Code', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.4px; text-transform: uppercase; color: var(--faint); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.d-cap::before { content: ''; width: 7px; height: 7px; background: var(--gold); border-radius: 50%; }
+.memrow { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+.memcol { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.idx { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--blue); }
+.cell { min-width: 62px; padding: 13px 10px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 7px; font-family: 'Fira Code', monospace; font-size: 15px; font-weight: 600; }
+.cell--hl { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.cell--zero { color: var(--faint); opacity: .55; }
+.addr { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--faint); }
+.d-note { margin-top: 16px; font-size: 13.5px; color: var(--dim); line-height: 1.62; border-top: 1px dashed var(--border2); padding-top: 12px; }
+.d-note b { color: var(--gold); }
+.d-note code { font-family: 'Fira Code', monospace; color: var(--blue); font-size: .9em; }
+.formula { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-family: 'Fira Code', monospace; font-size: 14.5px; color: var(--gold); overflow-x: auto; line-height: 1.7; max-width: 78ch; }
+.formula small { display: block; color: var(--faint); font-size: 12px; margin-top: 6px; line-height: 1.6; }
+.formula .k { color: var(--blue); }
+
+/* ================= TABLES ================= */
+.table-wrap { border: 1px solid var(--border); border-radius: 13px; overflow: hidden; margin: 22px 0; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.55; }
+.data-table thead { position: sticky; top: 0; z-index: 2; }
+.data-table th { background: var(--surface3); font-family: 'Fira Code', monospace; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.3px; color: var(--dim); text-align: left; padding: 11px 15px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.data-table td { padding: 11px 15px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.data-table tbody tr:nth-child(even) { background: var(--surface2); }
+.data-table tbody tr:hover { background: var(--gold-dim); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table td b { color: var(--gold); }
+.data-table td code { font-family: 'Fira Code', monospace; font-size: 12px; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+.data-table td.num, .data-table th.num { text-align: right; font-family: 'Fira Code', monospace; font-variant-numeric: tabular-nums; }
+
+/* ================= CODE ================= */
+.code-block { font-family: 'Fira Code', monospace; font-size: 13px; line-height: 1.62; background: #0c1424; border: 1px solid var(--border2); border-left: 3px solid var(--gold); border-radius: 10px; padding: 16px 18px; margin: 20px 0; overflow-x: auto; white-space: pre-wrap; word-break: break-word; color: #dfe7f5; max-width: 78ch; }
+[data-theme="light"] .code-block { background: #f3f6fc; color: #1a2436; }
+.code-block .cm { color: #6b7a99; }
+.code-block .kw { color: #6fb3e0; }
+.code-block .st { color: #e8b44a; }
+.code-block .fn { color: #3fc9a0; }
+
+/* ================= COMPARE ================= */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+.cmp-card { border: 1px solid var(--border2); border-radius: 12px; overflow: hidden; min-width: 0; background: var(--surface); }
+.cmp-card h5 { font-family: 'Fira Code', monospace; font-size: 11.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 18px; }
+.cmp-card--a h5 { background: var(--blue-dim); color: var(--blue); border-bottom: 2px solid var(--blue); }
+.cmp-card--b h5 { background: var(--emerald-dim); color: var(--emerald); border-bottom: 2px solid var(--emerald); }
+.cmp-card ul { list-style: none; padding: 14px 18px; }
+.cmp-card li { font-size: 13.5px; line-height: 1.62; color: var(--dim); padding: 4px 0 4px 16px; position: relative; }
+.cmp-card li::before { content: '›'; position: absolute; left: 0; color: var(--faint); font-weight: 700; }
+.cmp-card li b { color: var(--text); }
+@media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
+
+/* ================= Q&A ================= */
+.qa { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin: 18px 0; overflow: hidden; }
+.qa summary { padding: 16px 20px; cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: 15.5px; font-weight: 600; }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary:hover { background: var(--surface2); }
+.qa summary::after { content: '+'; font-family: 'Fira Code', monospace; color: var(--gold); margin-left: auto; font-size: 17px; }
+.qa[open] summary::after { content: '−'; }
+.mark { font-family: 'Fira Code', monospace; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 5px; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
+.mark--2 { background: var(--blue-dim); color: var(--blue); }
+.mark--5 { background: var(--gold-dim); color: var(--gold); }
+.mark--10 { background: var(--coral-dim); color: var(--coral); }
+.qa-body { padding: 4px 20px 18px; border-top: 1px solid var(--border); }
+.qa-body p { font-size: 14.5px; line-height: 1.72; color: var(--dim); margin: 12px 0; max-width: 78ch; }
+.qa-body p b { color: var(--text); }
+.qa-body code { font-family: 'Fira Code', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+
+/* ================= SUMMARY / EXAM ================= */
+.one-liners { counter-reset: ol; display: grid; gap: 9px; margin: 22px 0; max-width: 84ch; }
+.one-liners li { list-style: none; counter-increment: ol; position: relative; padding: 9px 14px 9px 46px; font-size: 14.5px; line-height: 1.62; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--dim); }
+.one-liners li::before { content: counter(ol, decimal-leading-zero); position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-family: 'Fira Code', monospace; font-size: 11px; font-weight: 600; color: var(--gold); }
+.one-liners li b { color: var(--text); }
+.defgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(292px,1fr)); gap: 14px; margin: 24px 0; }
+.defcard { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold); border-radius: 10px; padding: 15px 17px; min-width: 0; }
+.defcard h6 { font-family: 'Fira Code', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
+.defcard p { font-size: 13.5px; line-height: 1.62; color: var(--dim); }
+.defcard p b { color: var(--text); }
+
+/* ================= SIM SHELL ================= */
+.sim { border: 1px solid var(--gold); border-radius: 13px; overflow: hidden; margin: 26px 0; background: linear-gradient(165deg, var(--gold-dim), var(--surface) 42%); }
+.sim-head { padding: 13px 20px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface2); }
+.sim-head b { font-family: 'Fira Code', monospace; font-size: 12px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold); }
+.sim-head span { font-size: 12.5px; color: var(--faint); }
+.sim-body { padding: 20px; }
+.sim-controls { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+.sim-controls label { font-family: 'Fira Code', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; flex-wrap: wrap; }
+.btn { font-family: 'Fira Code', monospace; font-size: 12px; font-weight: 500; padding: 8px 15px; border-radius: 7px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); transition: all .15s; }
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.btn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.btn--ok { border-color: var(--emerald) !important; background: var(--emerald-dim) !important; color: var(--emerald) !important; }
+.btn--bad { border-color: var(--coral) !important; background: var(--coral-dim) !important; color: var(--coral) !important; }
+.btn--warn { border-color: var(--coral); color: var(--coral); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.sim input, .sim select { font-family: 'Fira Code', monospace; font-size: 13px; background: var(--surface); border: 1px solid var(--border2); color: var(--text); border-radius: 7px; padding: 8px 10px; width: 92px; }
+.sim select { width: auto; max-width: 100%; }
+.sim input:focus, .sim select:focus { outline: none; border-color: var(--gold); }
+.sim-steps { font-family: 'Fira Code', monospace; font-size: 13px; line-height: 1.9; background: var(--surface); border: 1px dashed var(--border2); border-radius: 8px; padding: 14px 18px; margin-top: 16px; color: var(--dim); min-height: 20px; }
+.sim-steps b { color: var(--gold); font-weight: 600; }
+.sim-msg { font-size: 13.5px; margin-top: 12px; color: var(--dim); }
+.sim-msg b { color: var(--gold); }
+
+/* ================= NEW VIZ: SEARCH BEAM ================= */
+.beam-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.beam-cell { min-width: 54px; padding: 13px 6px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 15px; font-weight: 600; transition: all .22s; position: relative; }
+.beam-cell .tag { display: block; font-size: 9px; font-weight: 500; letter-spacing: 1px; color: var(--faint); margin-top: 4px; }
+.beam-cell.scan { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); box-shadow: 0 0 0 3px var(--blue-dim); }
+.beam-cell.out { opacity: .26; }
+.beam-cell.mid { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.beam-cell.hit { border-color: var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.beam-meter { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-family: 'Fira Code', monospace; font-size: 12.5px; color: var(--dim); }
+.beam-meter b { color: var(--gold); }
+
+/* ================= NEW VIZ: HASH BUCKETS ================= */
+.buckets { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+.bk-row { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.bk-idx { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--faint); min-width: 46px; text-align: right; }
+.bk-slot { flex: 1; min-width: 0; border: 1px solid var(--border2); border-radius: 7px; padding: 7px 10px; background: var(--surface3); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-family: 'Fira Code', monospace; font-size: 13px; transition: all .25s; }
+.bk-slot.new { border-color: var(--gold); background: var(--gold-dim); }
+.bk-slot.coll { border-color: var(--coral); background: var(--coral-dim); }
+.bk-key { border-radius: 5px; padding: 2px 9px; font-size: 12px; border: 1px solid var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.bk-key.probe { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.bk-empty { color: var(--faint); font-size: 12px; }
+.lf-meter { height: 10px; border-radius: 6px; background: var(--surface3); border: 1px solid var(--border2); overflow: hidden; margin-top: 8px; }
+.lf-fill { height: 100%; background: linear-gradient(90deg, var(--emerald), var(--gold)); transition: width .3s; }
+
+/* ================= NEW VIZ: SORT RACE ================= */
+.race { display: flex; flex-direction: column; gap: 14px; }
+.lane { border: 1px solid var(--border2); border-radius: 11px; padding: 12px 14px; background: var(--surface2); }
+.lane.done { border-color: var(--emerald); }
+.lane__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 9px; }
+.lane__name { font-family: 'Fira Code', monospace; font-size: 12px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--blue); }
+.lane__meta { font-family: 'Fira Code', monospace; font-size: 11.5px; color: var(--dim); }
+.lane__meta b { color: var(--gold); }
+.lane.done .lane__name { color: var(--emerald); }
+.lane__bars { display: flex; align-items: flex-end; gap: 4px; height: 78px; }
+.lane__bar { flex: 1 1 0; min-width: 6px; background: var(--surface3); border: 1px solid var(--border2); border-radius: 3px 3px 0 0; transition: height .18s ease, background .15s ease; }
+.lane__bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.lane__bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.lane__bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+
+/* ================= NEW VIZ: SORT STEPPER (code sync) ================= */
+.step-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 860px) { .step-grid { grid-template-columns: 1fr; } }
+.step-bars { display: flex; align-items: flex-end; gap: 5px; height: 170px; padding: 22px 2px 0; }
+.step-bar { flex: 1 1 0; max-width: 58px; min-width: 12px; background: var(--surface3); border: 1px solid var(--border2); border-bottom: none; border-radius: 5px 5px 0 0; position: relative; transition: height .2s, background .18s, border-color .18s; }
+.step-bar i { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-family: 'Fira Code', monospace; font-size: 10px; font-style: normal; color: var(--dim); }
+.step-bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.step-bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.step-bar.piv { background: var(--coral-dim); border-color: var(--coral); }
+.step-bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+.step-code { font-family: 'Fira Code', monospace; font-size: 12.5px; line-height: 1.8; background: #0c1424; border: 1px solid var(--border2); border-radius: 10px; padding: 12px 14px; overflow-x: auto; }
+[data-theme="light"] .step-code { background: #f3f6fc; }
+.step-code .ln { display: block; padding: 1px 8px; border-radius: 5px; border-left: 3px solid transparent; white-space: pre; color: #93a3bd; }
+[data-theme="light"] .step-code .ln { color: #5a6b86; }
+.step-code .ln.on { background: var(--gold-dim); border-left-color: var(--gold); color: var(--text); }
+.step-code .ln b { color: var(--blue); font-weight: 600; }
+.step-vars { display: flex; gap: 9px; flex-wrap: wrap; margin: 12px 0 0; }
+.step-vars div { font-family: 'Fira Code', monospace; font-size: 12.5px; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border2); background: var(--surface3); color: var(--dim); }
+.step-vars div b { color: var(--gold); font-size: 14px; }
+.step-vars div.chg { border-color: var(--gold); background: var(--gold-dim); }
+.step-vars div.chg b { color: var(--gold); }
+
+/* ================= CHART ================= */
+.chart-card { border: 1px solid var(--border2); border-radius: 13px; background: var(--surface); padding: 16px 16px 14px; margin: 22px 0; }
+.chart-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.chart-card__head b { font-family: 'Fira Code', monospace; font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+.chart-card__head .sim-controls { margin: 0; }
+.chart-wrap { position: relative; width: 100%; height: 320px; }
+.chart-wrap canvas { width: 100%; height: 100%; display: block; }
+@media (max-width: 620px) { .chart-wrap { height: 250px; } }
+.chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-family: 'Fira Code', monospace; font-size: 11px; color: var(--dim); }
+.chart-legend span { display: flex; align-items: center; gap: 6px; }
+.chart-legend em { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+.chart-note { font-size: 13px; color: var(--faint); margin-top: 10px; line-height: 1.6; }
+
+/* ================= SCORE ROUND ================= */
+.score-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.score-tbl th { font-family: 'Fira Code', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.score-tbl td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+.score-tbl td b { color: var(--gold); }
+.score-tbl td.num { text-align: right; font-family: 'Fira Code', monospace; }
+.score-tbl tr.top td { background: var(--gold-dim); }
+.spin-q { border: 1px solid var(--blue); border-radius: 12px; background: var(--surface2); padding: 16px 18px; margin-top: 16px; text-align: left; }
+.spin-q .who { font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.spin-q .qtext { font-size: 16px; font-weight: 600; line-height: 1.55; }
+.spin-q .qans { font-size: 14px; line-height: 1.65; color: var(--emerald); margin-top: 10px; display: none; border-top: 1px dashed var(--border2); padding-top: 10px; }
+.spin-q .qans.show { display: block; }
+.picker-name { font-family: 'Sora', system-ui, sans-serif; font-weight: 800; font-size: 50px; line-height: 1.1; color: var(--blue); min-height: 58px; }
+.picker-name.spinning { opacity: .5; }
+.result-overlay { position: fixed; inset: 0; z-index: 960; background: rgba(6,10,20,.88); backdrop-filter: blur(7px); display: none; align-items: center; justify-content: center; padding: 22px; }
+.result-overlay.show { display: flex; }
+.result-card { background: var(--surface); border: 2px solid var(--gold); border-radius: 16px; padding: 26px 30px; max-width: 660px; width: 100%; max-height: 88vh; overflow: auto; box-shadow: 0 22px 60px rgba(0,0,0,.5); }
+.result-card h3 { font-family: 'Sora', system-ui, sans-serif; font-weight: 800; font-size: 32px; color: var(--gold); margin-bottom: 4px; }
+.result-card .sub { color: var(--dim); font-size: 14px; margin-bottom: 18px; }
+.result-card .win { font-size: 15px; margin: 16px 0; padding: 12px 16px; border-radius: 10px; background: var(--emerald-dim); border: 1px solid var(--emerald); }
+.result-card .win b { color: var(--emerald); }
+.chk { display: flex; gap: 11px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); margin-bottom: 7px; cursor: pointer; }
+.chk input { margin-top: 3px; accent-color: var(--gold); width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
+.chk span { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.chk.on { border-color: var(--gold); background: var(--gold-dim); }
+.chk.on span { color: var(--text); }
+.blk { display: flex; gap: 12px; align-items: flex-start; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; cursor: pointer; transition: all .15s; }
+.blk:hover { border-color: var(--gold); }
+.blk.on { border-color: var(--gold); background: var(--gold-dim); box-shadow: 0 0 0 1px var(--gold); }
+.blk .t { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--blue); min-width: 58px; flex-shrink: 0; }
+.blk .d { font-size: 13.5px; line-height: 1.5; color: var(--dim); min-width: 0; }
+.blk .d b { color: var(--text); display: block; font-size: 14.5px; }
+.timer-big { font-family: 'Fira Code', monospace; font-size: 58px; font-weight: 600; letter-spacing: 2px; color: var(--gold); line-height: 1; }
+.timer-big.warn { color: var(--coral); }
+
+/* ================= PLAYER (chhupa hua by default) ================= */
+.player {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border2); padding: 10px 18px 12px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  transition: transform .32s ease, opacity .32s ease;
+}
+body.audio-off .player { transform: translateY(115%); opacity: 0; pointer-events: none; }
+body.audio-off .sec-play { display: none; }
+.pbtn { font-family: 'Fira Code', monospace; font-size: 13px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 8px 12px; transition: all .15s; min-width: 42px; text-align: center; }
+.pbtn:hover { border-color: var(--gold); color: var(--gold); }
+.pbtn--main { width: 52px; height: 52px; border-radius: 50%; font-size: 17px; background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 700; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+.player select { font-family: 'Fira Code', monospace; font-size: 12px; background: var(--surface3); color: var(--text); border: 1px solid var(--border2); border-radius: 7px; padding: 7px 8px; max-width: 100%; }
+.p-meta { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 2px; }
+.p-now { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice { font-family: 'Fira Code', monospace; font-size: 10.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice .on { color: var(--emerald); }
+.p-voice .off { color: var(--coral); }
+
+/* ================= THEME TOGGLE ================= */
+.theme-toggle { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); cursor: pointer; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+[data-theme="dark"] .tt-sun { display: block; } [data-theme="dark"] .tt-moon { display: none; }
+[data-theme="light"] .tt-sun { display: none; } [data-theme="light"] .tt-moon { display: block; }
+
+/* ================= FOOTER ================= */
+.foot { margin-top: 80px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--faint); font-size: 12.5px; font-family: 'Fira Code', monospace; letter-spacing: .5px; }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1000px) {
+  .wrap { grid-template-columns: 1fr; padding: 0 18px; }
+  .toc { position: sticky; top: 0; z-index: 300; grid-row: auto; display: flex; gap: 6px; align-items: center; overflow-x: auto; -webkit-overflow-scrolling: touch; background: color-mix(in srgb, var(--bg) 93%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); margin: 0 -18px; padding: 10px 60px 10px 18px; max-height: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc-title { display: none; }
+  .toc a { white-space: nowrap; flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; border-radius: 5px; padding: 6px 11px; font-size: 11.5px; }
+  .toc a.active { border-bottom-color: var(--gold); background: var(--gold-dim); }
+  .main { padding-top: 20px; }
+  .sec-head { margin-top: 54px; }
+  .player { gap: 8px; padding: 10px 14px; }
+  .p-meta { min-width: 100%; order: 5; }
+  body.audio-off .player { transform: translateY(130%); }
+}
+@media (max-width: 480px) {
+  .memrow { gap: 4px; }
+  .cell { min-width: 50px; padding: 11px 6px; font-size: 13px; }
+  .rd { font-size: 15.5px; }
+  .beam-cell { min-width: 46px; font-size: 13px; padding: 10px 4px; }
+  .timer-big { font-size: 42px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } html { scroll-behavior: auto; } }
+
+/* ================= NEON PEN ================= */
+#penCanvas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 380; pointer-events: none; touch-action: none;
+}
+body.pen-on #penCanvas { pointer-events: auto; cursor: crosshair; }
+body.pen-on { user-select: none; -webkit-user-select: none; }
+.pen-bar {
+  position: fixed; left: 50%; bottom: 14px; transform: translate(-50%, 150%);
+  z-index: 470; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--gold); border-radius: 13px; padding: 9px 12px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.5); transition: transform .28s ease;
+  max-width: calc(100vw - 24px);
+}
+body.pen-on .pen-bar { transform: translate(-50%, 0); }
+.pen-bar .sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); cursor: pointer; flex-shrink: 0; transition: transform .15s; }
+.pen-bar .sw:hover { transform: scale(1.12); }
+.pen-bar .sw.sel { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 0 14px currentColor; }
+.pen-bar .pbtn2 {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; cursor: pointer;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--text);
+  border-radius: 8px; padding: 6px 10px; transition: all .15s;
+}
+.pen-bar .pbtn2:hover { border-color: var(--gold); color: var(--gold); }
+.pen-bar .pbtn2.on { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.pen-hint {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--faint);
+  letter-spacing: .4px; white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .pen-bar { gap: 6px; padding: 8px 10px; bottom: 10px; }
+  .pen-bar .sw { width: 22px; height: 22px; }
+  .pen-hint { display: none; }
+}
+/* lean class page tweaks */
+.board-tbl td { height: 34px; }
+.board-tbl td.blank { background: color-mix(in srgb, var(--gold-dim) 45%, transparent); }
+.plan-step { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; }
+.plan-step .tm { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); min-width: 54px; flex-shrink: 0; }
+.plan-step .tx { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.plan-step .tx b { color: var(--text); display: block; font-size: 14.5px; margin-bottom: 2px; }
+
+/* mobile: banner ko viewport me rakho */
+@media (max-width: 620px) {
+  .timeup-banner { font-size: 12.5px; padding: 10px 14px; white-space: normal; max-width: 92vw; text-align: center; }
+}
+
+/* ambient canvas ko fix karo (warna wo block ban ke content dhakel deta hai) */
+#ambient { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: .62; }
+.wrap { position: relative; z-index: 1; }
+
+
+/* ================= HASH ANIMATOR ================= */
+.hk-queue { display: flex; gap: 6px; flex-wrap: wrap; min-height: 34px; margin-bottom: 10px; }
+.hk-key {
+  font-family: 'Fira Code', monospace; font-size: 12.5px; font-weight: 500;
+  padding: 5px 11px; border-radius: 7px; border: 1px solid var(--border2);
+  background: var(--surface3); color: var(--dim);
+  transition: transform .25s ease, background .25s, border-color .25s, color .25s, opacity .25s;
+}
+.hk-key.now { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); transform: translateY(-3px) scale(1.06); box-shadow: 0 4px 14px rgba(255,158,109,.25); }
+.hk-key.done { opacity: .3; }
+.hk-calc { font-family: 'Fira Code', monospace; font-size: 13.5px; color: var(--blue); min-height: 24px; margin-bottom: 12px; line-height: 1.5; }
+.hk-calc b { color: var(--gold); }
+.bk-slot { transition: border-color .25s, background .25s, box-shadow .25s, transform .2s; }
+.bk-slot.target { border-color: var(--gold); background: var(--gold-dim); box-shadow: 0 0 0 3px var(--gold-dim); }
+.bk-slot.coll { border-color: var(--coral); background: var(--coral-dim); box-shadow: 0 0 0 3px var(--coral-dim); }
+.bk-key.drop { animation: dropIn .4s cubic-bezier(.2,.9,.3,1.3); }
+@keyframes dropIn { 0% { transform: translateY(-16px) scale(.7); opacity: 0; } 60% { transform: translateY(2px) scale(1.06); opacity: 1; } 100% { transform: translateY(0) scale(1); } }
+
+/* ================= STEPPER BUMP ================= */
+.step-bar { transition: height .26s ease, background .18s, border-color .18s, transform .22s ease; }
+.step-bar.bump { transform: translateY(-10px) scale(1.04); }
+
+/* ================= CODE COLOURS (plum palette) ================= */
+.code-block { background: #1a0f16; color: #fbeef5; }
+[data-theme="light"] .code-block { background: #fdf8fb; color: #2a1220; }
+.code-block .cm { color: #93707f; }
+.code-block .kw { color: #7fd1c1; }
+.code-block .fn { color: #ffe066; }
+.code-block .st { color: #ff9e6d; }
+.step-code { background: #1a0f16; }
+[data-theme="light"] .step-code { background: #fdf8fb; }
+.step-code .ln { color: #b393a2; }
+[data-theme="light"] .step-code .ln { color: #6f4c60; }
+.step-code .ln.on { background: var(--gold-dim); border-left-color: var(--gold); color: var(--text); }
+.step-code .ln b { color: var(--blue); }
+
+/* headings + anchors */
+h1, h2, h3 { font-family: 'Sora', system-ui, sans-serif; letter-spacing: -0.4px; }
+h1 em { font-style: normal; color: var(--gold); }
+.sec { scroll-margin-top: 120px; }
+@media (max-width: 1000px) { .sec { scroll-margin-top: 140px; } }
+.picker-name { font-family: 'Sora', system-ui, sans-serif; font-weight: 800; }
+
+/* code blocks: wrap with smaller font so comments fit */
+.code-block { white-space: pre-wrap; word-break: break-word; font-size: 12.3px; max-width: 100%; }
+
+</style>
+</head>
+<body class="audio-off">
+<canvas id="ambient" aria-hidden="true"></canvas>
+
+<div class="wrap">
+<canvas id="penCanvas" aria-hidden="true"></canvas>
+
+<nav class="toc" id="toc">
+  <div class="toc-title">SESSION 2 · 30 MIN</div>
+  <a href="#s0"><span class="n">00</span>Aaj ka plan</a>
+  <a href="#s1"><span class="n">01</span>Hashing</a>
+  <a href="#s2"><span class="n">02</span>Selection sort</a>
+  <a href="#s3"><span class="n">03</span>Insertion sort</a>
+  <a href="#s4"><span class="n">04</span>Question round</a>
+  <a href="#s5"><span class="n">05</span>Homework</a>
+</nav>
+
+<div class="main">
+
+<div class="dock" id="dock">
+  <span class="dock-timer" id="dkTimer">30:00</span>
+  <button class="dbtn dbtn--go" id="dkStart" title="Timer — ek baar chalao, khud chalta rahega">▶</button>
+  <button class="dbtn" id="dkNext" title="Agla block">⏭</button>
+  <span class="dock-blk" id="dkBlk">Block select karo (neeche plan se)</span>
+  <span class="dock-sep"></span>
+  <button class="dbtn dbtn--blue" id="dkSpin" title="Student + sawaal">🎯 SPIN</button>
+  <span class="dock-name" id="dkName">—</span>
+  <button class="dbtn dbtn--ok" id="dkOk" title="Sahi jawab">✓</button>
+  <button class="dbtn dbtn--bad" id="dkBad" title="Galat jawab">✕</button>
+  <span class="dock-sep"></span>
+  <button class="dbtn" id="dkPen" title="Neon pen on / off">✏️ PEN</button>
+  <span class="dock-spacer"></span>
+  <button class="dbtn" id="dkSide" title="Sidebar chhupao / dikhao">⇤ SIDEBAR</button>
+  <button class="dbtn" id="dkAudio" title="Audio player dikhao / chhupao">🎧 AUDIO</button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Theme toggle" title="Theme badlo"><span class="tt-sun">☀</span><span class="tt-moon">☾</span></button>
+</div>
+
+<div class="dock-q" id="dkQCard">
+  <div class="who" id="dkQWho"></div>
+  <div class="dq" id="dkQText"></div>
+  <div class="da" id="dkQAns"></div>
+  <div class="sim-controls" style="margin-top:12px">
+    <button class="btn btn--go" id="dkQShow">Jawab dekho</button>
+    <button class="btn btn--ok" id="dkQOk">✓ Sahi</button>
+    <button class="btn btn--bad" id="dkQBad">✕ Galat</button>
+    <button class="btn" id="dkQNext">🎲 Agla</button>
+    <button class="btn btn--warn" id="dkQClose">Band</button>
+  </div>
+</div>
+
+<div class="pen-bar" id="penBar">
+  <span class="pen-hint">NEON PEN</span>
+  <span class="sw sel" data-c="#ffe066" style="background:#ffe066;color:#ffe066"></span>
+  <span class="sw" data-c="#7fd1c1" style="background:#7fd1c1;color:#7fd1c1"></span>
+  <span class="sw" data-c="#ff9e6d" style="background:#ff9e6d;color:#ff9e6d"></span>
+  <span class="sw" data-c="#ff6b8a" style="background:#ff6b8a;color:#ff6b8a"></span>
+  <span class="sw" data-c="#a8c6ff" style="background:#a8c6ff;color:#a8c6ff"></span>
+  <button class="pbtn2" id="penThin" title="Patli">thin</button>
+  <button class="pbtn2 on" id="penMed" title="Medium">med</button>
+  <button class="pbtn2" id="penThick" title="Moti">thick</button>
+  <button class="pbtn2" id="penErase" title="Eraser">eraser</button>
+  <button class="pbtn2" id="penUndo" title="Last line hatao">undo</button>
+  <button class="pbtn2" id="penClear" title="Sab mitao">clear</button>
+  <span class="pen-hint" style="color:var(--gold)">likha hua page ke saath scroll hota hai ✓</span>
+</div>
+
+<header class="hero">
+  <div class="hero-badges">
+    <span class="chip chip--gold">UNIT 3 · SESSION 2</span>
+    <span class="chip chip--blue">30 MIN · HASHING + SELECTION + INSERTION</span>
+    <span class="chip chip--em">EVERY LINE COMMENTED</span>
+  </div>
+  <h1>Aaj: <em>seat</em> nikalna, phir <em>sort</em> karna</h1>
+  <p class="hero-sub">Hashing (formula se seat, collision), phir do aasaan sorting. Naya animation: <b>key chalti hui apni seat tak</b>. Har code line pe comment, aur neeche <b>ek hi question round — 23 sawaal</b>.</p>
+  <hr class="hero-hr">
+</header>
+
+<!-- ============================================================ S0 -->
+<section class="sec" id="s0">
+  <div class="sec-head">
+    <span class="sec-num">00</span>
+    <h2>Aaj ka plan — 30 minute</h2>
+  </div>
+  <p class="sec-tag">Block pe click karo → timer set → START (phir khud chalta rahega)</p>
+
+  <div class="grid2" style="align-items:start">
+    <div id="planSteps"></div>
+    <div>
+      <div style="border:1px solid var(--border2);border-radius:14px;background:linear-gradient(160deg,var(--gold-dim),var(--surface) 55%);padding:20px 16px;text-align:center">
+        <div class="timer-big" id="tkTimer">30:00</div>
+        <div style="font-family:'Fira Code',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:2px;color:var(--faint);margin-top:8px">BAACHA HUA TIME</div>
+        <div style="font-size:14px;font-weight:600;margin-top:10px;min-height:20px" id="tkBlkName">Block select karo →</div>
+        <div class="sim-controls" style="justify-content:center;margin-top:16px">
+          <button class="btn btn--go" id="tkStart">▶ START</button>
+          <button class="btn" id="tkNext">⏭ NEXT</button>
+          <button class="btn btn--warn" id="tkReset">■ RESET</button>
+        </div>
+        <div class="sim-msg" id="tkNote" style="margin-top:12px;font-size:12.5px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Recall (30 second):</b> "Binary search ke liye kya chahiye tha?" → <b>sorted array</b>. "Aur agar sorted hi na ho?" → linear, jo slow hai. Aaj: <b>hashing</b> (bina compare, O(1)) aur do <b>sorting</b> jo data ko order me laate hain.
+  </div>
+</section>
+
+<!-- ============================================================ S1 -->
+<section class="sec" id="s1">
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <h2>Hashing — formula se seat</h2>
+  </div>
+  <p class="sec-tag">h(k) = k mod m · collision · chaining · probing · load factor</p>
+
+  <p class="rd" data-dev="हैशिंग को सीट के फॉर्मूले से समझो। क्लास में हर छात्र की एक तय सीट होती है। रोल नंबर आया तो फॉर्मूला लगाया, सीट नंबर मिला, सीधे वहाँ चले गए। कोई नाम चेक नहीं करना। यही हैशिंग है।"><b>Analogy — class ki tay seat.</b> Har student ki seat pehle se fix hai. Roll 23 aaya? Formula lagao → seat number → <b>seedha wahan jao</b>. Ek bhi naam check nahi karna. <b>Yahi hashing hai.</b></p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — SCREEN PE LIKHO</span>
+    <p><b>Hashing:</b> Mapping keys to positions of a hash table using a hash function <b>h(k)</b>, giving near-constant-time search. <b>Collision</b> = two keys mapping to the same index. <b>Load factor</b> α = n/m (ideal 0.5–0.75).</p>
+  </div>
+
+  <div class="formula">h(k) = k mod m
+    <small>k = key · m = table size · mod = remainder — <span class="k">remainder hi seat number hai</span>. m = 10 → seats 0 se 9.</small>
+  </div>
+
+  <div class="sim" id="hashSim">
+    <div class="sim-head"><b>⚡ KEY → SEAT ANIMATION</b><span>— har key apni seat tak chalti hui, collision pe flash</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <label>KEYS <input id="hkKeys" style="width:170px" value="23,12,45,33,9,67,3"></label>
+        <label>m <input id="hkM" type="number" value="10" min="3" max="17"></label>
+        <label>METHOD <select id="hkMethod">
+          <option value="chain">Chaining</option>
+          <option value="linear" selected>Linear Probing</option>
+          <option value="quad">Quadratic</option>
+          <option value="double">Double Hashing</option>
+        </select></label>
+        <button class="btn btn--go" id="hkGo">▶ AUTO INSERT</button>
+        <button class="btn" id="hkStep">STEP →</button>
+        <button class="btn btn--warn" id="hkReset">RESET</button>
+      </div>
+      <div class="hk-queue" id="hkQueue"></div>
+      <div class="hk-calc" id="hkCalc">STEP dabao — pehli key se shuru karein.</div>
+      <div class="buckets" id="hkTable"></div>
+      <div style="font-family:'Fira Code',monospace;font-size:12px;color:var(--dim)">LOAD FACTOR α = <b id="hkLF" style="color:var(--gold)">0.00</b></div>
+      <div class="lf-meter"><div class="lf-fill" id="hkLFFill" style="width:0%"></div></div>
+      <div class="sim-steps" id="hkLog">Keys queue me hain — STEP se ek-ek insert hoga.</div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Sora',sans-serif;font-weight:700;font-size:23px;margin:34px 0 8px">Code — har line ka matlab (insert with linear probing)</h3>
+  <pre class="code-block"><span class="cm">/* ============ HASH TABLE: insert with LINEAR PROBING ============ */</span>
+<span class="kw">#define</span> M 10                            <span class="cm">// table ka size — 10 slots (0 se 9)</span>
+<span class="kw">int</span> table[M];                            <span class="cm">// hash table — yahan keys rahengi</span>
+<span class="kw">int</span> used[M];                             <span class="cm">// har slot bhara hai (1) ya khaali (0)</span>
+
+<span class="kw">void</span> <span class="fn">init</span>() {                           <span class="cm">// program shuru hote hi</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; M; i++)          <span class="cm">// har slot ke liye</span>
+        used[i] = 0;                     <span class="cm">// 0 = khaali mark karo</span>
+}
+
+<span class="kw">int</span> <span class="fn">hash</span>(<span class="kw">int</span> key) {                     <span class="cm">// hash function</span>
+    <span class="kw">return</span> key % M;                      <span class="cm">// remainder = seat number (0..9)</span>
+}
+
+<span class="kw">int</span> <span class="fn">insert</span>(<span class="kw">int</span> key) {                   <span class="cm">// key daalo, index lautao (-1 = full)</span>
+    <span class="kw">int</span> h = <span class="fn">hash</span>(key);                   <span class="cm">// pehle GHAR (home address) nikalo</span>
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; M; i++) {          <span class="cm">// max M tries (warna infinite loop)</span>
+        <span class="kw">int</span> pos = (h + i) % M;           <span class="cm">// i=0 → ghar, i=1 → ek aage, ... (circular)</span>
+
+        <span class="kw">if</span> (!used[pos]) {                <span class="cm">// slot khaali mila?</span>
+            table[pos] = key;            <span class="cm">// → key wahan rakho</span>
+            used[pos] = 1;               <span class="cm">// → slot ko bhara mark karo</span>
+            <span class="kw">return</span> pos;                   <span class="cm">// → index lautao</span>
+        }
+        <span class="cm">// warna slot bhara hai → loop ka agla i (probe)</span>
+    }
+    <span class="kw">return</span> -1;                          <span class="cm">// table FULL — insert nahi hua</span>
+}</pre>
+
+  <div class="diagram">
+    <div class="d-cap">7 KEYS KA POORA HISAB — m = 10 · linear probing</div>
+    <div class="table-wrap" style="margin:0">
+      <div class="table-scroll"><table class="data-table">
+        <thead><tr><th>Key</th><th>h(k) = k mod 10</th><th>Final seat</th><th>Kya hua</th></tr></thead>
+        <tbody>
+          <tr><td>23</td><td>3</td><td><b>3</b></td><td>khaali tha</td></tr>
+          <tr><td>12</td><td>2</td><td><b>2</b></td><td>khaali tha</td></tr>
+          <tr><td>45</td><td>5</td><td><b>5</b></td><td>khaali tha</td></tr>
+          <tr><td>33</td><td>3</td><td><b>4</b></td><td><span style="color:var(--coral)">collision</span> → ek aage</td></tr>
+          <tr><td>9</td><td>9</td><td><b>9</b></td><td>khaali tha</td></tr>
+          <tr><td>67</td><td>7</td><td><b>7</b></td><td>khaali tha</td></tr>
+          <tr><td>3</td><td>3</td><td><b>6</b></td><td><span style="color:var(--coral)">collision</span> → 4, 5 bhare → 6</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <p class="d-note">Load factor: <b>7/10 = 0.70</b> · collisions: <b>2</b> · isi table ko pen se circle karo (jahan collision hua).</p>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Point</th><th>Chaining</th><th>Open Addressing (probing)</th></tr></thead>
+      <tbody>
+        <tr><td>Structure</td><td>seat + linked list</td><td>sirf table, andar hi adjust</td></tr>
+        <tr><td>Extra memory</td><td>pointers</td><td>nahi</td></tr>
+        <tr><td>Table full</td><td>kabhi nahi hota</td><td>ho sakta hai</td></tr>
+        <tr><td>Deletion</td><td>easy</td><td><b>tombstone</b> chahiye</td></tr>
+        <tr><td>Clustering</td><td>nahi</td><td>hoti hai (probing se)</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card card--coral">
+      <h4>3 DOUBTS — AUR JAWAB</h4>
+      <p><b>"Key m se badi ho?"</b> → 245 mod 10 = 5. Mod hamesha 0…m−1 laata hai.<br><b>"Collision galat baat?"</b> → Nahi, <b>hamesha possible</b> — isliye resolution technique hai.<br><b>"Chaining ya probing?"</b> → chaining simple (table full nahi), probing memory kam (par tombstone).</p>
+    </div>
+    <div class="card card--em">
+      <h4>LOAD FACTOR + COMPLEXITY</h4>
+      <p><b>α = n/m</b> → 7/10 = <b>0.70</b> (ideal 0.5–0.75). α &gt; 1 → <b>rehashing</b>.<br><b>Average O(1)</b> · <b>worst O(n)</b> (sab ek seat pe).</p>
+    </div>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li><b>h(k) = k mod m</b> — bas yeh ek line</li>
+      <li><b>Chaining = list per seat</b> · <b>Open addressing = agli khaali seat</b></li>
+      <li><b>α = n/m</b> 0.75 se neeche · average <b>O(1)</b></li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <b>Exam pointer (5 marks):</b> "What is collision? How is it resolved?" → definition + <b>chaining</b> + <b>linear/quadratic/double probing</b> + load factor.
+  </div>
+</section>
+<!-- ============================================================ S2 -->
+<section class="sec" id="s2">
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <h2>Selection Sort — sabse chhota chuno</h2>
+  </div>
+  <p class="sec-tag">Minimum dhoondho, aage rakho · minimum swaps · har case O(n²)</p>
+
+  <p class="rd" data-dev="सिलेक्शन सॉर्ट को ऐसे समझो। क्लास में सबसे छोटे बच्चे को पहली कतार में खड़ा करना है। पूरी कतार में देखो, सबसे छोटा ढूँढो, और उसे पहली जगह पर खड़ा कर दो। फिर बाक़ी कतार में यही करो।"><b>Analogy — sabse chhota aage.</b> Class me sabse chhote bachche ko pehli jagah khada karna hai. Poori line dekho → sabse chhota dhoondho → <b>pehli jagah pe khada kar do</b>. Phir baaki line me wahi karo.</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — SCREEN PE LIKHO</span>
+    <p><b>Selection Sort:</b> Repeatedly selects the smallest element from the unsorted part and swaps it with the first unsorted position. <b>O(n²)</b> in all cases, O(1) space, <b>unstable</b>, performs <b>minimum swaps (n−1)</b>.</p>
+  </div>
+
+  <pre class="code-block"><span class="cm">/* ============ SELECTION SORT ============ */</span>
+<span class="kw">void</span> <span class="fn">selectionSort</span>(<span class="kw">int</span> a[], <span class="kw">int</span> n) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n - 1; i++) {      <span class="cm">// n-1 passes (aakhri element apne aap sahi)</span>
+        <span class="kw">int</span> min = i;                       <span class="cm">// maan lo i hi sabse chhota hai</span>
+
+        <span class="kw">for</span> (<span class="kw">int</span> j = i + 1; j &lt; n; j++) {  <span class="cm">// baaki unsorted hissa dekho</span>
+            <span class="kw">if</span> (a[j] &lt; a[min])             <span class="cm">// isse bhi chhota mila?</span>
+                min = j;                   <span class="cm">// → naya minimum yaad rakho</span>
+        }
+
+        <span class="kw">if</span> (min != i) {                    <span class="cm">// minimum aage hi hai? (faltu swap nahi)</span>
+            <span class="kw">int</span> t = a[i];                  <span class="cm">// swap shuru — purani value bachao</span>
+            a[i] = a[min];                 <span class="cm">// chhota element aage le aao</span>
+            a[min] = t;                    <span class="cm">// purani value peeche</span>
+        }
+    }
+}</pre>
+
+  <div class="diagram">
+    <div class="d-cap">DRY RUN — [64, 25, 12, 22, 11]</div>
+    <div style="font-family:'Fira Code',monospace;font-size:12.5px;line-height:2;color:var(--dim);overflow-x:auto;white-space:pre;min-width:470px">start:  <span style="color:var(--coral)">64</span>  25  12  22  <span style="color:var(--gold)">11</span>    min = 11 (i=4)
+pass1:  <span style="color:var(--emerald)">11</span>  25  12  22  64    64 ↔ 11 swap
+pass2:  11  <span style="color:var(--emerald)">12</span>  25  22  64    min = 12 (i=2)
+pass3:  11  12  <span style="color:var(--emerald)">22</span>  25  64    min = 22 (i=3)
+pass4:  11  12  22  <span style="color:var(--emerald)">25  64</span>   ✔ sorted</div>
+    <p class="d-note">Poochho: "pass 1 me minimum kaise mila?" (poora unsorted hissa dekha) · "kitne swaps?" (3)</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card card--coral">
+      <h4>TRAP — BEST CASE BHI O(n²)</h4>
+      <p>Array sorted ho tab bhi <b>O(n²)</b> — minimum dhoondhne ke liye <b>poora scan</b> hamesha karna padta hai.</p>
+    </div>
+    <div class="card card--em">
+      <h4>UNSTABLE KYUN?</h4>
+      <p><code>[3a, 3b, 1]</code> → min = 1, swap 3a ↔ 1 → <code>[1, 3b, 3a]</code>. <b>3a aur 3b ka order badal gaya.</b></p>
+    </div>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li><b>Selection = "sabse chhota chuno, aage rakho"</b></li>
+      <li>Har case <b>O(n²)</b> · space O(1) · <b>unstable</b> · <b>swaps sabse kam (n−1)</b></li>
+      <li>Common galti: <code>min = 0</code> likhna (sahi: <code>min = i</code>)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ S3 -->
+<section class="sec" id="s3">
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <h2>Insertion Sort — taash ke patte</h2>
+  </div>
+  <p class="sec-tag">Card uthao, sahi jagah pe daalo · nearly-sorted pe O(n)</p>
+
+  <p class="rd" data-dev="इंसर्शन सॉर्ट ताश के पत्ते जैसा है। एक-एक कार्ड उठाओ और बाईं तरफ़ के सॉर्टेड हिस्से में सही जगह पर डाल दो। जगह बनाने के लिए बड़े कार्ड एक-एक कदम दाईं तरफ़ खिसका देते हैं। अगर डेटा पहले से लगभग सॉर्टेड है तो यह बहुत तेज़ है।"><b>Analogy — taash ke patte.</b> Ek-ek card uthao aur <b>sorted hisse me sahi jagah</b> pe daal do. Jagah banane ke liye bade cards ek-ek kadam <b>shift</b> hote hain (swap nahi).</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — SCREEN PE LIKHO</span>
+    <p><b>Insertion Sort:</b> Builds the sorted array one element at a time by inserting each element into its correct position among the already sorted elements, shifting larger elements right. Best <b>O(n)</b>, average/worst O(n²), O(1) space, <b>stable</b>.</p>
+  </div>
+
+  <pre class="code-block"><span class="cm">/* ============ INSERTION SORT ============ */</span>
+<span class="kw">void</span> <span class="fn">insertionSort</span>(<span class="kw">int</span> a[], <span class="kw">int</span> n) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt; n; i++) {          <span class="cm">// i=1 se (pehla element akela sorted hai)</span>
+        <span class="kw">int</span> key = a[i];                     <span class="cm">// naya card uthaya</span>
+        <span class="kw">int</span> j = i - 1;                      <span class="cm">// uske peeche wale se compare shuru</span>
+
+        <span class="kw">while</span> (j &gt;= 0 &amp;&amp; a[j] &gt; key) {       <span class="cm">// jab tak peeche wala bada hai (aur index valid)</span>
+            a[j + 1] = a[j];               <span class="cm">// → usse ek kadam aage SHIFT karo (swap nahi)</span>
+            j--;                           <span class="cm">// → aur peeche jao</span>
+        }
+
+        a[j + 1] = key;                     <span class="cm">// khaali jagah pe key daal do (INSERT)</span>
+    }
+}</pre>
+
+  <div class="diagram">
+    <div class="d-cap">DRY RUN — [12, 11, 13, 5, 6]</div>
+    <div style="font-family:'Fira Code',monospace;font-size:12.5px;line-height:2;color:var(--dim);overflow-x:auto;white-space:pre;min-width:500px">i=1 key=11 → 12 shift → <span style="color:var(--emerald)">11 12</span> 13 5 6
+i=2 key=13 → 12 &gt; 13? nahi → 11 12 <span style="color:var(--emerald)">13</span> 5 6
+i=3 key=5  → 13,12,11 shift → <span style="color:var(--emerald)">5 11 12 13</span> 6
+i=4 key=6  → 13,12,11 shift → <span style="color:var(--emerald)">5 6 11 12 13</span>  ✔</div>
+    <p class="d-note">Poochho: "i=2 pe koi shift kyun nahi hua?" (13 pehle se sahi jagah pe tha)</p>
+  </div>
+
+  <div class="sim" id="stepSim">
+    <div class="sim-head"><b>⚡ STEPPER — selection vs insertion</b><span>— bars + code line + variables</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <label>ALGORITHM <select id="stAlgo">
+          <option value="selection" selected>Selection Sort</option>
+          <option value="insertion">Insertion Sort</option>
+        </select></label>
+        <button class="btn btn--go" id="stPlay">▶ PLAY</button>
+        <button class="btn" id="stStep">STEP →</button>
+        <button class="btn" id="stNew">NEW ARRAY</button>
+        <button class="btn btn--warn" id="stReset">RESET</button>
+      </div>
+      <div class="step-grid" style="margin-top:16px">
+        <div>
+          <div class="step-bars" id="stBars"></div>
+          <div class="step-vars" id="stVars"></div>
+        </div>
+        <div class="step-code" id="stCode"></div>
+      </div>
+      <div class="sim-steps" id="stLog">PLAY dabao — swap pe bars uchhalte dikhenge.</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Point</th><th>Selection</th><th>Insertion</th></tr></thead>
+      <tbody>
+        <tr><td>Best case</td><td>O(n²)</td><td><b>O(n)</b> (sorted data)</td></tr>
+        <tr><td>Average / Worst</td><td>O(n²)</td><td>O(n²)</td></tr>
+        <tr><td>Swaps / moves</td><td><b>minimum (n−1)</b></td><td>zyada (shifts)</td></tr>
+        <tr><td>Stable</td><td style="color:var(--coral)">✕</td><td style="color:var(--emerald)">✔</td></tr>
+        <tr><td>Kab use</td><td>swap mehnga ho</td><td>data lagbhag sorted ho</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">🧠 Yaad rakhne ka tareeka</span>
+    <ul>
+      <li><b>Insertion = taash ke patte</b> · <b>shift hota hai, swap nahi</b></li>
+      <li><code>while (j &gt;= 0 &amp;&amp; a[j] &gt; key)</code> — <b>j >= 0 pehle</b> (warna a[−1])</li>
+      <li>Nearly-sorted data pe <b>O(n)</b> — isliye real libraries chhote arrays pe isse use karti hain</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <b>Exam pointer (5 marks):</b> "Sort [12, 11, 13, 5, 6] using insertion sort — show each pass" + program. Har <code>i</code> ke baad ki array dikhana zaroori hai.
+  </div>
+</section>
+<!-- ============================================================ S4 -->
+<section class="sec" id="s4">
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <h2>Question Round — 23 sawaal</h2>
+  </div>
+  <p class="sec-tag">Ek hi jagah: spin + sawaal + ✓/✕ + scoreboard</p>
+
+  <div class="sim" style="border-color:var(--gold);background:linear-gradient(165deg,var(--gold-dim),var(--surface) 45%)">
+    <div class="sim-head" style="background:transparent;border-color:var(--border)">
+      <b>🎯 QUESTION ROUND</b>
+      <span id="qrMeta">23 sawaal · 0 poochhe · 23 bache</span>
+    </div>
+    <div class="sim-body">
+      <div class="grid2" style="align-items:start;margin-top:0">
+        <div style="text-align:center">
+          <div class="picker-name" id="qrName">—</div>
+          <div class="sim-controls" style="justify-content:center;margin-top:14px">
+            <button class="btn btn--go" id="qrSpin" style="font-size:14px;padding:11px 26px">🎯 SPIN — naam + sawaal</button>
+            <button class="btn btn--ok" id="qrOk">✓ Sahi</button>
+            <button class="btn btn--bad" id="qrBad">✕ Galat</button>
+            <button class="btn btn--warn" id="qrSkip">↻ Skip</button>
+          </div>
+          <div class="sim-msg" id="qrMsg" style="margin-top:12px">SPIN dabao — naam aur sawaal dono aayenge.</div>
+        </div>
+        <div>
+          <div style="border:1px solid var(--blue);border-radius:12px;background:var(--surface2);padding:16px 18px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+              <span class="chip chip--blue" id="qrCount">SAWAAL —</span>
+              <span class="chip chip--em" id="qrTopic">TOPIC</span>
+            </div>
+            <div id="qrText" style="font-size:16px;font-weight:600;line-height:1.55;min-height:54px">Sawaal yahan aayega.</div>
+            <div id="qrAns" style="font-size:14px;color:var(--emerald);border-top:1px dashed var(--border2);padding-top:11px;margin-top:11px;display:none"></div>
+            <div class="sim-controls" style="margin-top:12px">
+              <button class="btn btn--go" id="qrShow">Jawab dekho</button>
+            </div>
+          </div>
+          <div class="lf-meter" style="margin-top:14px"><div class="lf-fill" id="qrBar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="sim-controls">
+        <label>NAAM LIST <input id="qrNames" style="width:220px" value="Harsh, Aryan, Khusi"></label>
+        <button class="btn" id="qrSave">SAVE</button>
+        <button class="btn btn--go" id="qrResult">🏆 RESULT DIKHAO</button>
+        <button class="btn btn--warn" id="qrReset">SCORE RESET</button>
+      </div>
+
+      <div class="table-wrap" style="margin:18px 0 0">
+        <div class="table-scroll"><table class="score-tbl">
+          <thead><tr><th>Student</th><th>Poocha gaya</th><th>Sahi</th><th>Score</th></tr></thead>
+          <tbody id="qrBoard"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Kaise chalayein:</b> har 3-4 minute me ek SPIN. Pool me <b>23 sawaal</b> hain (hashing, selection, insertion + rapid yes/no) — koi repeat nahi jab tak pool khatam na ho. Aakhir me <b>🏆 RESULT</b>.
+  </div>
+</section>
+
+<!-- ============================================================ S5 -->
+<section class="sec" id="s5">
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <h2>Homework + aage kya</h2>
+  </div>
+  <p class="sec-tag">Ghar pe yeh karo, next session me revise karenge</p>
+
+  <div class="memo">
+    <span class="memo-label">📝 Homework</span>
+    <ul>
+      <li>Hashing: keys <b>7, 17, 27, 37</b> · m = 5 — chaining se table banao (kaun collision karega?)</li>
+      <li><b>Selection sort</b> se [5, 2, 9, 1] — har pass ki table</li>
+      <li><b>Insertion sort</b> se [8, 3, 6, 1] — har i ke baad array</li>
+      <li>Teeno yaad karo: hashing average <b>O(1)</b> · selection <b>O(n²)</b> har case · insertion best <b>O(n)</b></li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <b>Agla session:</b> Merge sort aur Quick sort — divide &amp; conquer, recursion ke saath (call-stack trace bhi hai).
+  </div>
+
+  <p class="foot">TEAM DEVDoots · UNIT 3 · SESSION 2 — HASHING + SELECTION + INSERTION</p>
+</section>
+
+</div><!-- /main -->
+</div><!-- /wrap -->
+
+<!-- ============================================================ PLAYER (chhupa hua) -->
+<div class="player" id="player">
+  <button class="pbtn pbtn--main" id="btnPlay" title="Play / Pause">▶</button>
+  <button class="pbtn" id="btnStop" title="Stop">■</button>
+  <button class="pbtn" id="btnPrev" title="Pichla section">⏮</button>
+  <button class="pbtn" id="btnNext" title="Agla section">⏭</button>
+  <select id="rateSel" title="Speed">
+    <option value="0.75">0.75×</option>
+    <option value="1" selected>1×</option>
+    <option value="1.25">1.25×</option>
+    <option value="1.5">1.5×</option>
+  </select>
+  <select id="voiceSel" title="Voice"><option>Loading voices…</option></select>
+  <div class="p-meta">
+    <div class="p-now" id="pNow">Player ready — Play dabao</div>
+    <div class="p-voice" id="pVoice">Voices check kar rahe hain…</div>
+  </div>
+</div>
+
+<div class="timeup-banner" id="tuBanner">⏰ TIME UP — agla block!</div>
+
+<div class="result-overlay" id="resOverlay">
+  <div class="result-card">
+    <h3>🏆 Team Devdoots — Score</h3>
+    <div class="sub" id="resSub">Aaj ke session ke sawaalon ka hisaab</div>
+    <div id="resBody"></div>
+    <div class="win" id="resWin"></div>
+    <div class="sim-controls">
+      <button class="btn btn--go" id="resClose">Band karo</button>
+      <button class="btn btn--warn" id="resReset">SCORE RESET</button>
+    </div>
+  </div>
+</div>
+<script>
+/* ================= 30-MIN CLASS PAGE — ENGINE ================= */
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+
+/* ---------- THEME ---------- */
+var root = document.documentElement;
+try { var sv = localStorage.getItem('u3s2-theme'); if (sv === 'light' || sv === 'dark') root.setAttribute('data-theme', sv); } catch (e) {}
+if ($('themeToggle')) $('themeToggle').addEventListener('click', function () {
+  var nx = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', nx);
+  try { localStorage.setItem('u3s2-theme', nx); } catch (e) {}
+});
+
+/* ---------- SIDEBAR + AUDIO ---------- */
+var sideOff = false, audioOn = false;
+try { sideOff = localStorage.getItem('u3s2-side') === '1'; } catch (e) {}
+function applySide() { document.body.classList.toggle('noside', sideOff); if ($('dkSide')) $('dkSide').textContent = sideOff ? '⇥ SIDEBAR' : '⇤ SIDEBAR'; }
+if ($('dkSide')) $('dkSide').addEventListener('click', function () { sideOff = !sideOff; try { localStorage.setItem('u3s2-side', sideOff ? '1' : '0'); } catch (e) {} applySide(); });
+applySide();
+function applyAudio() { document.body.classList.toggle('audio-off', !audioOn); if ($('dkAudio')) $('dkAudio').textContent = audioOn ? '🎧 ON' : '🎧 AUDIO'; }
+if ($('dkAudio')) $('dkAudio').addEventListener('click', function () { audioOn = !audioOn; applyAudio(); });
+applyAudio();
+
+/* ---------- SCROLL SPY ---------- */
+(function () {
+  var toc = $('toc'); if (!toc) return;
+  var links = toc.querySelectorAll('a'), secs = [];
+  links.forEach(function (l) { var el = $(l.getAttribute('href').slice(1)); if (el) secs.push({ el: el, link: l }); });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        links.forEach(function (l) { l.classList.remove('active'); });
+        var m = secs.find(function (s) { return s.el === en.target; });
+        if (m) { m.link.classList.add('active'); if (window.innerWidth <= 1000) m.link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  secs.forEach(function (s) { obs.observe(s.el); });
+})();
+
+/* ================= NEON PEN (page ke saath scroll hota hai) ================= */
+var PEN = (function () {
+  var cv = $('penCanvas'); if (!cv || !cv.getContext) return null;
+  var ctx = cv.getContext('2d');
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  var strokes = [], cur = null, color = '#39ff14', width = 4, on = false, eraser = false;
+  var raf = null;
+  function resize() {
+    cv.width = Math.floor(window.innerWidth * dpr);
+    cv.height = Math.floor(window.innerHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  function draw() {
+    var sx = window.scrollX || 0, sy = window.scrollY || 0;
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    strokes.forEach(function (st) {
+      if (!st.pts.length) return;
+      var pass = function (w, blur, alpha) {
+        ctx.globalAlpha = alpha; ctx.lineWidth = w;
+        ctx.strokeStyle = st.color; ctx.shadowColor = st.color; ctx.shadowBlur = blur;
+        ctx.beginPath();
+        if (st.pts.length === 1) {
+          ctx.arc(st.pts[0][0] - sx, st.pts[0][1] - sy, Math.max(1, w / 2), 0, Math.PI * 2);
+          ctx.fillStyle = st.color; ctx.fill();
+          return;
+        }
+        for (var i = 0; i < st.pts.length; i++) {
+          var p = st.pts[i], x = p[0] - sx, y = p[1] - sy;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      };
+      pass(st.w * 2.8, 18, 0.28);   /* outer glow */
+      pass(st.w * 1.5, 10, 0.55);   /* mid glow */
+      pass(st.w, 6, 1);             /* core */
+    });
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+  }
+  function schedule() { if (raf) return; raf = requestAnimationFrame(function () { raf = null; draw(); }); }
+  function pt(e) { return [e.clientX + (window.scrollX || 0), e.clientY + (window.scrollY || 0)]; }
+  function eraseAt(x, y) {
+    var keep = [];
+    strokes.forEach(function (st) {
+      var hit = st.pts.some(function (p) { var dx = p[0] - x, dy = p[1] - y; return dx * dx + dy * dy < 22 * 22; });
+      if (!hit) keep.push(st);
+    });
+    strokes = keep;
+  }
+  cv.addEventListener('pointerdown', function (e) {
+    if (!on) return;
+    try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+    if (eraser) { eraseAt.apply(null, pt(e)); schedule(); e.preventDefault(); return; }
+    cur = { color: color, w: width, pts: [pt(e)] };
+    strokes.push(cur); schedule();
+    e.preventDefault();
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (!on) return;
+    if (eraser) { eraseAt.apply(null, pt(e)); schedule(); e.preventDefault(); return; }
+    if (!cur) return;
+    cur.pts.push(pt(e)); schedule();
+    e.preventDefault();
+  });
+  ['pointerup', 'pointercancel', 'pointerleave', 'pointerout'].forEach(function (ev) {
+    cv.addEventListener(ev, function () { cur = null; });
+  });
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', resize);
+  resize();
+  function setOn(v) {
+    on = v;
+    document.body.classList.toggle('pen-on', on);
+    if ($('dkPen')) $('dkPen').textContent = on ? '✏️ PEN ON' : '✏️ PEN';
+    schedule();
+  }
+  window.__penDbg = { count: function () { return strokes.length; }, draw: draw, pts: function () { return strokes.map(function (s) { return s.pts.length; }); } };
+  return {
+    setOn: setOn, isOn: function () { return on; },
+    setColor: function (c) { color = c; eraser = false; },
+    setWidth: function (w) { width = w; },
+    setEraser: function (v) { eraser = v; },
+    undo: function () { strokes.pop(); schedule(); },
+    clear: function () { strokes = []; schedule(); },
+    count: function () { return strokes.length; }
+  };
+})();
+
+/* pen toolbar wiring */
+(function () {
+  if (!PEN) return;
+  var sws = document.querySelectorAll('.pen-bar .sw');
+  sws.forEach(function (s) {
+    s.addEventListener('click', function () {
+      sws.forEach(function (x) { x.classList.remove('sel'); });
+      s.classList.add('sel');
+      PEN.setColor(s.getAttribute('data-c'));
+      if ($('penErase')) $('penErase').classList.remove('on');
+    });
+  });
+  function widthBtn(id, w) {
+    if (!$(id)) return;
+    $(id).addEventListener('click', function () {
+      ['penThin', 'penMed', 'penThick'].forEach(function (k) { if ($(k)) $(k).classList.remove('on'); });
+      $(id).classList.add('on');
+      PEN.setWidth(w);
+    });
+  }
+  widthBtn('penThin', 2.5); widthBtn('penMed', 4); widthBtn('penThick', 7);
+  if ($('penErase')) $('penErase').addEventListener('click', function () {
+    var on = $('penErase').classList.toggle('on');
+    PEN.setEraser(on);
+  });
+  if ($('penUndo')) $('penUndo').addEventListener('click', function () { PEN.undo(); });
+  if ($('penClear')) $('penClear').addEventListener('click', function () { PEN.clear(); });
+  if ($('dkPen')) $('dkPen').addEventListener('click', function () { PEN.setOn(!PEN.isOn()); });
+  /* keyboard: P = pen toggle, Z = undo, E = eraser */
+  document.addEventListener('keydown', function (e) {
+    if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === 'p' || e.key === 'P') { PEN.setOn(!PEN.isOn()); }
+    if (e.key === 'z' || e.key === 'Z') { PEN.undo(); }
+    if (e.key === 'e' || e.key === 'E') { PEN.setEraser(true); if ($('penErase')) $('penErase').classList.add('on'); }
+  });
+})();
+
+/* ================= AUDIO ENGINE ================= */
+var synth = window.speechSynthesis;
+var SEC_IDS = ['s0', 's1', 's2', 's3', 's4', 's5'];
+var SEC_NAMES = { s0: 'Aaj ka plan', s1: 'Hashing', s2: 'Selection sort', s3: 'Insertion sort', s4: 'Question round', s5: 'Homework' };
+var units = [], cur = -1, endSec = null, stopFlag = false, keepAlive = null, activeSection = 's0';
+var btnPlay = $('btnPlay'), btnStop = $('btnStop'), btnPrev = $('btnPrev'), btnNext = $('btnNext');
+var rateSel = $('rateSel'), voiceSel = $('voiceSel'), pNow = $('pNow'), pVoice = $('pVoice');
+var allVoices = [], hindiVoice = null;
+SEC_IDS.forEach(function (sid) { var sec = $(sid); if (!sec) return; var n = 0; sec.querySelectorAll('.rd').forEach(function (el) { units.push({ el: el, sec: sid, inSec: n++ }); }); });
+function firstIndexOfSection(sid) { for (var k = 0; k < units.length; k++) if (units[k].sec === sid) return k; return -1; }
+function isHindi(v) { if (!v) return false; var l = (v.lang || '').toLowerCase(); return l.indexOf('hi') === 0 || /hindi|swara|hemant|kalpana|madhur|lekha|prabhat/i.test(v.name || ''); }
+function refreshVoices() {
+  if (!synth) return;
+  var vs = synth.getVoices() || []; if (!vs.length) return;
+  allVoices = vs; hindiVoice = null;
+  var hindi = [], others = [];
+  vs.forEach(function (v) { (isHindi(v) ? hindi : others).push(v); });
+  hindiVoice = hindi[0] || null;
+  var opts = '';
+  hindi.forEach(function (v) { opts += '<option value="' + encodeURIComponent(v.voiceURI) + '">★ ' + v.name + ' (' + v.lang + ')</option>'; });
+  if (hindi.length && others.length) opts += '<option disabled>— — —</option>';
+  others.forEach(function (v) { opts += '<option value="' + encodeURIComponent(v.voiceURI) + '">' + v.name + ' (' + v.lang + ')</option>'; });
+  voiceSel.innerHTML = opts;
+  voiceSel.value = encodeURIComponent((hindiVoice || others[0]).voiceURI);
+  if (allVoices.length) {
+    var v = getSelVoice();
+    pVoice.innerHTML = isHindi(v) ? '<span class="on">★ ' + v.name + ' — Hindi voice active</span>' : '<span class="off">⚠ Hindi voice nahi mili</span> · using ' + v.name;
+  }
+}
+function getSelVoice() { var uri = decodeURIComponent(voiceSel.value || ''); for (var k = 0; k < allVoices.length; k++) if (allVoices[k].voiceURI === uri) return allVoices[k]; return null; }
+if (synth) { refreshVoices(); synth.onvoiceschanged = refreshVoices; setTimeout(refreshVoices, 700); }
+else { btnPlay.disabled = btnStop.disabled = btnPrev.disabled = btnNext.disabled = true; }
+voiceSel.addEventListener('change', refreshVoices);
+function clearHi() { document.querySelectorAll('.rd.speaking').forEach(function (e) { e.classList.remove('speaking'); }); }
+function highlight(u) { clearHi(); u.el.classList.add('speaking'); try { u.el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }
+function snippet(el, len) { var t = (el.innerText || '').replace(/\s+/g, ' ').trim(); return t.length > len ? t.slice(0, len) + '…' : t; }
+function updateNow(u) {
+  if (!u) { pNow.textContent = 'Player ready'; return; }
+  var per = units.filter(function (x) { return x.sec === u.sec; }).length;
+  pNow.textContent = '▶ ' + SEC_NAMES[u.sec] + ' — para ' + (u.inSec + 1) + '/' + per + ' · ' + snippet(u.el, 52);
+}
+function speakUnit(i) {
+  if (stopFlag) return;
+  if (i >= units.length) { finishAll(); return; }
+  var u = units[i];
+  if (endSec !== null && u.sec !== endSec) { finishAll(); return; }
+  cur = i;
+  var v = getSelVoice();
+  var text = isHindi(v) ? (u.el.getAttribute('data-dev') || u.el.innerText) : u.el.innerText;
+  var utt = new SpeechSynthesisUtterance(text);
+  if (v) { utt.voice = v; utt.lang = v.lang; } else { utt.lang = 'hi-IN'; }
+  utt.rate = parseFloat(rateSel.value) || 1;
+  utt.onstart = function () { highlight(u); updateNow(u); btnPlay.textContent = '❚❚'; };
+  utt.onend = function () { if (!stopFlag) speakUnit(cur + 1); };
+  utt.onerror = function (ev) { if (ev && (ev.error === 'interrupted' || ev.error === 'canceled')) return; if (!stopFlag) setTimeout(function () { if (!stopFlag) speakUnit(cur + 1); }, 400); };
+  synth.speak(utt);
+}
+function finishAll() { stopKeepAlive(); clearHi(); btnPlay.textContent = '▶'; pNow.textContent = 'Khatam ✓'; endSec = null; cur = -1; }
+function hardStop() { stopFlag = true; try { synth.cancel(); } catch (e) {} stopKeepAlive(); clearHi(); btnPlay.textContent = '▶'; setTimeout(function () { stopFlag = false; }, 60); }
+function startKeepAlive() {
+  if (keepAlive) return;
+  var ua = navigator.userAgent || '';
+  if (/Chrome/.test(ua) && !/Edg|Android|iPhone|iPad/.test(ua)) keepAlive = setInterval(function () { if (synth.speaking && !synth.paused) { synth.pause(); synth.resume(); } }, 12000);
+}
+function stopKeepAlive() { if (keepAlive) { clearInterval(keepAlive); keepAlive = null; } }
+function startFrom(sid) {
+  if (!synth) return;
+  hardStop();
+  setTimeout(function () { var idx = firstIndexOfSection(sid); if (idx < 0) { finishAll(); return; } endSec = null; cur = idx - 1; startKeepAlive(); speakUnit(idx); }, 80);
+}
+btnPlay.addEventListener('click', function () {
+  if (!synth) return;
+  if (synth.speaking && !synth.paused) { synth.pause(); btnPlay.textContent = '▶'; return; }
+  if (synth.speaking && synth.paused) { synth.resume(); btnPlay.textContent = '❚❚'; return; }
+  startFrom(activeSection);
+});
+btnStop.addEventListener('click', function () { hardStop(); cur = -1; updateNow(null); });
+function curSection() { return (cur >= 0 && units[cur]) ? units[cur].sec : activeSection; }
+btnPrev.addEventListener('click', function () { var i = SEC_IDS.indexOf(curSection()); startFrom(SEC_IDS[Math.max(0, i - 1)]); });
+btnNext.addEventListener('click', function () { var i = SEC_IDS.indexOf(curSection()); startFrom(SEC_IDS[Math.min(SEC_IDS.length - 1, i + 1)]); });
+document.querySelectorAll('.sec-play').forEach(function (b) {
+  b.addEventListener('click', function () { if (b.textContent === '■') { hardStop(); return; } startFrom(b.getAttribute('data-sec')); });
+});
+(function () {
+  var obs = new IntersectionObserver(function (entries) { entries.forEach(function (en) { if (en.isIntersecting) activeSection = en.target.id; }); }, { rootMargin: '-15% 0px -75% 0px' });
+  SEC_IDS.forEach(function (sid) { var el = $(sid); if (el) obs.observe(el); });
+})();
+
+/* ================= 30-MIN AGENDA + TIMER ================= */
+var BLOCKS = [
+  { m: 2, t: 'Recall + hook', d: '"Binary search ke liye kya chahiye tha?" → sorted. Aaj hashing + 2 sorting.', n: 'Students se poochho' },
+  { m: 6, t: 'Hashing — formula + animation', d: 'Seat wali analogy, phir KEY → SEAT animation (3-4 keys).', n: 'Hash sawaal 1-2' },
+  { m: 5, t: 'Collision + probing + code', d: 'Method switch karo (chaining ↔ linear). Phir code line by line.', n: 'Hash sawaal 3' },
+  { m: 3, t: 'Load factor + doubts', d: 'α = n/m dikhao, teen doubts poochho.', n: 'Hash sawaal 4' },
+  { m: 6, t: 'Selection sort', d: 'Code + dry run + stepper me selection chalao.', n: 'Selection sawaal 1-2' },
+  { m: 5, t: 'Insertion sort', d: 'Code + stepper me insertion chalao (shift dikhao).', n: 'Insertion sawaal 1-2' },
+  { m: 2, t: 'Question round', d: 'SPIN se 3-4 sawaal, score dikhao.', n: '🏆 RESULT' },
+  { m: 1, t: 'Homework', d: 'Hashing + dono sort ke practice. Next: merge/quick.', n: 'Aaj ka takeaway' }
+];
+var tcur = -1, left = 0, ticker = null;
+function fmt(s) { var m = Math.floor(s / 60), x = s % 60; return (m < 10 ? '0' : '') + m + ':' + (x < 10 ? '0' : '') + x; }
+function paintTimer() {
+  var t = fmt(left), warn = left <= 30 && tcur >= 0;
+  ['dkTimer', 'tkTimer'].forEach(function (id) { var e = $(id); if (e) { e.textContent = t; e.classList.toggle('warn', warn); } });
+}
+function paintPlan() {
+  if (!$('planSteps')) return;
+  var html = '';
+  BLOCKS.forEach(function (b, i) {
+    html += '<div class="plan-step' + (i === tcur ? ' on' : '') + '" data-i="' + i + '" style="cursor:pointer' + (i === tcur ? ';border-color:var(--gold);background:var(--gold-dim)' : '') + '">' +
+      '<span class="tm">' + b.m + ' min</span><span class="tx"><b>' + b.t + '</b>' + b.d + '</span></div>';
+  });
+  $('planSteps').innerHTML = html;
+  $('planSteps').querySelectorAll('.plan-step').forEach(function (el) { el.addEventListener('click', function () { selectBlock(+el.getAttribute('data-i')); }); });
+}
+function selectBlock(i) {
+  tcur = i; left = BLOCKS[i].m * 60; paintTimer();
+  var label = 'Block ' + (i + 1) + '/' + BLOCKS.length + ' — ' + BLOCKS[i].t;
+  if ($('tkBlkName')) $('tkBlkName').textContent = label;
+  if ($('dkBlk')) $('dkBlk').textContent = label;
+  if ($('tkNote')) $('tkNote').innerHTML = '<b style="color:var(--blue)">' + BLOCKS[i].n + '</b>';
+  paintPlan();
+}
+function beep() {
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    var ac = new AC(), o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination); o.type = 'sine'; o.frequency.value = 900; g.gain.value = 0.1;
+    o.start(); setTimeout(function () { o.frequency.value = 640; }, 190); setTimeout(function () { o.stop(); try { ac.close(); } catch (e) {} }, 430);
+  } catch (e) {}
+}
+function timeUpAlert(msg) {
+  document.body.classList.add('timeup');
+  if ($('dock')) $('dock').classList.add('timeup');
+  var b = $('tuBanner'); if (b) { b.textContent = msg; b.classList.add('show'); }
+  beep();
+  setTimeout(function () { document.body.classList.remove('timeup'); if ($('dock')) $('dock').classList.remove('timeup'); if (b) b.classList.remove('show'); }, 3600);
+}
+function tickFn() {
+  left--;
+  if (left <= 0) {
+    left = 0; paintTimer();
+    var nx = tcur + 1;
+    if (nx < BLOCKS.length) { timeUpAlert('⏰ Block khatam — ab: ' + BLOCKS[nx].t); selectBlock(nx); }
+    else { timeUpAlert('⏰ Class poora! 🎉'); stopTimer(); }
+    return;
+  }
+  paintTimer();
+}
+function startTimer() {
+  if (ticker) { stopTimer(); return; }
+  if (tcur < 0) selectBlock(0);
+  ticker = setInterval(tickFn, 1000);
+  if ($('dkStart')) $('dkStart').textContent = '⏸';
+  if ($('tkStart')) $('tkStart').textContent = '⏸ PAUSE';
+}
+function stopTimer() { if (ticker) { clearInterval(ticker); ticker = null; } if ($('dkStart')) $('dkStart').textContent = '▶'; if ($('tkStart')) $('tkStart').textContent = '▶ START'; }
+function nextBlock() { var i = (tcur < 0 ? 0 : tcur + 1); if (i >= BLOCKS.length) { stopTimer(); return; } selectBlock(i); }
+if ($('dkStart')) $('dkStart').addEventListener('click', startTimer);
+if ($('dkNext')) $('dkNext').addEventListener('click', nextBlock);
+if ($('tkStart')) $('tkStart').addEventListener('click', startTimer);
+if ($('tkNext')) $('tkNext').addEventListener('click', nextBlock);
+if ($('tkReset')) $('tkReset').addEventListener('click', function () {
+  stopTimer(); tcur = -1; left = 0; paintTimer();
+  if ($('tkBlkName')) $('tkBlkName').textContent = 'Block select karo →';
+  if ($('dkBlk')) $('dkBlk').textContent = 'Block select karo (neeche plan se)';
+  if ($('tkNote')) $('tkNote').innerHTML = '';
+  paintPlan();
+});
+paintPlan();
+window.__cls = { setSeconds: function (v) { left = v; paintTimer(); }, timeUp: function (m) { timeUpAlert(m || '⏰ TIME UP'); }, state: function () { return { cur: tcur, left: left, running: !!ticker }; } };
+
+/* ================= QUESTION BANK ================= */
+var TOPICS = { hash: 'Hashing', sel: 'Selection sort', ins: 'Insertion sort' };
+var Q = [
+  { t: 'hash', keep: 1, q: 'Hashing ka formula kya hai aur average complexity?', a: '<b>h(k) = k mod m</b> · average <b>O(1)</b>, worst O(n).', w: 'Hashing shuru me' },
+  { t: 'hash', keep: 1, q: 'Collision kya hai? Ek example do.', a: 'Do alag keys ka same hash — <b>h(23) = h(33) = 3</b> (m = 10).', w: 'Buckets animation se pehle' },
+  { t: 'hash', keep: 1, q: 'Chaining aur open addressing me fark?', a: '<b>Chaining</b> = list per seat · <b>Open addressing</b> = agli khaali seat (probing).', w: 'Method switch karke' },
+  { t: 'hash', keep: 1, q: 'Load factor α kya hai aur ideal kitna?', a: 'α = n/m · ideal <b>0.5–0.75</b> · α &gt; 1 pe rehashing.', w: 'Meter dikhane pe' },
+  { t: 'hash', q: 'Open addressing me deletion ke liye kya chahiye?', a: '<b>Tombstone</b> — warna probe chain toot jayegi.', w: 'Section ke end me' },
+  { t: 'hash', q: 'h(45) kya hoga jab m = 10?', a: '<b>5</b> — 45 mod 10 = 5.', w: 'Formula dikhane ke baad' },
+  { t: 'sel', keep: 1, q: 'Selection sort me har pass me kya dhoondhte hain?', a: 'Unsorted hisse se <b>sabse chhota</b> element, phir us pass ki pehli position pe swap.', w: 'Selection dry run se pehle' },
+  { t: 'sel', keep: 1, q: 'Selection sort best case me bhi O(n²) kyun hai?', a: 'Kyunki minimum dhoondhne ke liye <b>poora unsorted hissa scan</b> karna padta hai — comparisons kam nahi hote.', w: 'Dry run ke baad' },
+  { t: 'sel', keep: 1, q: 'Kaunsa sort minimum swaps karta hai?', a: '<b>Selection</b> — sirf n−1 swaps.', w: 'Section ke end me' },
+  { t: 'sel', q: 'Selection sort stable hai ya nahi?', a: '<b>Unstable</b> — [3a, 3b, 1] me swap se 3a/3b ka order badal jata hai.', w: 'Unstable card pe' },
+  { t: 'ins', keep: 1, q: 'Insertion sort me swap hota hai ya shift?', a: '<b>Shift</b> — <code>a[j+1] = a[j]</code> se bade elements ek kadam aage jaate hain.', w: 'Code dikhane ke baad' },
+  { t: 'ins', keep: 1, q: 'Insertion sort ka best case kab O(n) hota hai?', a: 'Jab array <b>already sorted</b> ho — sirf compare, koi shift nahi.', w: 'Stepper me sorted array pe' },
+  { t: 'ins', keep: 1, q: 'while (j >= 0 && a[j] > key) me j >= 0 pehle kyun?', a: 'Warna <b>a[−1]</b> access hoga. C me && short-circuit hai, isliye order zaroori hai.', w: 'Code line pe pen se mark karo' },
+  { t: 'ins', q: 'Insertion sort stable hai?', a: '<b>Stable</b> — <code>a[j] > key</code> strict hai, barabar elements shift nahi hote.', w: 'Section ke end me' },
+  { t: 'ins', q: 'Selection vs insertion — kab kaunsa?', a: 'Swap mehnga → <b>selection</b> · data lagbhag sorted → <b>insertion</b> (O(n)).', w: 'Comparison table pe' }
+];
+var RAPID = [
+  { q: 'h(k) = k mod m — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Collision ka matlab do keys ka same index — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Chaining me table full ho jata hai — sahi ya galat?', a: 'Galat — list badhti hai.' },
+  { q: 'Load factor α = n/m — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Selection sort best case me O(n) hota hai — sahi ya galat?', a: 'Galat — har case O(n²).' },
+  { q: 'Insertion sort stable hai — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Selection sort sabse kam swaps karta hai — sahi ya galat?', a: 'Sahi (n−1).' },
+  { q: 'Insertion sort me swap hota hai — sahi ya galat?', a: 'Galat — shift hota hai.' }
+];
+var SEC_TOPICS = { s0: ['hash', 'sel', 'ins'], s1: ['hash'], s2: ['sel'], s3: ['ins'], s4: ['hash', 'sel', 'ins'], s5: ['hash', 'sel', 'ins'] };
+function qsFor(sec) { var keys = SEC_TOPICS[sec] || ['search']; var l = Q.filter(function (q) { return keys.indexOf(q.t) > -1; }); return l.length ? l : Q; }
+
+/* ================= QUESTION ROUND (combined: topic + rapid) ================= */
+var names = ['Harsh', 'Aryan', 'Khusi'], scores = {}, current = null, curQ = null, spinTimer = null;
+var pool = [], poolIdx = 0, askedTotal = 0;
+try { var sn = localStorage.getItem('u3s2b-names'); if (sn) names = JSON.parse(sn); } catch (e) {}
+try { var sc = localStorage.getItem('u3s2b-scores'); if (sc) scores = JSON.parse(sc); } catch (e) {}
+names.forEach(function (n) { if (!scores[n]) scores[n] = { a: 0, c: 0 }; });
+function saveScore() { try { localStorage.setItem('u3s2b-names', JSON.stringify(names)); localStorage.setItem('u3s2b-scores', JSON.stringify(scores)); } catch (e) {} }
+function pct(o) { return o.a ? Math.round(o.c * 100 / o.a) : 0; }
+function buildPool() {
+  pool = [];
+  Q.forEach(function (q) { pool.push({ q: q.q, a: q.a, t: TOPICS[q.t] || 'Concept', kind: 'concept' }); });
+  RAPID.forEach(function (q) { pool.push({ q: q.q, a: q.a, t: 'Rapid (yes/no)', kind: 'rapid' }); });
+  for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+  poolIdx = 0;
+  paintMeta();
+}
+function paintMeta() {
+  var total = pool.length, left = Math.max(0, total - poolIdx);
+  if ($('qrMeta')) $('qrMeta').textContent = total + ' sawaal · ' + poolIdx + ' poochhe · ' + left + ' bache';
+  if ($('qrBar')) $('qrBar').style.width = (total ? (poolIdx / total) * 100 : 0) + '%';
+}
+function nextQ() { if (poolIdx >= pool.length) buildPool(); return pool[poolIdx++]; }
+function paintBoard() {
+  if (!$('qrBoard')) return;
+  var minA = Math.min.apply(null, names.map(function (n) { return scores[n].a; }));
+  var best = -1;
+  names.forEach(function (n) { if (scores[n].a && pct(scores[n]) > best) best = pct(scores[n]); });
+  var rows = names.map(function (n) { return { n: n, o: scores[n] }; }).sort(function (x, y) { var d = pct(y.o) - pct(x.o); return d ? d : y.o.c - x.o.c; });
+  var html = '';
+  rows.forEach(function (r) {
+    var cls = (r.o.a && pct(r.o) === best) ? 'top' : '';
+    var least = (r.o.a === minA) ? ' <span style="color:var(--emerald);font-size:11px">· kam poocha</span>' : '';
+    html += '<tr class="' + cls + '"><td><b>' + r.n + '</b>' + least + '</td><td class="num">' + r.o.a + '</td><td class="num">' + r.o.c + '</td><td class="num">' + pct(r.o) + '%</td></tr>';
+  });
+  $('qrBoard').innerHTML = html;
+}
+function showQ(where) {
+  if (!curQ) return;
+  var q = curQ, nm = current || '—';
+  var num = 'SAWAAL ' + poolIdx + '/' + pool.length;
+  if (where === 'dock' || where === 'both') {
+    if ($('dkQWho')) $('dkQWho').textContent = current ? '🎯 ' + nm + ' — ' + num : '🎲 ' + num;
+    if ($('dkQText')) $('dkQText').innerHTML = q.q;
+    if ($('dkQAns')) { $('dkQAns').innerHTML = q.a; $('dkQAns').classList.remove('show'); }
+    if ($('dkQShow')) $('dkQShow').textContent = 'Jawab dekho';
+    if ($('dkQCard')) $('dkQCard').classList.add('show');
+  }
+  if (where === 'tool' || where === 'both') {
+    if ($('qrCount')) $('qrCount').textContent = num;
+    if ($('qrTopic')) $('qrTopic').textContent = q.t;
+    if ($('qrText')) $('qrText').innerHTML = q.q;
+    if ($('qrAns')) { $('qrAns').innerHTML = q.a; $('qrAns').style.display = 'none'; }
+    if ($('qrShow')) $('qrShow').textContent = 'Jawab dekho';
+  }
+  paintMeta();
+}
+function doSpin() {
+  if (spinTimer) return;
+  var minA = Math.min.apply(null, names.map(function (n) { return scores[n].a; }));
+  var poolN = names.filter(function (n) { return scores[n].a === minA; });
+  var chosen = poolN[Math.floor(Math.random() * poolN.length)];
+  curQ = nextQ();
+  var targets = [$('dkName'), $('qrName')].filter(Boolean);
+  var i = 0;
+  targets.forEach(function (t) { t.classList.add('spinning'); });
+  spinTimer = setInterval(function () { targets.forEach(function (t) { t.textContent = names[i % names.length]; }); i++; }, 80);
+  setTimeout(function () {
+    clearInterval(spinTimer); spinTimer = null;
+    current = chosen;
+    targets.forEach(function (t) { t.classList.remove('spinning'); t.textContent = current; });
+    showQ('both');
+    if ($('qrMsg')) $('qrMsg').innerHTML = '<b>' + current + '</b> — sawaal dikh raha hai. Jawab suno, phir ✓ ya ✕ dabao.';
+  }, 1300);
+}
+function mark(ok) {
+  if (!current) { if ($('qrMsg')) $('qrMsg').textContent = 'Pehle SPIN karo.'; return; }
+  scores[current].a++; if (ok) scores[current].c++;
+  askedTotal++;
+  saveScore(); paintBoard(); paintMeta();
+  if ($('qrMsg')) $('qrMsg').innerHTML = '<b>' + current + '</b> → ' + (ok ? '✓ sahi (+1)' : '✕ galat') + ' · ab agla SPIN.';
+  current = null; curQ = null;
+  [$('dkName'), $('qrName')].filter(Boolean).forEach(function (t) { t.textContent = '—'; });
+  if ($('dkQCard')) $('dkQCard').classList.remove('show');
+}
+if ($('dkSpin')) $('dkSpin').addEventListener('click', doSpin);
+if ($('qrSpin')) $('qrSpin').addEventListener('click', doSpin);
+[['dkOk', true], ['qrOk', true], ['dkQOk', true], ['dkBad', false], ['qrBad', false], ['dkQBad', false]].forEach(function (p) { if ($(p[0])) $(p[0]).addEventListener('click', function () { mark(p[1]); }); });
+if ($('qrSkip')) $('qrSkip').addEventListener('click', function () {
+  [$('dkName'), $('qrName')].filter(Boolean).forEach(function (t) { t.textContent = '—'; });
+  current = null; curQ = null;
+  if ($('dkQCard')) $('dkQCard').classList.remove('show');
+  if ($('qrMsg')) $('qrMsg').textContent = 'Skip — dobara SPIN.';
+});
+if ($('dkQShow')) $('dkQShow').addEventListener('click', function () { var el = $('dkQAns'); var on = el.classList.toggle('show'); $('dkQShow').textContent = on ? 'Jawab chhupao' : 'Jawab dekho'; });
+if ($('qrShow')) $('qrShow').addEventListener('click', function () { var el = $('qrAns'); var on = el.style.display === 'block'; el.style.display = on ? 'none' : 'block'; $('qrShow').textContent = on ? 'Jawab dekho' : 'Jawab chhupao'; });
+if ($('dkQ')) $('dkQ').addEventListener('click', function () { curQ = nextQ(); current = null; showQ('dock'); });
+if ($('dkQNext')) $('dkQNext').addEventListener('click', function () { curQ = nextQ(); current = null; showQ('dock'); });
+if ($('dkQClose')) $('dkQClose').addEventListener('click', function () { $('dkQCard').classList.remove('show'); });
+if ($('qrSave')) $('qrSave').addEventListener('click', function () {
+  var arr = $('qrNames').value.split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s.length; });
+  if (!arr.length) { $('qrMsg').textContent = 'Kam se kam ek naam likho.'; return; }
+  names = arr; names.forEach(function (n) { if (!scores[n]) scores[n] = { a: 0, c: 0 }; });
+  saveScore(); paintBoard(); $('qrMsg').innerHTML = 'List save: <b>' + names.join(', ') + '</b>';
+});
+if ($('qrReset')) $('qrReset').addEventListener('click', function () { names.forEach(function (n) { scores[n] = { a: 0, c: 0 }; }); saveScore(); paintBoard(); buildPool(); $('qrMsg').textContent = 'Score aur sawaal reset.'; });
+function showResult() {
+  var rows = names.map(function (n) { return { n: n, o: scores[n] }; });
+  var asked = rows.reduce(function (s, r) { return s + r.o.a; }, 0);
+  rows.sort(function (x, y) { var d = pct(y.o) - pct(x.o); return d ? d : y.o.c - x.o.c; });
+  var html = '<table class="score-tbl"><thead><tr><th>#</th><th>Student</th><th>Poocha gaya</th><th>Sahi</th><th>Score</th></tr></thead><tbody>';
+  var best = null;
+  rows.forEach(function (r, i) {
+    if (i === 0 && r.o.a > 0) best = r;
+    html += '<tr class="' + ((i === 0 && r.o.a > 0) ? 'top' : '') + '"><td class="num">' + (i + 1) + '</td><td><b>' + r.n + '</b></td><td class="num">' + r.o.a + '</td><td class="num">' + r.o.c + '</td><td class="num">' + pct(r.o) + '%</td></tr>';
+  });
+  html += '</tbody></table>';
+  if ($('resBody')) $('resBody').innerHTML = html;
+  if ($('resSub')) $('resSub').innerHTML = 'Aaj kul <b>' + asked + '</b> sawaal poochhe gaye · pool me <b>' + pool.length + '</b> the';
+  if ($('resWin')) {
+    if (best && asked) {
+      var msg = pct(best.o) >= 75 ? 'Shandaar kaam! 🚩' : pct(best.o) >= 50 ? 'Achha kiya — thoda aur practice.' : 'Practice chahiye — concepts dobara dekh lo.';
+      $('resWin').innerHTML = '🏆 Sabse achha: <b>' + best.n + '</b> — ' + best.o.c + '/' + best.o.a + ' sahi (' + pct(best.o) + '%). ' + msg;
+    } else $('resWin').innerHTML = 'Abhi koi sawaal nahi poochha gaya — SPIN karke shuru karo.';
+  }
+  if ($('resOverlay')) $('resOverlay').classList.add('show');
+}
+if ($('qrResult')) $('qrResult').addEventListener('click', showResult);
+if ($('resClose')) $('resClose').addEventListener('click', function () { $('resOverlay').classList.remove('show'); });
+if ($('resReset')) $('resReset').addEventListener('click', function () { names.forEach(function (n) { scores[n] = { a: 0, c: 0 }; }); saveScore(); paintBoard(); showResult(); });
+if ($('qrNames')) $('qrNames').value = names.join(', ');
+buildPool(); paintBoard();
+
+/* ================= HASH ANIMATOR (key → seat) ================= */
+(function () {
+  if (!$('hkQueue')) return;
+  var keys = [], m = 10, method = 'linear', slots = [], qi = 0, busy = false, autoT = null;
+  var collisions = 0, probes = 0;
+  function parseKeys() {
+    keys = ($('hkKeys').value || '').split(/[,\s]+/).map(function (s) { return parseInt(s, 10); }).filter(function (x) { return !isNaN(x); });
+    m = Math.max(3, Math.min(17, parseInt($('hkM').value, 10) || 10));
+    if ($('hkM')) $('hkM').value = m;
+    method = $('hkMethod').value;
+    slots = []; for (var i = 0; i < m; i++) slots.push(method === 'chain' ? [] : null);
+    qi = 0; busy = false; collisions = 0; probes = 0;
+    stopAuto();
+    paintQueue(); paintTable(); paintLF();
+    if ($('hkCalc')) $('hkCalc').textContent = 'STEP dabao — pehli key se shuru karein.';
+    if ($('hkLog')) $('hkLog').innerHTML = keys.length + ' keys queue me hain · method: <b>' + method + '</b>';
+  }
+  function paintQueue() {
+    if (!$('hkQueue')) return;
+    var html = '';
+    keys.forEach(function (k, i) {
+      html += '<span class="hk-key' + (i < qi ? ' done' : '') + (i === qi ? ' now' : '') + '">' + k + '</span>';
+    });
+    $('hkQueue').innerHTML = html || '<span class="hk-key">— koi key nahi —</span>';
+  }
+  function paintTable(hl) {
+    if (!$('hkTable')) return;
+    hl = hl || {};
+    var html = '';
+    for (var i = 0; i < m; i++) {
+      var inner;
+      if (method === 'chain') {
+        inner = slots[i].length ? slots[i].map(function (v, idx) {
+          var drop = (hl.dropIdx === i && idx === slots[i].length - 1) ? ' drop' : '';
+          return '<span class="bk-key' + (idx > 0 ? ' probe' : '') + drop + '">' + v + '</span>';
+        }).join('<span style="color:var(--faint)">→</span>') + '<span style="color:var(--faint)">→ NULL</span>' : '<span class="bk-empty">NULL</span>';
+      } else {
+        inner = slots[i] !== null ? '<span class="bk-key' + ((((slots[i] % m) + m) % m) !== i ? ' probe' : '') + '">' + slots[i] + '</span>' : '<span class="bk-empty">— khaali —</span>';
+      }
+      var cls = 'bk-slot';
+      if (hl.slot === i) cls += hl.coll ? ' coll' : ' target';
+      html += '<div class="bk-row"><span class="bk-idx">[' + i + ']</span><div class="' + cls + '">' + inner + '</div></div>';
+    }
+    $('hkTable').innerHTML = html;
+  }
+  function paintLF() {
+    var a = qi / m;                       /* α = n/m = (insert ho chuki keys) / table size */
+    if ($('hkLF')) $('hkLF').textContent = a.toFixed(2);
+    if ($('hkLFFill')) $('hkLFFill').style.width = Math.min(100, a * 100) + '%';
+  }
+  function stopAuto() { if (autoT) { clearInterval(autoT); autoT = null; } if ($('hkGo')) $('hkGo').textContent = '▶ AUTO INSERT'; }
+  function probePath(key) {
+    var h = ((key % m) + m) % m, path = [h];
+    if (method === 'chain') return path;
+    var pos = h;
+    for (var tries = 1; tries < m; tries++) {
+      if (slots[pos] === null) break;
+      var step = tries;                       /* linear: 1,2,3... kadam */
+      if (method === 'quad') step = tries * tries;
+      else if (method === 'double') { var h2 = 7 - (((key % 7) + 7) % 7); if (h2 === 0) h2 = 1; step = tries * h2; }
+      pos = (h + step) % m;
+      path.push(pos);
+    }
+    return path;
+  }
+  function step() {
+    if (busy) return;
+    if (qi >= keys.length) {
+      stopAuto();
+      if ($('hkCalc')) $('hkCalc').innerHTML = '<b style="color:var(--emerald)">Sab keys insert ho gayi ✔</b>';
+      if ($('hkLog')) $('hkLog').innerHTML = 'Collisions: <b>' + collisions + '</b> · probes: <b>' + probes + '</b> · load factor α = <b>' + (keys.length / m).toFixed(2) + '</b>';
+      return;
+    }
+    busy = true;
+    var key = keys[qi], h = ((key % m) + m) % m;
+    if ($('hkCalc')) $('hkCalc').innerHTML = 'h(' + key + ') = ' + key + ' mod ' + m + ' = <b>' + h + '</b> — seat ' + h + ' dekho';
+    paintQueue(); paintTable({ slot: h });
+    var path = probePath(key);
+    var k = 0;
+    (function walk() {
+      if (k < path.length - 1) {
+        var pos = path[k];
+        var occupied = method === 'chain' ? slots[pos].length > 0 : slots[pos] !== null;
+        if (occupied) {
+          collisions++; probes++;
+          paintTable({ slot: pos, coll: true });
+          if ($('hkLog')) $('hkLog').innerHTML = 'Seat <b>' + pos + '</b> bhara hai → <span style="color:var(--coral)">collision!</span> agla seat dekho…';
+          k++;
+          setTimeout(walk, 420);
+          return;
+        }
+      }
+      var finalPos = path[path.length - 1];
+      if (method === 'chain') {
+        var had = slots[finalPos].length > 0;
+        if (had) { collisions++; probes++; }
+        slots[finalPos].push(key);
+        paintTable({ slot: finalPos, coll: had, dropIdx: finalPos });
+      } else {
+        slots[finalPos] = key;
+        paintTable({ slot: finalPos });
+      }
+      qi++;
+      paintQueue(); paintLF();
+      if ($('hkLog')) $('hkLog').innerHTML = 'Key <b>' + key + '</b> → seat <b>' + finalPos + '</b>' + (finalPos !== h ? ' <span style="color:var(--gold)">(probe kiya)</span>' : '');
+      if ($('hkCalc')) $('hkCalc').innerHTML = 'h(' + key + ') = <b>' + h + '</b> · final seat = <b style="color:var(--gold)">' + finalPos + '</b>';
+      busy = false;
+    })();
+  }
+  if ($('hkStep')) $('hkStep').addEventListener('click', step);
+  if ($('hkGo')) $('hkGo').addEventListener('click', function () {
+    if (autoT) { stopAuto(); return; }
+    $('hkGo').textContent = '⏸ PAUSE';
+    autoT = setInterval(function () { step(); if (qi >= keys.length) stopAuto(); }, 1100);
+  });
+  if ($('hkReset')) $('hkReset').addEventListener('click', parseKeys);
+  if ($('hkMethod')) $('hkMethod').addEventListener('change', parseKeys);
+  parseKeys();
+})();
+
+/* ================= STEPPER (selection / insertion, code-sync) ================= */
+(function () {
+  if (!$('stBars')) return;
+  var CODES = {
+    selection: ['for (i = 0; i < n-1; i++) {', '    min = i;', '    for (j = i+1; j < n; j++) {', '        if (a[j] < a[min])', '            min = j;', '    }', '    if (min != i) swap(a[i], a[min]);', '}'],
+    insertion: ['for (i = 1; i < n; i++) {', '    key = a[i];', '    j = i - 1;', '    while (j >= 0 && a[j] > key) {', '        a[j+1] = a[j];   // shift', '        j--;', '    }', '    a[j+1] = key;   // insert', '}']
+  };
+  var base = [], frames = [], fi = 0, timer = null, algo = 'selection';
+  function newArr() { base = []; for (var i = 0; i < 7; i++) base.push(5 + Math.floor(Math.random() * 45)); }
+  function gen(algo, base) {
+    var a = base.slice(), n = a.length, out = [], done = new Array(n).fill(false);
+    function snap(msg, o) { o = o || {}; out.push({ arr: a.slice(), done: done.slice(), cmp: o.cmp || [], swp: o.swp || [], piv: [], line: (o.line === undefined ? -1 : o.line), vars: o.vars || {}, msg: msg }); }
+    if (algo === 'selection') {
+      for (var i = 0; i < n - 1; i++) {
+        var min = i;
+        snap('min = i = ' + i, { line: 1, vars: { i: i, min: min } });
+        for (var j = i + 1; j < n; j++) {
+          snap('compare a[' + j + ']=' + a[j] + ' vs min a[' + min + ']=' + a[min], { cmp: [j, min], line: 3, vars: { i: i, j: j, min: min } });
+          if (a[j] < a[min]) { min = j; snap('naya min = ' + a[min] + ' (index ' + min + ')', { cmp: [min], line: 4, vars: { i: i, j: j, min: min } }); }
+        }
+        if (min !== i) { var t = a[i]; a[i] = a[min]; a[min] = t; snap('swap a[' + i + '] ↔ a[' + min + ']', { swp: [i, min], line: 6, vars: { i: i, min: min } }); }
+        done[i] = true;
+        snap('index ' + i + ' FINAL — ' + a[i], { line: 6, vars: { i: i } });
+      }
+    } else {
+      done[0] = true;
+      for (var i2 = 1; i2 < n; i2++) {
+        var key = a[i2];
+        snap('key = a[' + i2 + '] = ' + key, { line: 1, vars: { i: i2, key: key } });
+        var j2 = i2 - 1;
+        while (j2 >= 0 && a[j2] > key) {
+          snap('a[' + j2 + ']=' + a[j2] + ' > key ' + key + ' → shift right', { cmp: [j2], line: 4, vars: { i: i2, j: j2, key: key } });
+          a[j2 + 1] = a[j2]; j2--;
+        }
+        a[j2 + 1] = key;
+        snap('key ' + key + ' ko index ' + (j2 + 1) + ' pe INSERT', { swp: [j2 + 1], line: 7, vars: { i: i2, j: j2, key: key } });
+        for (var k2 = 0; k2 <= i2; k2++) done[k2] = true;
+        snap('pehle ' + (i2 + 1) + ' elements sorted', { line: 7, vars: { i: i2 } });
+      }
+    }
+    for (var z = 0; z < n; z++) done[z] = true;
+    snap('SORTED! 🎉 — ' + a.join(', '), { line: -1 });
+    return out;
+  }
+  function paint() {
+    var f = frames[fi]; if (!f) return;
+    var mx = Math.max.apply(null, base), html = '';
+    f.arr.forEach(function (v, k) {
+      var cls = 'step-bar';
+      if (f.swp.indexOf(k) > -1) cls += ' swp bump';
+      else if (f.cmp.indexOf(k) > -1) cls += ' cmp';
+      if (f.done[k]) cls += ' fix';
+      html += '<div class="' + cls + '" style="height:' + Math.max(10, Math.round(v / mx * 100)) + '%"><i>' + v + '</i></div>';
+    });
+    $('stBars').innerHTML = html;
+    var code = CODES[algo] || [], ch = '';
+    code.forEach(function (ln, k) {
+      var esc = ln.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      ch += '<span class="ln' + (k === f.line ? ' on' : '') + '">' + esc + '</span>';
+    });
+    $('stCode').innerHTML = ch;
+    var vh = '';
+    Object.keys(f.vars).forEach(function (k) { vh += '<div class="chg">' + k + ' = <b>' + f.vars[k] + '</b></div>'; });
+    if (!vh) vh = '<div>vars: —</div>';
+    $('stVars').innerHTML = vh;
+    $('stLog').innerHTML = '<b>Step ' + (fi + 1) + '/' + frames.length + '</b> · ' + f.msg;
+  }
+  function rebuild() { stop(); algo = $('stAlgo').value; frames = gen(algo, base); fi = 0; paint(); }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } if ($('stPlay')) $('stPlay').textContent = '▶ PLAY'; }
+  function step() {
+    if (fi < frames.length - 1) { fi++; paint(); }
+    else { stop(); $('stLog').innerHTML = '<b style="color:var(--emerald)">Sorted ho gaya! 🎉</b> NEW ARRAY ya ALGORITHM badal ke dekho.'; }
+  }
+  if ($('stPlay')) $('stPlay').addEventListener('click', function () {
+    if (timer) { stop(); return; }
+    if (fi >= frames.length - 1) { fi = 0; paint(); }
+    $('stPlay').textContent = '⏸ PAUSE';
+    timer = setInterval(function () { step(); if (fi >= frames.length - 1) stop(); }, 520);
+  });
+  if ($('stStep')) $('stStep').addEventListener('click', function () { stop(); step(); });
+  if ($('stNew')) $('stNew').addEventListener('click', function () { newArr(); rebuild(); });
+  if ($('stReset')) $('stReset').addEventListener('click', function () { stop(); fi = 0; paint(); });
+  if ($('stAlgo')) $('stAlgo').addEventListener('change', rebuild);
+  newArr(); rebuild();
+})();
+
+/* ================= AMBIENT: DATA FALLING INTO SLOTS ================= */
+(function () {
+  var cv = document.getElementById('ambient');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
+  var COLS = 42, ROWS = 26, t = 0, drops = [], flash = [];
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.floor(W * dpr); cv.height = Math.floor(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  function cellPos(c, r) {
+    var gw = W / COLS, gh = H / ROWS;
+    return { x: c * gw + gw / 2, y: r * gh + gh / 2, w: gw, h: gh };
+  }
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    var gw = W / COLS, gh = H / ROWS;
+    for (var c = 0; c < COLS; c++) {
+      for (var r = 0; r < ROWS; r++) {
+        var f = 0;
+        for (var i = 0; i < flash.length; i++) if (flash[i].c === c && flash[i].r === r) f = Math.max(f, flash[i].a);
+        var pulse = 0.012 + 0.010 * Math.sin(t * 0.03 + (c + r) * 0.7);
+        var a = pulse + f * 0.16;
+        ctx.fillStyle = 'rgba(255,158,109,' + a.toFixed(3) + ')';
+        var pad = 2;
+        ctx.fillRect(c * gw + pad, r * gh + pad, gw - pad * 2, gh - pad * 2);
+      }
+    }
+    drops.forEach(function (d) {
+      ctx.fillStyle = 'rgba(127,209,193,0.85)';
+      ctx.beginPath(); ctx.arc(d.x, d.y, 2.2, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+  function step() {
+    t++;
+    if (Math.random() < 0.10) {
+      var c = Math.floor(Math.random() * COLS);
+      drops.push({ x: (c + 0.5) * (W / COLS), y: -10, c: c, targetRow: 1 + Math.floor(Math.random() * (ROWS - 1)), sp: 3 + Math.random() * 3 });
+    }
+    drops.forEach(function (d) { d.y += d.sp; });
+    drops = drops.filter(function (d) {
+      var gh = H / ROWS;
+      if (d.y >= d.targetRow * gh + gh / 2) {
+        flash.push({ c: d.c, r: d.targetRow, a: 1 });
+        return false;
+      }
+      return true;
+    });
+    flash.forEach(function (f) { f.a -= 0.045; });
+    flash = flash.filter(function (f) { return f.a > 0; });
+    draw();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  if (reduce) { draw(); return; }
+  setInterval(function () { if (!document.hidden) step(); }, 70);
+})();
+
+})();
+</script>
+
+<div class="dsnav" role="navigation" aria-label="Page navigation">
+  <a class="dsnav-b" href="DS_Unit3_Session1.html" title="Pichla page (←)">←</a>
+  <a class="dsnav-b" href="../index.html" title="Sab pages (Home)">⌂</a>
+  <a class="dsnav-b" href="DS_Unit3_Session3.html" title="Agla page (→)">→</a>
+</div>
+<style>
+/* ===== DS page nav (auto-injected) ===== */
+.dsnav{position:fixed;right:14px;bottom:78px;z-index:650;display:flex;gap:6px;align-items:center;
+  background:rgba(10,14,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:6px 8px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);opacity:.6;transition:opacity .2s ease, transform .2s ease;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.dsnav:hover{opacity:1;transform:translateY(-2px)}
+.dsnav-b{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:15px;line-height:1;
+  transition:background .15s ease,color .15s ease}
+.dsnav-b:hover{background:#ff9f45;color:#101820}
+.dsnav-b.dsnav-off{opacity:.25;pointer-events:none}
+.dsnav-tip{font-size:10px;letter-spacing:.8px;color:rgba(255,255,255,.45);padding:0 4px;white-space:nowrap}
+@media (max-width:640px){.dsnav-tip{display:none}.dsnav{right:10px;bottom:70px;padding:5px 6px}.dsnav-b{width:30px;height:30px;font-size:14px}}
+@media print{.dsnav{display:none!important}}
+</style>
+<script>
+(function(){
+  var PREV="DS_Unit3_Session1.html", NEXT="DS_Unit3_Session3.html";
+  document.addEventListener('keydown', function(e){
+    var t=e.target||{};
+    if(/INPUT|TEXTAREA|SELECT/.test(t.tagName||'')) return;
+    if(e.key==='ArrowRight' && NEXT) window.location.href=NEXT;
+    else if(e.key==='ArrowLeft' && PREV) window.location.href=PREV;
+    else if(e.key==='Home') window.location.href='../index.html';
+  });
+})();
+</script>
+
+</body>
+</html>

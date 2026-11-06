@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 3 — AKTU Answer Copy (Handwritten Style) | Team Devdoots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12306e;          /* blue pen */
+  --ink2:#1b4b9c;
+  --red:#b3261e;          /* red pen / margin */
+  --pencil:#5b6470;
+  --paper:#fffdf7;
+  --rule:#d7e3f4;
+  --line:32px;
+  --pad-l:84px;
+}
+html[data-theme="night"]{
+  --ink:#dbe6ff;
+  --ink2:#b9cdf5;
+  --red:#ff9a90;
+  --pencil:#9aa6b8;
+  --paper:#151a21;
+  --rule:#26303c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:#e9edf3;
+  font-family:'Kalam',cursive;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:64px 16px 90px;
+}
+html[data-theme="night"] body{background:#0b0f14}
+
+/* ---------- top bar ---------- */
+.bar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:8px 14px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid #d3dae4;font-family:'Caveat',cursive;font-size:19px;
+}
+html[data-theme="night"] .bar{background:rgba(12,17,23,.92);border-color:#26303c}
+.bar .t{font-weight:700;color:var(--red);font-size:21px;margin-right:6px}
+.bar button{
+  font-family:'Caveat',cursive;font-size:17px;cursor:pointer;
+  background:#fff;border:1.5px solid var(--ink);color:var(--ink);
+  padding:4px 12px;border-radius:8px;
+}
+.bar button:hover{background:var(--ink);color:#fff}
+html[data-theme="night"] .bar button{background:#1b222c;color:var(--ink);border-color:var(--ink)}
+.bar .sp{flex:1}
+.bar .pg{font-family:'Kalam',cursive;font-size:14px;color:var(--pencil)}
+
+/* ---------- page (A4-ish) ---------- */
+.page{
+  scroll-margin-top:58px;
+  position:relative;width:794px;max-width:100%;margin:26px auto;
+  background:var(--paper);
+  padding:34px 34px 30px var(--pad-l);
+  box-shadow:0 10px 30px rgba(20,35,70,.14), 0 2px 6px rgba(20,35,70,.08);
+  border-radius:2px;
+  background-image:
+    repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--line) - 1px), var(--rule) calc(var(--line) - 1px), var(--rule) var(--line));
+  background-position:0 34px;
+  min-height:1123px;
+}
+/* red margin line + punch holes */
+.page::before{
+  content:'';position:absolute;top:0;bottom:0;left:66px;width:2px;background:var(--red);opacity:.55;
+}
+.page::after{
+  content:'';position:absolute;top:0;bottom:0;left:18px;width:12px;
+  background-image:radial-gradient(circle, #cfd8e6 3.4px, transparent 3.6px);
+  background-size:12px 120px;background-repeat:repeat-y;opacity:.9;
+}
+html[data-theme="night"] .page::after{background-image:radial-gradient(circle, #2a3440 3.4px, transparent 3.6px)}
+
+/* ---------- text ---------- */
+.qhead{
+  font-family:'Caveat',cursive;font-weight:700;font-size:25px;line-height:var(--line);
+  color:var(--red);margin:0 0 4px;
+}
+.qhead .mk{font-family:'Kalam',cursive;font-size:15px;color:var(--red);opacity:.8}
+.sub{font-family:'Caveat',cursive;font-weight:700;font-size:21px;line-height:var(--line);color:var(--ink2);margin:6px 0 0}
+p,li{font-size:18px;line-height:var(--line);margin:0}
+b{font-weight:700;color:var(--ink2)}
+.hl{background:linear-gradient(transparent 62%, #ffe98a 62%, #ffe98a 92%, transparent 92%)}
+html[data-theme="night"] .hl{background:linear-gradient(transparent 62%, #3d3a1e 62%, #3d3a1e 92%, transparent 92%)}
+ul{margin:0;padding-left:26px}
+li{list-style:none;position:relative}
+li::before{content:'•';position:absolute;left:-18px;color:var(--ink)}
+.step{margin-left:6px}
+.step b{color:var(--red)}
+
+/* ---------- sketches (hand-drawn feel) ---------- */
+.sketch{
+  border:1.7px solid var(--ink);
+  border-radius:6px 3px 7px 2px;
+  padding:12px 14px;margin:10px 0 6px;
+  background:rgba(255,255,255,.55);
+  display:inline-block;max-width:100%;
+}
+html[data-theme="night"] .sketch{background:rgba(255,255,255,.03)}
+.sketch .cap{font-family:'Caveat',cursive;font-size:17px;color:var(--pencil);margin-top:8px;text-align:center}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cell{
+  border:1.6px solid var(--ink);border-radius:3px 5px 3px 6px;
+  min-width:44px;padding:4px 8px;text-align:center;font-size:17px;line-height:1.4;
+}
+.cell.idx{border:none;min-width:auto;padding:0 4px;font-size:14px;color:var(--pencil)}
+.cell.fill{background:rgba(255,233,138,.55)}
+html[data-theme="night"] .cell.fill{background:rgba(255,233,138,.12)}
+.arrow{font-size:18px;color:var(--ink);margin:0 2px}
+
+/* hand-drawn table */
+table.hw{width:100%;border-collapse:collapse;margin:8px 0;font-size:17px}
+table.hw th,table.hw td{border:1.6px solid var(--ink);padding:5px 8px;text-align:left;line-height:1.5}
+table.hw th{font-family:'Caveat',cursive;font-size:18px;font-weight:700;color:var(--ink2);background:rgba(18,48,110,.05)}
+html[data-theme="night"] table.hw th{background:rgba(219,230,255,.06)}
+
+/* code-ish lines in handwriting */
+.code{
+  font-family:'Kalam',cursive;font-size:16.5px;line-height:28px;
+  border-left:3px solid var(--ink);padding-left:14px;margin:8px 0;
+  background:rgba(18,48,110,.04);
+}
+html[data-theme="night"] .code{background:rgba(219,230,255,.05)}
+
+/* cover */
+.cover{border:2.5px double var(--ink);padding:26px 24px;margin:6px 0 16px}
+.cover h1{font-family:'Caveat',cursive;font-size:44px;margin:0 0 6px;color:var(--red);line-height:1.1}
+.cover .meta{font-size:18px;line-height:36px}
+.cover .fill-line{display:inline-block;border-bottom:1.6px dotted var(--ink);min-width:200px}
+.roll{display:flex;gap:6px;margin:10px 0}
+.roll span{width:34px;height:38px;border:1.6px solid var(--ink);border-radius:3px}
+
+/* page number */
+.pnum{position:absolute;right:30px;bottom:16px;font-family:'Caveat',cursive;font-size:17px;color:var(--pencil)}
+
+/* print */
+@media print{
+  body{background:#fff;padding:0}
+  .bar,.penbar{display:none !important}
+  .page{box-shadow:none;margin:0;page-break-after:always;width:100%;min-height:auto}
+  @page{size:A4;margin:10mm}
+}
+@media (max-width:820px){
+  .page{padding:24px 18px 24px 74px;min-height:auto}
+  .page::before{left:56px}
+  p,li{font-size:17px;line-height:30px}
+  :root{--line:30px}
+  .qhead{font-size:22px}
+}
+
+/* ---------- pen ---------- */
+#penCanvas { position: fixed; inset: 0; z-index: 40; pointer-events: none; touch-action: none; }
+body.pen-on #penCanvas { pointer-events: auto; cursor: crosshair; }
+body.pen-on { user-select: none; -webkit-user-select: none; }
+@media print { #penCanvas { display: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="t">AKTU Answer Copy</span>
+  <span class="pg" id="pgInfo">Page 1 / 17</span>
+  <span class="sp"></span>
+  <button id="btnPen">✏️ Pen</button>
+  <button id="btnTheme">🌙 Night</button>
+  <button id="btnPrint">🖨 Print / PDF</button>
+</div>
+
+<canvas id="penCanvas" aria-hidden="true"></canvas>
+
+<!-- ================= PAGE 1 : COVER ================= -->
+<div class="page">
+  <div class="cover">
+    <h1>Dr. A.P.J. Abdul Kalam Technical University</h1>
+    <div class="meta">
+      <b>Subject:</b> Data Structure &nbsp;·&nbsp; <b>Code:</b> BCS-301<br>
+      <b>Unit:</b> III — Searching, Hashing &amp; Sorting<br>
+      <b>Session:</b> 2026-27 &nbsp;·&nbsp; <b>Branch:</b> CSE / IT &nbsp;·&nbsp; <b>Sem:</b> 3rd<br>
+      <b>Name:</b> <span class="fill-line">&nbsp;</span> &nbsp; <b>Roll No.:</b> <span class="fill-line" style="min-width:140px">&nbsp;</span>
+    </div>
+    <div class="roll"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="meta" style="font-size:16px;line-height:30px;color:var(--pencil)">
+      (Roll number ke boxes — exam me isi tarah bharna hota hai)
+    </div>
+  </div>
+
+  <div class="sub">INDEX</div>
+  <table class="hw">
+    <tr><th>Q. No.</th><th>Question</th><th>Marks</th><th>Page</th></tr>
+    <tr><td>Q1</td><td>Hashing, division method &amp; collision resolution strategies</td><td>7</td><td>2</td></tr>
+    <tr><td>Q2</td><td>Linear probing &amp; quadratic probing with examples</td><td>7</td><td>3</td></tr>
+    <tr><td>Q3</td><td>Disadvantages of linear probing &amp; role of quadratic probing</td><td>7</td><td>4</td></tr>
+    <tr><td>Q4</td><td>Two different forms of hashing</td><td>2</td><td>4</td></tr>
+    <tr><td>Q5</td><td>Three hash functions with examples</td><td>10</td><td>5</td></tr>
+    <tr><td>Q6</td><td>Hash table (10 buckets, linear probing) — location of 142</td><td>7</td><td>6</td></tr>
+    <tr><td>Q7</td><td>Keys 12, 17, 13, 2, 5, 43, 5, 15 — resultant table</td><td>10</td><td>7</td></tr>
+    <tr><td>Q8</td><td>h(k) = k%7 — location of key 11, collisions</td><td>10</td><td>8</td></tr>
+    <tr><td>Q9</td><td>Insertion sort — algorithm + sort 70, 17, 30, 80, 55, 1, 29, 67, 15</td><td>7</td><td>9</td></tr>
+    <tr><td>Q10</td><td>Merge sort — 11, 16, 13, 11, 4, 12, 6, 7 + complexity</td><td>7</td><td>10</td></tr>
+    <tr><td>Q11</td><td>Heap sort — algorithm + sort 18, 25, 45, 34, 36, 51, 43, 24</td><td>10</td><td>11</td></tr>
+    <tr><td>Q12</td><td>Quick sort — 2, 8, 7, 1, 3, 5, 6, 4 + stability</td><td>10</td><td>12</td></tr>
+    <tr><td>Q13</td><td>Selection sort — C program + worst case</td><td>7</td><td>13</td></tr>
+    <tr><td>Q14</td><td>Indexed sequential search</td><td>2</td><td>14</td></tr>
+    <tr><td>Q15</td><td>Linear vs binary search + recursive binary search</td><td>10</td><td>14</td></tr>
+    <tr><td>Q16</td><td>Effect of pivot on quick sort</td><td>2</td><td>15</td></tr>
+    <tr><td>Q17</td><td>One example each of stable &amp; unstable sort</td><td>2</td><td>15</td></tr>
+  </table>
+  <div class="pnum">Page 1</div>
+</div>
+<!-- ================= PAGE 2 : Q1 ================= -->
+<div class="page">
+  <div class="qhead">Q1. What is Hashing? Explain division method to compute the hash function and also explain the collision resolution strategies used in hashing. <span class="mk">[7 Marks · 2026]</span></div>
+
+  <p><b>Ans.</b> <b>Hashing</b> is a technique of mapping a key <b>k</b> to a position (index) of a table, called the <b>hash table</b>, by using a function called the <b>hash function h(k)</b>. It gives searching in <b>O(1)</b> average time because no comparison is required — the position is computed directly.</p>
+
+  <div class="sub">(a) Division Method</div>
+  <p>The hash function is defined as:</p>
+  <p style="text-align:center"><b>h(k) = k mod m</b> &nbsp;&nbsp; (where m = size of the hash table)</p>
+  <p><b>Example:</b> Let m = 10 and key k = 45.<br>
+  h(45) = 45 mod 10 = <b>5</b> → key 45 will be stored at index <b>5</b>.</p>
+  <p><span class="hl">Note:</span> m should be a prime number to reduce collisions.</p>
+
+  <div class="sub">(b) Collision</div>
+  <p>A <b>collision</b> occurs when two different keys map to the same index, e.g. h(23) = 3 and h(33) = 3 for m = 10. Collision cannot be avoided, so it is <b>resolved</b> by the following techniques.</p>
+
+  <div class="sub">(c) Collision Resolution Strategies</div>
+  <p><b>1. Chaining (Open Hashing):</b> Each slot of the table stores a <b>linked list</b>. All keys mapping to the same slot are inserted in that list.</p>
+  <div class="sketch">
+    <div class="row"><span class="cell idx">[2]</span><span class="cell">12</span><span class="arrow">→</span><span class="cell idx">NULL</span></div>
+    <div class="row" style="margin-top:6px"><span class="cell idx">[3]</span><span class="cell fill">23</span><span class="arrow">→</span><span class="cell fill">33</span><span class="arrow">→</span><span class="cell idx">NULL</span></div>
+    <div class="cap">Fig. 1 — Chaining (keys 12, 23, 33 with m = 10)</div>
+  </div>
+
+  <p><b>2. Open Addressing:</b> All keys are stored <b>inside the table</b> itself; another empty slot is searched.</p>
+  <ul>
+    <li><b>Linear Probing:</b> h<sub>i</sub>(k) = (h(k) + i) mod m, &nbsp;i = 0, 1, 2, …</li>
+    <li><b>Quadratic Probing:</b> h<sub>i</sub>(k) = (h(k) + i²) mod m, &nbsp;i = 0, 1, 2, …</li>
+    <li><b>Double Hashing:</b> h<sub>i</sub>(k) = (h(k) + i · h₂(k)) mod m</li>
+  </ul>
+
+  <p><b>Load factor:</b> α = n/m, where n = number of keys stored. Its ideal value is <b>0.5 to 0.75</b>.</p>
+  <p><b>Complexity:</b> Average case = <b>O(1)</b>; Worst case = <b>O(n)</b> (when all keys map to one slot).</p>
+  <div class="pnum">Page 2</div>
+</div>
+
+<!-- ================= PAGE 3 : Q2 ================= -->
+<div class="page">
+  <div class="qhead">Q2. Explain linear probing and quadratic probing in hashing with examples. <span class="mk">[7 Marks · 2026]</span></div>
+
+  <p><b>Ans.</b> Both are <b>open addressing</b> techniques. When the home position h(k) is already occupied, the next positions are searched by a fixed rule.</p>
+
+  <div class="sub">(a) Linear Probing</div>
+  <p>In linear probing the next slot is checked one by one in a <b>circular</b> manner:</p>
+  <p style="text-align:center"><b>h<sub>i</sub>(k) = (h(k) + i) mod m, &nbsp; i = 0, 1, 2, 3 …</b></p>
+  <p><b>Example:</b> m = 10, keys = 23, 12, 45, 33, 9.</p>
+  <table class="hw">
+    <tr><th>Key</th><th>h(k) = k mod 10</th><th>Probing</th><th>Slot</th></tr>
+    <tr><td>23</td><td>3</td><td>3 empty</td><td>3</td></tr>
+    <tr><td>12</td><td>2</td><td>2 empty</td><td>2</td></tr>
+    <tr><td>45</td><td>5</td><td>5 empty</td><td>5</td></tr>
+    <tr><td>33</td><td>3</td><td>3 full → (3+1) = 4</td><td><b>4</b></td></tr>
+    <tr><td>9</td><td>9</td><td>9 empty</td><td>9</td></tr>
+  </table>
+  <div class="sketch">
+    <div class="row">
+      <span class="cell idx">0</span><span class="cell idx">1</span><span class="cell">12</span><span class="cell fill">23</span><span class="cell fill">33</span><span class="cell">45</span>
+      <span class="cell idx">6</span><span class="cell idx">7</span><span class="cell idx">8</span><span class="cell">9</span>
+    </div>
+    <div class="cap">Fig. 2 — Linear probing: 33 got slot 4 because slot 3 was full</div>
+  </div>
+
+  <div class="sub">(b) Quadratic Probing</div>
+  <p>Here the gap increases as <b>1, 4, 9, 16 …</b> (i²):</p>
+  <p style="text-align:center"><b>h<sub>i</sub>(k) = (h(k) + i²) mod m</b></p>
+  <p><b>Example:</b> m = 10, insert 33 → h(33) = 3.</p>
+  <p>If slot 3 is full → (3 + 1²) = <b>4</b>; if 4 is also full → (3 + 2²) = <b>7</b>; if 7 is full → (3 + 3²) = 12 mod 10 = <b>2</b>.</p>
+
+  <div class="sub">(c) Difference</div>
+  <table class="hw">
+    <tr><th>Point</th><th>Linear Probing</th><th>Quadratic Probing</th></tr>
+    <tr><td>Formula</td><td>(h(k) + i) mod m</td><td>(h(k) + i²) mod m</td></tr>
+    <tr><td>Gap</td><td>1, 2, 3, 4 …</td><td>1, 4, 9, 16 …</td></tr>
+    <tr><td>Problem</td><td><b>Primary clustering</b> (block ban jata hai)</td><td>Secondary clustering (kam hoti hai)</td></tr>
+  </table>
+  <div class="pnum">Page 3</div>
+</div>
+
+<!-- ================= PAGE 4 : Q3 + Q4 ================= -->
+<div class="page">
+  <div class="qhead">Q3. What are the disadvantages of linear probing in hashing? Discuss how quadratic probing can be used to solve some of these problems. <span class="mk">[7 Marks · 2024]</span></div>
+
+  <p><b>Ans.</b> <b>Disadvantages of Linear Probing:</b></p>
+  <ul>
+    <li><b>Primary clustering:</b> continuous occupied slots form a block. Any new key whose home slot falls in this block is pushed further, so the block grows and search time increases.</li>
+    <li><b>More probes:</b> as the table becomes full, the number of comparisons per search increases rapidly.</li>
+    <li><b>Deletion problem:</b> an element cannot be deleted simply by making the slot empty, because the probe chain of other keys will break. A special marker called <b>tombstone</b> is required.</li>
+    <li><b>Poor performance at high load factor:</b> when α → 1, search becomes almost O(n).</li>
+  </ul>
+
+  <p><b>How Quadratic Probing helps:</b> in quadratic probing the step size is i², i.e. 1, 4, 9, 16 … instead of 1, 2, 3. Therefore two keys having nearby home positions do not occupy consecutive slots; the occupied slots are spread out. This breaks the long blocks, so <b>primary clustering is removed</b> and the average number of probes decreases.</p>
+
+  <p><b>Limitation:</b> quadratic probing still causes <b>secondary clustering</b> — two keys with the same home position follow the same probe sequence. Double hashing removes this problem.</p>
+
+  <div class="sub">Diagram — clustering</div>
+  <div class="sketch">
+    <div class="row"><span class="cell idx">Linear:</span><span class="cell fill">23</span><span class="cell fill">33</span><span class="cell fill">43</span><span class="cell fill">53</span><span class="cell idx">— block ban gaya</span></div>
+    <div class="row" style="margin-top:6px"><span class="cell idx">Quad:</span><span class="cell fill">23</span><span class="cell idx">—</span><span class="cell idx">—</span><span class="cell fill">33</span><span class="cell idx">— slots bikhre hue</span></div>
+    <div class="cap">Fig. 3 — linear me block, quadratic me failav</div>
+  </div>
+
+  <div class="qhead" style="margin-top:22px">Q4. What are the 2 different forms of hashing? <span class="mk">[2 Marks · 2024]</span></div>
+  <p><b>Ans.</b> (i) <b>Open Hashing (Chaining)</b> — the collision keys are stored in a linked list outside the table; the table never becomes full.<br>
+  (ii) <b>Closed Hashing (Open Addressing)</b> — all keys are stored inside the table itself and an empty slot is found by probing.</p>
+  <div class="pnum">Page 4</div>
+</div>
+
+<!-- ================= PAGE 5 : Q5 ================= -->
+<div class="page">
+  <div class="qhead">Q5. Explain any three commonly used hash functions with suitable examples. <span class="mk">[10 Marks · 2020-21]</span></div>
+
+  <p><b>Ans.</b> A hash function converts a key into a valid table index. Three commonly used hash functions are:</p>
+
+  <div class="sub">1. Division Method</div>
+  <p><b>h(k) = k mod m</b>, where m is the table size (preferably prime).</p>
+  <p><b>Example:</b> m = 10, k = 45 → h(45) = 45 mod 10 = <b>5</b>.<br>
+  k = 23 → 23 mod 10 = <b>3</b>.</p>
+  <p><b>Advantage:</b> very simple and fast; <b>Disadvantage:</b> if m has many factors, collisions increase — hence m is chosen prime.</p>
+
+  <div class="sub">2. Mid-Square Method</div>
+  <p>The key is <b>squared</b> and the <b>middle digits</b> of the result are taken as the index.</p>
+  <p><b>Example:</b> k = 23 → k² = 529. The middle digit is <b>2</b>, so h(23) = 2.<br>
+  k = 45 → 45² = 2025 → middle digit <b>0</b> → h(45) = 0.</p>
+  <p><b>Advantage:</b> the middle digits depend on all the digits of the key, so the distribution is good.</p>
+
+  <div class="sub">3. Folding Method</div>
+  <p>The key is divided into <b>parts</b> of equal size and all parts are <b>added</b>; the sum (mod m) is the index.</p>
+  <p><b>Example:</b> k = 123456 → parts 12, 34, 56 → sum = 102 → h(k) = 102 mod 10 = <b>2</b>.</p>
+
+  <div class="sub">4. Multiplication Method (for reference)</div>
+  <p><b>h(k) = ⌊ m × (k·A mod 1) ⌋</b>, where A ≈ 0.618 (golden ratio).<br>
+  <b>Example:</b> m = 10, k = 45 → 45 × 0.618 = 27.81 → fraction 0.81 → 10 × 0.81 = <b>8</b>.</p>
+
+  <div class="sub">Conclusion</div>
+  <p>A good hash function should be <b>easy to compute</b>, should give <b>uniform distribution</b> of keys, and should <b>minimise collisions</b>. The division method is used most in practice.</p>
+
+  <table class="hw">
+    <tr><th>Method</th><th>Formula</th><th>Example (m = 10)</th></tr>
+    <tr><td>Division</td><td>k mod m</td><td>45 → 5</td></tr>
+    <tr><td>Mid-square</td><td>middle digits of k²</td><td>23 → 529 → 2</td></tr>
+    <tr><td>Folding</td><td>(sum of parts) mod m</td><td>123456 → 102 → 2</td></tr>
+  </table>
+  <div class="pnum">Page 5</div>
+</div>
+<!-- ================= PAGE 6 : Q6 ================= -->
+<div class="page">
+  <div class="qhead">Q6. Construct a hash table that contains 10 buckets and uses linear probing to resolve collisions. The key values are integers and the hash function used is key % 10. Insert values 43, 165, 62, 123, 142 in the table. Show all the steps and find the location of the key value 142. <span class="mk">[7 Marks · 2025]</span></div>
+
+  <p><b>Ans.</b> Given: m = 10 buckets (0 to 9), h(k) = k mod 10, collision resolution = <b>linear probing</b><br>
+  Formula: h<sub>i</sub>(k) = (h(k) + i) mod 10</p>
+
+  <div class="sub">Step-by-step insertion</div>
+  <table class="hw">
+    <tr><th>Key</th><th>h(k) = k mod 10</th><th>Probing steps</th><th>Final index</th></tr>
+    <tr><td>43</td><td>43 mod 10 = 3</td><td>slot 3 is empty</td><td><b>3</b></td></tr>
+    <tr><td>165</td><td>165 mod 10 = 5</td><td>slot 5 is empty</td><td><b>5</b></td></tr>
+    <tr><td>62</td><td>62 mod 10 = 2</td><td>slot 2 is empty</td><td><b>2</b></td></tr>
+    <tr><td>123</td><td>123 mod 10 = 3</td><td>3 occupied → (3+1) = 4 empty</td><td><b>4</b></td></tr>
+    <tr><td><b>142</b></td><td>142 mod 10 = 2</td><td>2 occ. → 3 occ. → 4 occ. → 5 occ. → <b>6 empty</b></td><td><b>6</b></td></tr>
+  </table>
+
+  <div class="sub">Hash Table (final)</div>
+  <div class="sketch">
+    <div class="row">
+      <span class="cell idx">0</span><span class="cell idx">1</span><span class="cell">62</span><span class="cell">43</span><span class="cell">123</span><span class="cell">165</span><span class="cell fill">142</span><span class="cell idx">7</span><span class="cell idx">8</span><span class="cell idx">9</span>
+    </div>
+    <div class="cap">Fig. 4 — Index: 0 1 2 3 4 5 6 7 8 9 (7, 8, 9 khaali)</div>
+  </div>
+
+  <p><b>Answer:</b> The key <b>142 is stored at index 6</b>. For 142, total <b>5 probes</b> are required (slots 2, 3, 4, 5 checked, placed at 6).</p>
+
+  <p><b>Load factor:</b> α = n/m = 5/10 = <b>0.5</b> — which is within the ideal range (0.5 – 0.75).</p>
+
+  <div class="sub">Observation</div>
+  <p>Collisions occurred for the keys <b>123</b> and <b>142</b>, because their home positions (3 and 2) were already occupied. This is the reason linear probing checks the next slot circularly.</p>
+  <div class="pnum">Page 6</div>
+</div>
+
+<!-- ================= PAGE 7 : Q7 ================= -->
+<div class="page">
+  <div class="qhead">Q7. The keys 12, 17, 13, 2, 5, 43, 5 and 15 are inserted into an initially empty hash table of length 15 using open addressing with hash function h(k) = k mod 10 and linear probing. What is the resultant hash table? Also differentiate between linear and quadratic probing. <span class="mk">[10 Marks · 2021-22]</span></div>
+
+  <p><b>Ans.</b> Table length = 15 (indices 0–14), h(k) = k mod 10, linear probing.</p>
+
+  <div class="sub">Step 1 — Insertion table</div>
+  <table class="hw">
+    <tr><th>Key</th><th>h(k)</th><th>Probing</th><th>Index</th></tr>
+    <tr><td>12</td><td>2</td><td>2 empty</td><td>2</td></tr>
+    <tr><td>17</td><td>7</td><td>7 empty</td><td>7</td></tr>
+    <tr><td>13</td><td>3</td><td>3 empty</td><td>3</td></tr>
+    <tr><td>2</td><td>2</td><td>2, 3 full → 4</td><td>4</td></tr>
+    <tr><td>5</td><td>5</td><td>5 empty</td><td>5</td></tr>
+    <tr><td>43</td><td>3</td><td>3, 4, 5 full → 6</td><td>6</td></tr>
+    <tr><td>5 (again)</td><td>5</td><td>5, 6, 7 full → 8</td><td>8</td></tr>
+    <tr><td>15</td><td>5</td><td>5, 6, 7, 8 full → 9</td><td>9</td></tr>
+  </table>
+
+  <div class="sub">Step 2 — Resultant hash table</div>
+  <div class="sketch">
+    <div class="row"><span class="cell idx">0</span><span class="cell idx">1</span><span class="cell">12</span><span class="cell">13</span><span class="cell">2</span><span class="cell">5</span><span class="cell">43</span><span class="cell">17</span><span class="cell">5</span><span class="cell">15</span><span class="cell idx">10…14</span></div>
+    <div class="cap">Fig. 5 — Indices 0, 1 and 10–14 remain empty</div>
+  </div>
+  <p>So the table is: <b>[2]=12, [3]=13, [4]=2, [5]=5, [6]=43, [7]=17, [8]=5, [9]=15</b>.</p>
+
+  <div class="sub">Step 3 — Difference between linear and quadratic probing</div>
+  <table class="hw">
+    <tr><th>Point</th><th>Linear Probing</th><th>Quadratic Probing</th></tr>
+    <tr><td>Formula</td><td>h<sub>i</sub>(k) = (h(k) + i) mod m</td><td>h<sub>i</sub>(k) = (h(k) + i²) mod m</td></tr>
+    <tr><td>Step size</td><td>1, 2, 3, 4 …</td><td>1, 4, 9, 16 …</td></tr>
+    <tr><td>Clustering</td><td>Primary clustering (blocks)</td><td>Secondary clustering (less)</td></tr>
+    <tr><td>Probes</td><td>More</td><td>Comparatively less</td></tr>
+    <tr><td>Search cost</td><td>Increases fast with α</td><td>More uniform</td></tr>
+  </table>
+
+  <p><b>Note:</b> Here the key <b>5 appears twice</b> in the question; both are inserted at different indices (5 and 8), which shows how linear probing handles repeated keys.</p>
+  <div class="pnum">Page 7</div>
+</div>
+
+<!-- ================= PAGE 8 : Q8 ================= -->
+<div class="page">
+  <div class="qhead">Q8. A hash function H is defined as H(key) = key % 7, with linear probing, used to insert the keys 37, 38, 72, 48, 98, 11, 66 into a table indexed from 0 to 6. What will be the location of key 11? Justify your answer and count the total number of collisions and probes. <span class="mk">[10 Marks · 2020-21]</span></div>
+
+  <p><b>Ans.</b> Table size m = 7 (indices 0 to 6), h(k) = k mod 7, linear probing.</p>
+
+  <div class="sub">Step 1 — Insertion</div>
+  <table class="hw">
+    <tr><th>Key</th><th>k mod 7</th><th>Probing</th><th>Index</th></tr>
+    <tr><td>37</td><td>2</td><td>2 empty</td><td>2</td></tr>
+    <tr><td>38</td><td>3</td><td>3 empty</td><td>3</td></tr>
+    <tr><td>72</td><td>2</td><td>2, 3 full → 4</td><td>4</td></tr>
+    <tr><td>48</td><td>6</td><td>6 empty</td><td>6</td></tr>
+    <tr><td>98</td><td>0</td><td>0 empty</td><td>0</td></tr>
+    <tr><td><b>11</b></td><td><b>4</b></td><td>4 full → <b>5 empty</b></td><td><b>5</b></td></tr>
+    <tr><td>66</td><td>3</td><td>3, 4, 5, 6, 0 full → 1</td><td>1</td></tr>
+  </table>
+
+  <div class="sub">Step 2 — Final table</div>
+  <div class="sketch">
+    <div class="row"><span class="cell">98</span><span class="cell">66</span><span class="cell">37</span><span class="cell">38</span><span class="cell">72</span><span class="cell fill">11</span><span class="cell">48</span></div>
+    <div class="row" style="margin-top:4px"><span class="cell idx">0</span><span class="cell idx">1</span><span class="cell idx">2</span><span class="cell idx">3</span><span class="cell idx">4</span><span class="cell idx">5</span><span class="cell idx">6</span></div>
+    <div class="cap">Fig. 6 — Key 11 is placed at index 5</div>
+  </div>
+
+  <p><b>Justification:</b> H(11) = 11 mod 7 = <b>4</b>. Slot 4 already contains 72, so by linear probing the next slot is checked: (4 + 1) mod 7 = <b>5</b>, which is empty. Hence key <b>11 is stored at index 5</b>.</p>
+
+  <div class="sub">Step 3 — Counting collisions and probes</div>
+  <table class="hw">
+    <tr><th>Key</th><th>Collisions</th><th>Probes used</th></tr>
+    <tr><td>37, 38, 48, 98</td><td>0</td><td>1 each = 4</td></tr>
+    <tr><td>72</td><td>1</td><td>3 (slots 2, 3, 4)</td></tr>
+    <tr><td>11</td><td>1</td><td>2 (slots 4, 5)</td></tr>
+    <tr><td>66</td><td>4</td><td>6 (slots 3, 4, 5, 6, 0, 1)</td></tr>
+    <tr><th>Total</th><th><b>6</b></th><th><b>15</b></th></tr>
+  </table>
+
+  <p><b>Answer:</b> Location of key 11 = <b>index 5</b> · Total collisions = <b>6</b> · Total probes = <b>15</b> · Load factor α = 7/7 = <b>1.0</b> (table is completely full, so the next insertion would need rehashing).</p>
+  <div class="pnum">Page 8</div>
+</div>
+<!-- ================= PAGE 9 : Q9 ================= -->
+<div class="page">
+  <div class="qhead">Q9. Write the algorithm of Insertion sort and sort the following list of numbers using insertion sort: 70, 17, 30, 80, 55, 1, 29, 67, 15. <span class="mk">[7 Marks · 2026]</span></div>
+
+  <p><b>Ans.</b> <b>Insertion sort</b> works like arranging playing cards in hand: each element is picked and inserted at its correct position among the already sorted elements, shifting the bigger elements to the right.</p>
+
+  <div class="sub">Algorithm</div>
+  <div class="code">
+    1. for i = 1 to n−1<br>
+    2. &nbsp;&nbsp;&nbsp;key = a[i]<br>
+    3. &nbsp;&nbsp;&nbsp;j = i − 1<br>
+    4. &nbsp;&nbsp;&nbsp;while (j ≥ 0 and a[j] &gt; key)<br>
+    5. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a[j+1] = a[j] &nbsp;&nbsp;(shift right)<br>
+    6. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;j = j − 1<br>
+    7. &nbsp;&nbsp;&nbsp;a[j+1] = key &nbsp;&nbsp;(insert)<br>
+    8. end for
+  </div>
+
+  <div class="sub">Step-by-step sorting</div>
+  <p>Given: <b>70, 17, 30, 80, 55, 1, 29, 67, 15</b></p>
+  <table class="hw">
+    <tr><th>Pass (i)</th><th>key</th><th>Shifting</th><th>Array after pass</th></tr>
+    <tr><td>1</td><td>17</td><td>70 → right</td><td>17, 70, 30, 80, 55, 1, 29, 67, 15</td></tr>
+    <tr><td>2</td><td>30</td><td>70 → right</td><td>17, 30, 70, 80, 55, 1, 29, 67, 15</td></tr>
+    <tr><td>3</td><td>80</td><td>no shift</td><td>17, 30, 70, 80, 55, 1, 29, 67, 15</td></tr>
+    <tr><td>4</td><td>55</td><td>80, 70 → right</td><td>17, 30, 55, 70, 80, 1, 29, 67, 15</td></tr>
+    <tr><td>5</td><td>1</td><td>5 elements shift</td><td>1, 17, 30, 55, 70, 80, 29, 67, 15</td></tr>
+    <tr><td>6</td><td>29</td><td>80, 70, 55, 30 → right</td><td>1, 17, 29, 30, 55, 70, 80, 67, 15</td></tr>
+    <tr><td>7</td><td>67</td><td>80, 70 → right</td><td>1, 17, 29, 30, 55, 67, 70, 80, 15</td></tr>
+    <tr><td>8</td><td>15</td><td>7 elements shift</td><td><b>1, 15, 17, 29, 30, 55, 67, 70, 80</b></td></tr>
+  </table>
+
+  <div class="sketch">
+    <div class="row"><span class="cell idx">sorted</span><span class="cell fill">1</span><span class="cell fill">15</span><span class="cell fill">17</span><span class="cell fill">29</span><span class="cell fill">30</span><span class="cell fill">55</span><span class="cell fill">67</span><span class="cell fill">70</span><span class="cell fill">80</span></div>
+    <div class="cap">Fig. 7 — Final sorted array</div>
+  </div>
+
+  <p><b>Complexity:</b> Best case = <b>O(n)</b> (already sorted, no shifting) · Average = <b>O(n²)</b> · Worst = <b>O(n²)</b> · Space = <b>O(1)</b> · <b>Stable</b>.</p>
+  <div class="pnum">Page 9</div>
+</div>
+
+<!-- ================= PAGE 10 : Q10 ================= -->
+<div class="page">
+  <div class="qhead">Q10. Demonstrate merge sort algorithm to sort the following elements in ascending order: 11, 16, 13, 11, 4, 12, 6, 7. What is the time and space complexity of merge sort? <span class="mk">[7 Marks · 2025]</span></div>
+
+  <p><b>Ans.</b> <b>Merge sort</b> is based on the <b>divide and conquer</b> technique. The array is divided into two halves recursively until single elements remain (a single element is already sorted), and then the sorted halves are <b>merged</b> using two pointers.</p>
+
+  <div class="sub">Step 1 — Divide</div>
+  <div class="sketch">
+    <div class="row"><span class="cell">11 16 13 11 4 12 6 7</span></div>
+    <div class="row" style="margin-top:6px"><span class="cell">11 16 13 11</span><span class="cell">4 12 6 7</span></div>
+    <div class="row" style="margin-top:6px"><span class="cell">11 16</span><span class="cell">13 11</span><span class="cell">4 12</span><span class="cell">6 7</span></div>
+    <div class="row" style="margin-top:6px"><span class="cell idx">11</span><span class="cell idx">16</span><span class="cell idx">13</span><span class="cell idx">11</span><span class="cell idx">4</span><span class="cell idx">12</span><span class="cell idx">6</span><span class="cell idx">7</span></div>
+    <div class="cap">Fig. 8 — Dividing the array into single elements</div>
+  </div>
+
+  <div class="sub">Step 2 — Merge (combine sorted halves)</div>
+  <table class="hw">
+    <tr><th>Merge</th><th>Result</th></tr>
+    <tr><td>11 + 16</td><td>11, 16</td></tr>
+    <tr><td>13 + 11</td><td>11, 13</td></tr>
+    <tr><td>4 + 12</td><td>4, 12</td></tr>
+    <tr><td>6 + 7</td><td>6, 7</td></tr>
+    <tr><td>(11, 16) + (11, 13)</td><td>11, 11, 13, 16</td></tr>
+    <tr><td>(4, 12) + (6, 7)</td><td>4, 6, 7, 12</td></tr>
+    <tr><td>(11, 11, 13, 16) + (4, 6, 7, 12)</td><td><b>4, 6, 7, 11, 11, 12, 13, 16</b></td></tr>
+  </table>
+
+  <p><b>Explanation of last merge:</b> compare 11 and 4 → take 4; 11 and 6 → take 6; 11 and 7 → take 7; 11 and 12 → take 11; 11 and 12 → take 11; 13 and 12 → take 12; then 13 and 16 are copied.</p>
+
+  <div class="sub">Step 3 — Complexity</div>
+  <p>The array is divided into <b>log₂n</b> levels and at every level the total merging work is <b>O(n)</b>. Hence:</p>
+  <p style="text-align:center"><b>T(n) = 2T(n/2) + O(n) = O(n log n)</b></p>
+  <p><b>Time:</b> Best = Average = Worst = <b>O(n log n)</b><br>
+  <b>Space:</b> <b>O(n)</b> (temporary arrays L and R are required)<br>
+  <b>Stable:</b> Yes (equal elements keep their order).</p>
+  <div class="pnum">Page 10</div>
+</div>
+
+<!-- ================= PAGE 11 : Q11 ================= -->
+<div class="page">
+  <div class="qhead">Q11. Write an algorithm for Heap Sort. Use Heap sort algorithm to sort the following sequence: 18, 25, 45, 34, 36, 51, 43, 24. <span class="mk">[10 Marks · 2026 / 2022-23]</span></div>
+
+  <p><b>Ans.</b> <b>Heap sort</b> builds a <b>max-heap</b> (parent ≥ children) in the array, then repeatedly moves the largest element (root) to the end and heapifies the remaining part.</p>
+  <p>For a node at index i: left child = <b>2i+1</b>, right child = <b>2i+2</b>.</p>
+
+  <div class="sub">Algorithm</div>
+  <div class="code">
+    heapify(a, n, i):<br>
+    &nbsp;&nbsp;largest = i; l = 2i+1; r = 2i+2<br>
+    &nbsp;&nbsp;if (l &lt; n and a[l] &gt; a[largest]) largest = l<br>
+    &nbsp;&nbsp;if (r &lt; n and a[r] &gt; a[largest]) largest = r<br>
+    &nbsp;&nbsp;if (largest ≠ i) { swap(a[i], a[largest]); heapify(a, n, largest) }<br><br>
+    heapSort(a, n):<br>
+    &nbsp;&nbsp;for i = n/2−1 down to 0 : heapify(a, n, i) &nbsp;&nbsp;// build max-heap<br>
+    &nbsp;&nbsp;for i = n−1 down to 1 : swap(a[0], a[i]); heapify(a, i, 0)
+  </div>
+
+  <div class="sub">Step 1 — Build max-heap</div>
+  <div class="sketch">
+    <div class="row"><span class="cell idx">array:</span><span class="cell">18</span><span class="cell">25</span><span class="cell">45</span><span class="cell">34</span><span class="cell">36</span><span class="cell">51</span><span class="cell">43</span><span class="cell">24</span></div>
+    <div class="row" style="margin-top:6px"><span class="cell idx">after:</span><span class="cell fill">51</span><span class="cell fill">36</span><span class="cell fill">45</span><span class="cell">34</span><span class="cell">25</span><span class="cell">18</span><span class="cell">43</span><span class="cell">24</span></div>
+    <div class="cap">Fig. 9 — Max-heap: root 51 (sabse bada), har parent apne children se bada</div>
+  </div>
+
+  <div class="sub">Step 2 — Repeated extraction</div>
+  <table class="hw">
+    <tr><th>Step</th><th>Action</th><th>Array after heapify</th></tr>
+    <tr><td>1</td><td>swap 51 ↔ 24, heapify</td><td>45, 36, 43, 34, 25, 18, 24 | <b>51</b></td></tr>
+    <tr><td>2</td><td>swap 45 ↔ 24, heapify</td><td>43, 36, 24, 34, 25, 18 | <b>45, 51</b></td></tr>
+    <tr><td>3</td><td>swap 43 ↔ 18, heapify</td><td>36, 34, 24, 18, 25 | <b>43, 45, 51</b></td></tr>
+    <tr><td>4</td><td>swap 36 ↔ 25, heapify</td><td>34, 25, 24, 18 | <b>36, 43, 45, 51</b></td></tr>
+    <tr><td>5</td><td>swap 34 ↔ 18, heapify</td><td>25, 18, 24 | <b>34, 36, 43, 45, 51</b></td></tr>
+    <tr><td>6</td><td>swap 25 ↔ 24</td><td>24, 18 | <b>25, 34, 36, 43, 45, 51</b></td></tr>
+    <tr><td>7</td><td>swap 24 ↔ 18</td><td><b>18, 24, 25, 34, 36, 43, 45, 51</b></td></tr>
+  </table>
+
+  <p><b>Sorted array:</b> <b>18, 24, 25, 34, 36, 43, 45, 51</b></p>
+  <p><b>Complexity:</b> Building heap = O(n), each of the (n−1) extractions takes O(log n) → Time = <b>O(n log n)</b> in <b>all cases</b> · Space = <b>O(1)</b> (in-place) · <b>Unstable</b>.</p>
+  <div class="pnum">Page 11</div>
+</div>
+
+<!-- ================= PAGE 12 : Q12 ================= -->
+<div class="page">
+  <div class="qhead">Q12. Write an algorithm for Quick sort. Use Quick sort to sort the following elements: 2, 8, 7, 1, 3, 5, 6, 4. Is it a stable sorting algorithm? Justify. <span class="mk">[10 Marks · 2022-23]</span></div>
+
+  <p><b>Ans.</b> <b>Quick sort</b> selects a <b>pivot</b> and partitions the array so that all smaller elements come to its left and larger to its right. The pivot then reaches its <b>final position</b>, and the same process is repeated on the left and right parts.</p>
+
+  <div class="sub">Algorithm</div>
+  <div class="code">
+    quickSort(a, low, high):<br>
+    &nbsp;&nbsp;if (low &lt; high) {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;pi = partition(a, low, high)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;quickSort(a, low, pi−1)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;quickSort(a, pi+1, high) }<br><br>
+    partition(a, low, high):<br>
+    &nbsp;&nbsp;pivot = a[high]; i = low − 1<br>
+    &nbsp;&nbsp;for j = low to high−1:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;if (a[j] ≤ pivot) { i++; swap(a[i], a[j]) }<br>
+    &nbsp;&nbsp;swap(a[i+1], a[high]); return i+1
+  </div>
+
+  <div class="sub">Step 1 — First partition (pivot = 4)</div>
+  <table class="hw">
+    <tr><th>j</th><th>a[j]</th><th>≤ 4 ?</th><th>Action</th><th>Array</th></tr>
+    <tr><td>0</td><td>2</td><td>yes</td><td>i=0, swap 2↔2</td><td>2, 8, 7, 1, 3, 5, 6, 4</td></tr>
+    <tr><td>1</td><td>8</td><td>no</td><td>—</td><td>2, 8, 7, 1, 3, 5, 6, 4</td></tr>
+    <tr><td>2</td><td>7</td><td>no</td><td>—</td><td>2, 8, 7, 1, 3, 5, 6, 4</td></tr>
+    <tr><td>3</td><td>1</td><td>yes</td><td>i=1, swap 8↔1</td><td>2, 1, 7, 8, 3, 5, 6, 4</td></tr>
+    <tr><td>4</td><td>3</td><td>yes</td><td>i=2, swap 7↔3</td><td>2, 1, 3, 8, 7, 5, 6, 4</td></tr>
+    <tr><td>5</td><td>5</td><td>no</td><td>—</td><td>2, 1, 3, 8, 7, 5, 6, 4</td></tr>
+    <tr><td>6</td><td>6</td><td>no</td><td>—</td><td>2, 1, 3, 8, 7, 5, 6, 4</td></tr>
+  </table>
+  <p>Now place pivot at i+1: swap a[3] and a[7] → <b>2, 1, 3, 4, 7, 5, 6, 8</b> → <b>4 is at index 3 (final position)</b>.</p>
+
+  <div class="sub">Step 2 — Recursive partitions</div>
+  <table class="hw">
+    <tr><th>Sub-array</th><th>Pivot</th><th>Result</th></tr>
+    <tr><td>2, 1, 3</td><td>3</td><td>2, 1, 3 → 3 final → (2, 1) → 1, 2</td></tr>
+    <tr><td>7, 5, 6, 8</td><td>8</td><td>7, 5, 6, 8 → 8 final → (7, 5, 6) → 6 final → 5, 6, 7</td></tr>
+  </table>
+  <p><b>Final sorted array:</b> <b>1, 2, 3, 4, 5, 6, 7, 8</b></p>
+
+  <div class="sub">Step 3 — Stability</div>
+  <p><b>Quick sort is NOT stable.</b> During partitioning, elements are swapped over long distances. If two elements have equal keys, their relative order may change. Hence quick sort is <b>unstable</b>. (Example: in the partition step 8 was swapped with 1, jumping over several elements.)</p>
+  <p><b>Complexity:</b> Best/Average = <b>O(n log n)</b> · Worst = <b>O(n²)</b> (when the array is already sorted and the last element is taken as pivot) · Space = O(log n) · <b>In-place</b>.</p>
+  <div class="pnum">Page 12</div>
+</div>
+
+<!-- ================= PAGE 13 : Q13 ================= -->
+<div class="page">
+  <div class="qhead">Q13. Write a C program for sorting 100 integer numbers using selection sort procedure. Discuss the worst-case time complexity of the algorithm. <span class="mk">[7 Marks · 2024]</span></div>
+
+  <p><b>Ans.</b> <b>Selection sort</b> finds the smallest element from the unsorted part in every pass and swaps it with the first element of that part.</p>
+
+  <div class="sub">C Program</div>
+  <div class="code">
+    #include &lt;stdio.h&gt;<br>
+    int main() {<br>
+    &nbsp;&nbsp;int a[100], n, i, j, min, temp;<br>
+    &nbsp;&nbsp;printf("Enter number of elements: ");<br>
+    &nbsp;&nbsp;scanf("%d", &amp;n);<br>
+    &nbsp;&nbsp;for (i = 0; i &lt; n; i++)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;scanf("%d", &amp;a[i]);<br><br>
+    &nbsp;&nbsp;for (i = 0; i &lt; n - 1; i++) { &nbsp;&nbsp;// n−1 passes<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;min = i;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;for (j = i + 1; j &lt; n; j++)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (a[j] &lt; a[min]) min = j;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;if (min != i) {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;temp = a[i]; a[i] = a[min]; a[min] = temp;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+    &nbsp;&nbsp;}<br><br>
+    &nbsp;&nbsp;printf("Sorted array: ");<br>
+    &nbsp;&nbsp;for (i = 0; i &lt; n; i++) printf("%d ", a[i]);<br>
+    &nbsp;&nbsp;return 0;<br>
+    }
+  </div>
+
+  <div class="sub">Working (example)</div>
+  <p>Array: 64, 25, 12, 22, 11</p>
+  <table class="hw">
+    <tr><th>Pass</th><th>Minimum</th><th>Swap</th><th>Array</th></tr>
+    <tr><td>1</td><td>11 (index 4)</td><td>64 ↔ 11</td><td>11, 25, 12, 22, 64</td></tr>
+    <tr><td>2</td><td>12 (index 2)</td><td>25 ↔ 12</td><td>11, 12, 25, 22, 64</td></tr>
+    <tr><td>3</td><td>22 (index 3)</td><td>25 ↔ 22</td><td>11, 12, 22, 25, 64</td></tr>
+    <tr><td>4</td><td>25</td><td>no swap</td><td><b>11, 12, 22, 25, 64</b></td></tr>
+  </table>
+
+  <div class="sub">Worst-case time complexity</div>
+  <p>In every pass the inner loop scans the complete unsorted part to find the minimum. The number of comparisons is:</p>
+  <p style="text-align:center">(n−1) + (n−2) + … + 1 = <b>n(n−1)/2</b></p>
+  <p>Hence the time complexity is <b>O(n²)</b> in the <b>worst case, average case and even the best case</b> (because the full scan is always required).</p>
+  <p><b>Space:</b> O(1) · <b>Swaps:</b> only (n−1) — minimum among all sorting algorithms · <b>Unstable</b>.</p>
+  <div class="pnum">Page 13</div>
+</div>
+<!-- ================= PAGE 14 : Q14 + Q15 ================= -->
+<div class="page">
+  <div class="qhead">Q14. Illustrate the concept of Indexed Sequential search. <span class="mk">[2 Marks · 2025]</span></div>
+  <p><b>Ans.</b> In <b>indexed sequential search</b> the sorted file is divided into blocks and an <b>index table</b> is created which stores the starting key and address of each block. First the index table is searched to locate the block, then a <b>linear search is performed only inside that block</b>. It reduces the search time to approximately <b>O(√n)</b> and is useful for large files stored on disk.</p>
+
+  <div class="sketch">
+    <div class="row"><span class="cell idx">index:</span><span class="cell">10</span><span class="cell">40</span><span class="cell">70</span></div>
+    <div class="row" style="margin-top:6px"><span class="cell idx">file:</span><span class="cell">10 20 30</span><span class="cell">40 50 60</span><span class="cell">70 80 90</span></div>
+    <div class="cap">Fig. 10 — Index table se block, phir block ke andar linear search</div>
+  </div>
+
+  <div class="qhead" style="margin-top:20px">Q15. Differentiate between linear and binary search algorithm. Write a recursive function to implement binary search. <span class="mk">[10 Marks · 2021-22]</span></div>
+
+  <p><b>Ans.</b> <b>Linear search</b> compares the key with every element one by one from the beginning. <b>Binary search</b> compares the key with the middle element and discards half of the array in each step.</p>
+
+  <table class="hw">
+    <tr><th>Point</th><th>Linear Search</th><th>Binary Search</th></tr>
+    <tr><td>Requirement</td><td>No condition (works on unsorted data)</td><td>Array must be <b>sorted</b></td></tr>
+    <tr><td>Working</td><td>checks each element sequentially</td><td>checks middle element, halves the list</td></tr>
+    <tr><td>Best case</td><td>O(1)</td><td>O(1)</td></tr>
+    <tr><td>Worst case</td><td>O(n)</td><td>O(log n)</td></tr>
+    <tr><td>Comparisons (n = 1000)</td><td>up to 1000</td><td>about 10</td></tr>
+    <tr><td>Suitable for</td><td>small / unsorted data</td><td>large sorted data</td></tr>
+  </table>
+
+  <div class="sub">Recursive binary search function</div>
+  <div class="code">
+    int binarySearch(int a[], int low, int high, int key) {<br>
+    &nbsp;&nbsp;if (low &gt; high) return -1; &nbsp;&nbsp;// base case: not found<br>
+    &nbsp;&nbsp;int mid = (low + high) / 2;<br>
+    &nbsp;&nbsp;if (a[mid] == key) return mid; &nbsp;&nbsp;// found<br>
+    &nbsp;&nbsp;if (a[mid] &gt; key) &nbsp;&nbsp;// key is smaller<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;return binarySearch(a, low, mid - 1, key);<br>
+    &nbsp;&nbsp;return binarySearch(a, mid + 1, high, key);<br>
+    }
+  </div>
+
+  <p><b>Complexity of recursive binary search:</b> the array size becomes half at every call, so there are log₂n calls. Hence <b>O(log n)</b> time and <b>O(log n)</b> recursion stack space.</p>
+  <div class="pnum">Page 14</div>
+</div>
+
+<!-- ================= PAGE 15 : Q16 + Q17 ================= -->
+<div class="page">
+  <div class="qhead">Q16. How does the choice of pivot element affect the running time of quick sort algorithm? <span class="mk">[2 Marks · 2024]</span></div>
+  <p><b>Ans.</b> The pivot decides how the array is partitioned. If the pivot divides the array into <b>two nearly equal halves</b>, the recursion depth is log₂n and the time is <b>O(n log n)</b>. But if the pivot is always the <b>smallest or largest</b> element (e.g. the last element of an already sorted array), the partition splits into 0 and n−1 elements, the recursion becomes n, n−1, n−2 … and the time becomes <b>O(n²)</b>. Therefore a <b>random pivot</b> or <b>median-of-three</b> is used.</p>
+
+  <div class="qhead" style="margin-top:20px">Q17. Give an example of one each stable and unstable sorting technique. <span class="mk">[2 Marks · 2021-22]</span></div>
+  <p><b>Ans.</b> <b>Stable:</b> <b>Merge sort</b> — if two elements have equal keys, their relative order is preserved after sorting.<br>
+  <b>Unstable:</b> <b>Quick sort</b> — the swapping during partition may change the relative order of equal keys.</p>
+
+  <div class="sketch">
+    <div class="row"><span class="cell idx">before:</span><span class="cell">3a</span><span class="cell">1</span><span class="cell">3b</span></div>
+    <div class="row" style="margin-top:6px"><span class="cell idx">stable:</span><span class="cell fill">1</span><span class="cell fill">3a</span><span class="cell fill">3b</span><span class="cell idx">order same ✔</span></div>
+    <div class="row" style="margin-top:6px"><span class="cell idx">unstable:</span><span class="cell fill">1</span><span class="cell fill">3b</span><span class="cell fill">3a</span><span class="cell idx">order badal gaya ✕</span></div>
+    <div class="cap">Fig. 11 — Stability ka matlab: barabar keys ka order bacha ya nahi</div>
+  </div>
+
+  <div class="sub">Quick revision — is unit ke saare formulas</div>
+  <div class="code">
+    h(k) = k mod m &nbsp;&nbsp;·&nbsp;&nbsp; linear: (h(k) + i) mod m<br>
+    quadratic: (h(k) + i²) mod m &nbsp;&nbsp;·&nbsp;&nbsp; double: (h(k) + i·h₂(k)) mod m<br>
+    α = n/m (ideal 0.5–0.75) &nbsp;&nbsp;·&nbsp;&nbsp; mid = (low + high)/2<br>
+    T(n) = 2T(n/2) + O(n) = O(n log n) &nbsp;&nbsp;·&nbsp;&nbsp; heap children: 2i+1, 2i+2<br>
+    radix: O(d(n+k)) &nbsp;&nbsp;·&nbsp;&nbsp; stable = BIMR
+  </div>
+  <div class="pnum">Page 15</div>
+</div>
+
+<!-- ================= PAGE 16 : MOST REPEATED ================= -->
+<div class="page">
+  <div class="qhead" style="font-size:29px">MOST REPEATED PYQs — Unit 3 (2020–2026)</div>
+  <p>Yeh woh questions hain jo baar-baar aaye hain. Inko sabse pehle pakka karo.</p>
+
+  <table class="hw">
+    <tr><th>#</th><th>Question</th><th>Kitni baar / saal</th><th>Marks</th></tr>
+    <tr><td>1</td><td>What is hashing? Division method + collision resolution strategies</td><td>2026, 2025-26, 2019-20 (3×)</td><td>7–10</td></tr>
+    <tr><td>2</td><td>Linear probing vs quadratic probing (with examples / disadvantages)</td><td>2026, 2024, 2023-24, 2021-22 (4×)</td><td>7–10</td></tr>
+    <tr><td>3</td><td>Construct hash table with linear probing (numerical)</td><td>2025, 2021-22, 2020-21 (3×)</td><td>7–10</td></tr>
+    <tr><td>4</td><td>Merge sort — algorithm + sort given elements + complexity</td><td>2025, 2024-25, 2021-22, 2020-21 (4×)</td><td>7–10</td></tr>
+    <tr><td>5</td><td>Quick sort — algorithm + sort + stability justify</td><td>2022-23, 2021-22 (2×)</td><td>10</td></tr>
+    <tr><td>6</td><td>Heap sort — algorithm + sort given sequence</td><td>2026, 2022-23 (2×)</td><td>7–10</td></tr>
+    <tr><td>7</td><td>Insertion sort — algorithm + sort given numbers + complexity</td><td>2026, 2021-22 (2×)</td><td>7–10</td></tr>
+    <tr><td>8</td><td>Selection sort — C program + worst case</td><td>2024 (1×)</td><td>7</td></tr>
+    <tr><td>9</td><td>Binary search — program / recursive function / average behaviour</td><td>2024, 2021-22 (2×)</td><td>7–10</td></tr>
+    <tr><td>10</td><td>Indexed sequential search (concept)</td><td>2025 (1×)</td><td>2</td></tr>
+    <tr><td>11</td><td>Stable / unstable sorting — example</td><td>2021-22 (1×)</td><td>2</td></tr>
+    <tr><td>12</td><td>Effect of pivot on quick sort</td><td>2024 (1×)</td><td>2</td></tr>
+  </table>
+
+  <div class="sub">Topic-wise weightage (2020–2026)</div>
+  <table class="hw">
+    <tr><th>Topic</th><th>Kitni baar poocha</th><th>Approx marks per paper</th></tr>
+    <tr><td>Sorting</td><td><b>14</b></td><td>14–20</td></tr>
+    <tr><td>Hashing</td><td><b>9</b></td><td>7–14</td></tr>
+    <tr><td>Searching</td><td><b>6</b></td><td>2–10</td></tr>
+    <tr><th>Total</th><th>29 questions</th><th><b>~30 marks</b></th></tr>
+  </table>
+
+  <p><b>Note:</b> 2-mark questions 7 baar, 7-mark 9 baar aur 10-mark 13 baar poochhe gaye. Iska matlab <b>long questions (7/10) sabse zyada</b> hain — dry run table aur algorithm likhne ki practice zaroori hai.</p>
+  <div class="pnum">Page 16</div>
+</div>
+
+<!-- ================= PAGE 17 : PREDICTION ================= -->
+<div class="page">
+  <div class="qhead" style="font-size:29px">2027 PREDICTION — kya aa sakta hai?</div>
+  <p style="color:var(--red)"><b>Dhyan do:</b> yeh <b>prediction</b> hai (pattern ke aadhar par), guarantee nahi. Par jo 4-5 baar repeat ho chuka hai woh dobara aane ke chances sabse zyada hote hain.</p>
+
+  <div class="sub">A. Sabse zyada chance (high probability)</div>
+  <table class="hw">
+    <tr><th>#</th><th>Predicted question</th><th>Marks</th><th>Kyun</th></tr>
+    <tr><td>1</td><td>Hash table construct karo (linear probing) + kisi key ka location</td><td>7–10</td><td>3 saal me aaya, numerical sabse safe</td></tr>
+    <tr><td>2</td><td>Collision resolution techniques (chaining + probing) with example</td><td>7–10</td><td>har paper me kuch na kuch</td></tr>
+    <tr><td>3</td><td>Merge sort — sort karo + complexity</td><td>7–10</td><td>4 baar repeat</td></tr>
+    <tr><td>4</td><td>Quick sort — sort karo + stability justify</td><td>10</td><td>2 baar, aur "stability" ka favourite</td></tr>
+    <tr><td>5</td><td>Heap sort — heap banao + sort</td><td>7–10</td><td>2026 me aaya, alternate saal pattern</td></tr>
+  </table>
+
+  <div class="sub">B. Medium chance</div>
+  <ul>
+    <li><b>Insertion sort</b> ka algorithm + dry run (2026 me aaya tha, ab gap ho sakta hai)</li>
+    <li><b>Binary search</b> ka recursive function + complexity</li>
+    <li><b>Radix sort</b> ka concept + ek pass ka dry run (kam poocha gaya hai — ab chance ban sakta hai)</li>
+    <li><b>Comparison table</b> — "differentiate between merge and quick sort" (naya pattern)</li>
+  </ul>
+
+  <div class="sub">C. 2-mark ke liye predict</div>
+  <ul>
+    <li>Define collision. / What is load factor?</li>
+    <li>Which sorting is stable? Give example.</li>
+    <li>Time complexity of binary search / quick sort worst case</li>
+    <li>Difference between linear and quadratic probing</li>
+    <li>What is indexed sequential search?</li>
+  </ul>
+
+  <div class="sub">D. Meri salah — last 3 din ka plan</div>
+  <table class="hw">
+    <tr><th>Din</th><th>Kya karo</th></tr>
+    <tr><td>Day 1</td><td>Hashing poora — formulas + 3 numericals haath se (page 6, 7, 8)</td></tr>
+    <tr><td>Day 2</td><td>Merge + Quick + Heap — algorithm + dry run table (page 10, 11, 12)</td></tr>
+    <tr><td>Day 3</td><td>Insertion + Selection + Binary search + saare 2-mark (page 9, 13, 14, 15)</td></tr>
+  </table>
+
+  <p style="margin-top:14px"><b>Yaad rakho:</b> examiner <b>table</b>, <b>steps</b> aur <b>complexity line</b> dekhta hai. Sirf final answer likhne se aadhe marks kat jate hain. Har question me — definition → algorithm/steps → dry run table → complexity.</p>
+
+  <p style="text-align:center;margin-top:18px;color:var(--red);font-family:'Caveat',cursive;font-size:24px">All the best! 🚩</p>
+  <div class="pnum">Page 17</div>
+</div>
+
+<script>
+(function(){
+  var root = document.documentElement;
+  var btnT = document.getElementById('btnTheme');
+  try { var t = localStorage.getItem('copy-theme'); if (t) root.setAttribute('data-theme', t); } catch(e){}
+  function paintBtn(){ btnT.textContent = root.getAttribute('data-theme') === 'night' ? '☀ Day' : '🌙 Night'; }
+  paintBtn();
+  btnT.addEventListener('click', function(){
+    var nx = root.getAttribute('data-theme') === 'night' ? 'day' : 'night';
+    root.setAttribute('data-theme', nx);
+    try { localStorage.setItem('copy-theme', nx); } catch(e){}
+    paintBtn();
+  });
+
+  document.getElementById('btnPrint').addEventListener('click', function(){ window.print(); });
+
+  var pages = document.querySelectorAll('.page');
+  var info = document.getElementById('pgInfo');
+  function upd(){
+    var mid = window.innerHeight / 2, cur = 1;
+    pages.forEach(function(p, i){ var r = p.getBoundingClientRect(); if (r.top < mid && r.bottom > mid) cur = i + 1; });
+    info.textContent = 'Page ' + cur + ' / ' + pages.length;
+  }
+  window.addEventListener('scroll', upd, {passive:true});
+  upd();
+
+  /* ---- pen (blue ink) ---- */
+  var cv = document.getElementById('penCanvas');
+  var ctx = cv.getContext('2d');
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  var strokes = [], cur = null, on = false;
+  function resize(){
+    cv.width = Math.floor(window.innerWidth * dpr);
+    cv.height = Math.floor(window.innerHeight * dpr);
+    cv.style.width = window.innerWidth + 'px';
+    cv.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  function draw(){
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    var sy = window.scrollY || 0;
+    strokes.forEach(function(st){
+      ctx.strokeStyle = st.c; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.lineWidth = st.w; ctx.globalAlpha = 0.92;
+      ctx.beginPath();
+      st.pts.forEach(function(p, i){
+        var x = p[0], y = p[1] - sy;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      if (st.pts.length === 1) ctx.lineTo(st.pts[0][0] + 0.1, st.pts[0][1] - sy + 0.1);
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+  }
+  var raf = null;
+  function schedule(){ if (raf) return; raf = requestAnimationFrame(function(){ raf = null; draw(); }); }
+  cv.addEventListener('pointerdown', function(e){
+    if (!on) return;
+    cv.setPointerCapture(e.pointerId);
+    cur = { c: '#1f4fbf', w: 2.2, pts: [[e.clientX + window.scrollX, e.clientY + window.scrollY]] };
+    strokes.push(cur); draw();
+  });
+  cv.addEventListener('pointermove', function(e){
+    if (!on || !cur) return;
+    cur.pts.push([e.clientX + window.scrollX, e.clientY + window.scrollY]);
+    schedule();
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){ cv.addEventListener(ev, function(){ cur = null; }); });
+  window.addEventListener('scroll', schedule, {passive:true});
+  window.addEventListener('resize', resize);
+  resize();
+
+  var btnPen = document.getElementById('btnPen');
+  btnPen.addEventListener('click', function(){
+    on = !on;
+    document.body.classList.toggle('pen-on', on);
+    btnPen.textContent = on ? '✏️ Pen ON' : '✏️ Pen';
+    btnPen.style.background = on ? 'var(--ink)' : '#fff';
+    btnPen.style.color = on ? '#fff' : 'var(--ink)';
+  });
+})();
+</script>
+
+<div class="dsnav" role="navigation" aria-label="Page navigation">
+  <a class="dsnav-b" href="DS_Unit3_PYQ_Copy.html" title="Pichla page (←)">←</a>
+  <a class="dsnav-b" href="../index.html" title="Sab pages (Home)">⌂</a>
+  <a class="dsnav-b" href="../unit4/DS_Unit4_Session1.html" title="Agla page (→)">→</a>
+</div>
+<style>
+/* ===== DS page nav (auto-injected) ===== */
+.dsnav{position:fixed;right:14px;bottom:78px;z-index:650;display:flex;gap:6px;align-items:center;
+  background:rgba(10,14,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:6px 8px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);opacity:.6;transition:opacity .2s ease, transform .2s ease;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.dsnav:hover{opacity:1;transform:translateY(-2px)}
+.dsnav-b{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:15px;line-height:1;
+  transition:background .15s ease,color .15s ease}
+.dsnav-b:hover{background:#ff9f45;color:#101820}
+.dsnav-b.dsnav-off{opacity:.25;pointer-events:none}
+.dsnav-tip{font-size:10px;letter-spacing:.8px;color:rgba(255,255,255,.45);padding:0 4px;white-space:nowrap}
+@media (max-width:640px){.dsnav-tip{display:none}.dsnav{right:10px;bottom:70px;padding:5px 6px}.dsnav-b{width:30px;height:30px;font-size:14px}}
+@media print{.dsnav{display:none!important}}
+</style>
+<script>
+(function(){
+  var PREV="DS_Unit3_PYQ_Copy.html", NEXT="../unit4/DS_Unit4_Session1.html";
+  document.addEventListener('keydown', function(e){
+    var t=e.target||{};
+    if(/INPUT|TEXTAREA|SELECT/.test(t.tagName||'')) return;
+    if(e.key==='ArrowRight' && NEXT) window.location.href=NEXT;
+    else if(e.key==='ArrowLeft' && PREV) window.location.href=PREV;
+    else if(e.key==='Home') window.location.href='../index.html';
+  });
+})();
+</script>
+
+</body>
+</html>

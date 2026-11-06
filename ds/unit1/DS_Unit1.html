@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DS Unit 1 — Data Structures (BCS301) · Hinglish Audio Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Azeret+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root, [data-theme="dark"] {
+  --bg: #0c1210;
+  --surface: #131b18;
+  --surface2: #182420;
+  --surface3: #1e2d27;
+  --border: rgba(255,255,255,0.09);
+  --border2: rgba(255,255,255,0.18);
+  --text: #e7efe9;
+  --dim: #94a89d;
+  --faint: #65786d;
+  --teal: #3ecfa5;
+  --teal-dim: rgba(62,207,165,0.12);
+  --sky: #6db3e8;
+  --sky-dim: rgba(109,179,232,0.12);
+  --gold: #ffd166;
+  --gold-dim: rgba(255,209,102,0.12);
+  --orange: #ff9f6e;
+  --orange-dim: rgba(255,159,110,0.13);
+  --red: #ff8071;
+  --shadow: 0 10px 34px rgba(0,0,0,0.42);
+}
+[data-theme="light"] {
+  --bg: #f1f5f2;
+  --surface: #ffffff;
+  --surface2: #f6faf7;
+  --surface3: #e9f1ec;
+  --border: rgba(18,38,28,0.11);
+  --border2: rgba(18,38,28,0.2);
+  --text: #17211c;
+  --dim: #55685e;
+  --faint: #85988d;
+  --teal: #0d8f68;
+  --teal-dim: rgba(13,143,104,0.1);
+  --sky: #2c76b8;
+  --sky-dim: rgba(44,118,184,0.1);
+  --gold: #9a6b06;
+  --gold-dim: rgba(154,107,6,0.1);
+  --orange: #cf5a24;
+  --orange-dim: rgba(207,90,36,0.1);
+  --red: #c94434;
+  --shadow: 0 10px 30px rgba(20,40,30,0.1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.72;
+  overflow-wrap: break-word;
+  padding-bottom: 150px;
+  background-image:
+    radial-gradient(ellipse 900px 420px at 70% -80px, var(--teal-dim), transparent 65%),
+    radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: auto, 26px 26px;
+}
+::selection { background: var(--teal-dim); }
+
+/* ============ LAYOUT ============ */
+.wrap {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 225px minmax(0,1fr);
+  gap: 0 56px;
+  padding: 0 32px;
+}
+.main { min-width: 0; padding: 40px 0 80px; }
+
+/* ============ TOC ============ */
+.toc {
+  position: sticky; top: 20px; align-self: start;
+  max-height: calc(100dvh - 60px);
+  overflow-y: auto;
+  padding: 26px 0 30px;
+  grid-row: 1 / -1;
+}
+.toc::-webkit-scrollbar { width: 3px; }
+.toc::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+.toc-title {
+  font-family: 'Azeret Mono', monospace;
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2.2px; color: var(--faint);
+  padding-bottom: 12px; margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.toc a {
+  display: flex; align-items: baseline; gap: 8px;
+  font-size: 12.5px; color: var(--dim);
+  text-decoration: none; padding: 5px 10px;
+  border-radius: 6px; border-left: 2px solid transparent;
+  transition: all .15s; line-height: 1.45; margin-bottom: 1px;
+}
+.toc a .n { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--faint); }
+.toc a:hover { color: var(--text); background: var(--surface); }
+.toc a.active { color: var(--teal); border-left-color: var(--teal); background: var(--teal-dim); }
+.toc a.active .n { color: var(--teal); }
+
+/* ============ HERO ============ */
+.hero { padding: 44px 0 8px; }
+.hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.chip {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 500;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  padding: 5px 12px; border-radius: 5px;
+  border: 1px solid var(--border2);
+}
+.chip--teal { color: var(--teal); border-color: var(--teal); background: var(--teal-dim); }
+.chip--sky  { color: var(--sky); border-color: var(--sky); background: var(--sky-dim); }
+.chip--gold { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+h1 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400; font-size: clamp(40px, 5.4vw, 62px);
+  line-height: 1.04; letter-spacing: -0.5px;
+}
+h1 em { font-style: italic; color: var(--teal); }
+.hero-sub { font-size: 17px; color: var(--dim); max-width: 60ch; margin-top: 14px; }
+.hero-hr { height: 1px; background: linear-gradient(90deg, var(--teal), transparent 70%); border: none; margin: 30px 0 0; opacity: .55; }
+
+/* ============ SECTION HEAD ============ */
+.sec { scroll-margin-top: 56px; }
+.sec-head { display: flex; align-items: center; gap: 16px; margin: 74px 0 8px; flex-wrap: wrap; }
+.sec-num {
+  font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 600;
+  color: var(--bg); background: var(--teal);
+  border-radius: 6px; padding: 4px 9px; letter-spacing: 1px;
+  flex-shrink: 0;
+}
+h2 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400; font-size: clamp(29px, 3.3vw, 40px); line-height: 1.1;
+  letter-spacing: -0.3px; flex: 1; min-width: 200px;
+}
+.sec-play {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--teal); background: var(--teal-dim);
+  color: var(--teal); font-size: 13px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all .15s; flex-shrink: 0; font-family: 'Azeret Mono', monospace;
+}
+.sec-play:hover { background: var(--teal); color: var(--bg); transform: scale(1.06); }
+.sec-tag {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--faint);
+  text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 24px 0;
+}
+
+/* ============ READING TEXT ============ */
+.rd {
+  font-size: 16.5px; line-height: 1.78; color: var(--text);
+  max-width: 72ch; margin: 18px 0;
+  padding: 4px 14px 4px 16px; border-left: 3px solid transparent;
+  border-radius: 0 8px 8px 0;
+  transition: background .35s, border-color .35s;
+}
+.rd.speaking {
+  background: var(--teal-dim);
+  border-left-color: var(--teal);
+}
+.rd b, .rd strong { color: var(--teal); font-weight: 700; }
+.rd i { color: var(--sky); }
+.rd code {
+  font-family: 'Azeret Mono', monospace; font-size: 0.86em;
+  background: var(--surface3); color: var(--gold);
+  padding: 1px 6px; border-radius: 4px;
+}
+
+/* ============ DEFINITION BOX (exam verbatim) ============ */
+.def {
+  background: var(--gold-dim);
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  padding: 16px 20px 14px;
+  margin: 22px 0;
+  max-width: 76ch;
+  position: relative;
+}
+.def-label {
+  font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--gold);
+  display: block; margin-bottom: 7px;
+}
+.def p { font-size: 15.5px; line-height: 1.65; color: var(--text); }
+.def p b { color: var(--gold); }
+
+/* ============ CALLOUT ============ */
+.callout {
+  border-radius: 10px; padding: 14px 18px; margin: 22px 0;
+  max-width: 76ch; font-size: 15px; line-height: 1.65;
+  border: 1px solid var(--orange);
+  background: var(--orange-dim);
+}
+.callout b { color: var(--orange); }
+.callout--info { border-color: var(--sky); background: var(--sky-dim); }
+.callout--info b { color: var(--sky); }
+
+/* ============ CARDS / GRIDS ============ */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin: 22px 0; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin: 22px 0; }
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px; min-width: 0;
+}
+.card h4 {
+  font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 9px;
+  color: var(--teal); display: flex; align-items: center; gap: 8px;
+}
+.card h4::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.card p, .card li { font-size: 14px; line-height: 1.6; color: var(--dim); }
+.card p b, .card li b { color: var(--text); }
+.card ul { padding-left: 1.2em; }
+.card--sky h4 { color: var(--sky); }
+.card--gold h4 { color: var(--gold); }
+.card--orange h4 { color: var(--orange); }
+
+/* ============ DIAGRAM ============ */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 20px 18px;
+  margin: 24px 0;
+  overflow-x: auto;
+}
+.d-cap {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 500;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--faint);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.d-cap::before { content: ''; width: 7px; height: 7px; background: var(--teal); border-radius: 50%; }
+
+/* memory row (array cells) */
+.memrow { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+.memcol { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.idx { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--sky); }
+.cell {
+  min-width: 64px; padding: 14px 10px; text-align: center;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 7px; font-family: 'Azeret Mono', monospace;
+  font-size: 15px; font-weight: 600; color: var(--text);
+}
+.cell--hl { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); }
+.cell--zero { color: var(--faint); opacity: .55; }
+.addr { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--faint); }
+.d-note {
+  margin-top: 16px; font-size: 13.5px; color: var(--dim); line-height: 1.6;
+  border-top: 1px dashed var(--border2); padding-top: 12px;
+}
+.d-note b { color: var(--teal); }
+.d-note code { font-family: 'Azeret Mono', monospace; color: var(--gold); font-size: 0.9em; }
+
+/* formula card */
+.formula {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 14px 18px; margin: 14px 0;
+  font-family: 'Azeret Mono', monospace; font-size: 14.5px;
+  color: var(--teal); overflow-x: auto; line-height: 1.7;
+  max-width: 76ch;
+}
+.formula small { display: block; color: var(--faint); font-size: 12px; margin-top: 6px; line-height: 1.6; }
+.formula .k { color: var(--sky); }
+
+/* linked list node */
+.ll-row { display: flex; align-items: center; gap: 0; flex-wrap: wrap; row-gap: 14px; }
+.node {
+  display: flex; border: 1px solid var(--border2); border-radius: 8px;
+  overflow: hidden; background: var(--surface3); flex-shrink: 0;
+}
+.node .nd {
+  padding: 13px 16px; font-family: 'Azeret Mono', monospace;
+  font-size: 14px; font-weight: 600; text-align: center; min-width: 52px;
+}
+.node .nd--data { color: var(--text); border-right: 1px dashed var(--border2); }
+.node .nd--next { color: var(--teal); }
+.node .nd--prev { color: var(--sky); border-right: 1px dashed var(--border2); }
+.node .nd small { display: block; font-size: 8.5px; font-weight: 500; color: var(--faint); letter-spacing: 1px; margin-top: 3px; }
+.arrow {
+  padding: 0 8px; color: var(--teal); font-size: 19px; font-weight: 700;
+  flex-shrink: 0; font-family: 'Azeret Mono', monospace;
+}
+.null-tag { font-family: 'Azeret Mono', monospace; font-size: 12px; color: var(--red); padding: 0 6px; flex-shrink: 0; align-self: center; }
+.head-tag {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--gold);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;
+}
+
+/* stack visual */
+.stackwrap { display: flex; gap: 26px; align-items: flex-end; flex-wrap: wrap; }
+.stackcol { display: flex; flex-direction: column-reverse; gap: 7px; align-items: stretch; min-width: 130px; }
+.scell {
+  background: var(--surface3); border: 1px solid var(--border2); border-radius: 7px;
+  padding: 11px 16px; text-align: center; font-family: 'Azeret Mono', monospace;
+  font-size: 15px; font-weight: 600;
+}
+.scell--top { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); }
+.scell--empty { border-style: dashed; color: var(--faint); font-size: 12px; }
+.stackside { font-size: 13.5px; color: var(--dim); line-height: 1.9; min-width: 180px; }
+.stackside b { font-family: 'Azeret Mono', monospace; color: var(--teal); font-size: 14px; }
+.stackside .op { color: var(--sky); font-family: 'Azeret Mono', monospace; font-size: 12px; }
+
+/* queue visual */
+.qwrap { display: flex; flex-direction: column; gap: 8px; }
+.qrow { display: flex; gap: 6px; align-items: stretch; flex-wrap: wrap; }
+.qrow .cell { min-width: 58px; padding: 13px 8px; }
+.qptr { display: flex; gap: 6px; }
+.qptr span {
+  font-family: 'Azeret Mono', monospace; font-size: 11px; min-width: 58px;
+  text-align: center; padding: 3px 8px; flex: 1;
+}
+.qptr .p-front { color: var(--teal); }
+.qptr .p-rear { color: var(--gold); }
+.qptr .p-none { color: transparent; }
+
+/* ============ TABLES ============ */
+.table-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 22px 0; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.55; }
+.data-table thead { position: sticky; top: 0; z-index: 2; }
+.data-table th {
+  background: var(--surface3); font-family: 'Azeret Mono', monospace;
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.3px;
+  color: var(--dim); text-align: left; padding: 11px 15px;
+  border-bottom: 2px solid var(--border2); white-space: nowrap;
+}
+.data-table td { padding: 11px 15px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text); }
+.data-table tbody tr:nth-child(even) { background: var(--surface2); }
+.data-table tbody tr { transition: background .15s; }
+.data-table tbody tr:hover { background: var(--teal-dim); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table td b { color: var(--teal); }
+.data-table td code { font-family: 'Azeret Mono', monospace; font-size: 12px; background: var(--surface3); color: var(--gold); padding: 1px 5px; border-radius: 4px; }
+
+/* ============ CODE ============ */
+.code-block {
+  font-family: 'Azeret Mono', monospace; font-size: 13px; line-height: 1.62;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px; margin: 20px 0;
+  overflow-x: auto; white-space: pre-wrap; word-break: break-word;
+  color: var(--text); max-width: 76ch;
+}
+.code-block .cm { color: var(--faint); }
+.code-block .kw { color: var(--sky); }
+.code-block .st { color: var(--gold); }
+.code-block .fn { color: var(--teal); }
+
+/* ============ COMPARISON CARDS ============ */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+.cmp-card {
+  border: 1px solid var(--border2); border-radius: 12px; overflow: hidden;
+  min-width: 0; background: var(--surface);
+}
+.cmp-card h5 {
+  font-family: 'Azeret Mono', monospace; font-size: 11.5px; font-weight: 600;
+  letter-spacing: 1.6px; text-transform: uppercase; padding: 12px 18px;
+}
+.cmp-card--arr h5 { background: var(--sky-dim); color: var(--sky); border-bottom: 2px solid var(--sky); }
+.cmp-card--ll h5 { background: var(--teal-dim); color: var(--teal); border-bottom: 2px solid var(--teal); }
+.cmp-card ul { list-style: none; padding: 14px 18px; }
+.cmp-card li { font-size: 13.5px; line-height: 1.62; color: var(--dim); padding: 4px 0 4px 16px; position: relative; }
+.cmp-card li::before { content: '›'; position: absolute; left: 0; color: var(--faint); font-weight: 700; }
+.cmp-card li b { color: var(--text); }
+
+/* ============ Q&A ============ */
+.qa {
+  border: 1px solid var(--border); border-radius: 12px; background: var(--surface);
+  margin: 18px 0; overflow: hidden;
+}
+.qa summary {
+  padding: 16px 20px; cursor: pointer; list-style: none;
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  font-size: 15.5px; font-weight: 600; transition: background .15s;
+}
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary:hover { background: var(--surface2); }
+.qa summary::after { content: '+'; font-family: 'Azeret Mono', monospace; color: var(--teal); margin-left: auto; font-size: 17px; }
+.qa[open] summary::after { content: '−'; }
+.mark {
+  font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 600;
+  padding: 3px 9px; border-radius: 5px; letter-spacing: 1px; white-space: nowrap;
+  flex-shrink: 0;
+}
+.mark--2 { background: var(--sky-dim); color: var(--sky); }
+.mark--5 { background: var(--gold-dim); color: var(--gold); }
+.mark--10 { background: var(--orange-dim); color: var(--orange); }
+.qa-body { padding: 4px 20px 18px; border-top: 1px solid var(--border); }
+.qa-body p { font-size: 14.5px; line-height: 1.7; color: var(--dim); margin: 12px 0; max-width: 76ch; }
+.qa-body p b { color: var(--text); }
+.qa-body code { font-family: 'Azeret Mono', monospace; font-size: 0.86em; background: var(--surface3); color: var(--gold); padding: 1px 5px; border-radius: 4px; }
+
+/* ============ SUMMARY / EXAM ============ */
+.one-liners { counter-reset: ol; display: grid; gap: 9px; margin: 22px 0; max-width: 82ch; }
+.one-liners li {
+  list-style: none; counter-increment: ol; position: relative;
+  padding: 9px 14px 9px 46px; font-size: 14.5px; line-height: 1.6;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--dim);
+}
+.one-liners li::before {
+  content: counter(ol, decimal-leading-zero);
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 600;
+  color: var(--teal);
+}
+.one-liners li b { color: var(--text); }
+.defgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; margin: 24px 0; }
+.defcard {
+  background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 10px; padding: 15px 17px; min-width: 0;
+}
+.defcard h6 {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 7px;
+}
+.defcard p { font-size: 13.5px; line-height: 1.62; color: var(--dim); }
+.defcard p b { color: var(--text); }
+
+/* ============ SIMULATOR ============ */
+.sim {
+  border: 1px solid var(--teal); border-radius: 12px; overflow: hidden;
+  margin: 26px 0; background: linear-gradient(160deg, var(--teal-dim), var(--surface) 45%);
+}
+.sim-head {
+  padding: 13px 20px; border-bottom: 1px solid var(--border2);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--surface2);
+}
+.sim-head b { font-family: 'Azeret Mono', monospace; font-size: 12px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--teal); }
+.sim-head span { font-size: 12.5px; color: var(--faint); }
+.sim-body { padding: 20px; }
+.sim-controls { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+.btn {
+  font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 500;
+  padding: 8px 15px; border-radius: 7px; cursor: pointer;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--text);
+  transition: all .15s;
+}
+.btn:hover { border-color: var(--teal); color: var(--teal); }
+.btn--go { background: var(--teal); border-color: var(--teal); color: var(--bg); font-weight: 600; }
+.btn--go:hover { filter: brightness(1.12); color: var(--bg); }
+.btn--warn { border-color: var(--orange); color: var(--orange); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.sim input, .sim select {
+  font-family: 'Azeret Mono', monospace; font-size: 13px;
+  background: var(--surface); border: 1px solid var(--border2); color: var(--text);
+  border-radius: 7px; padding: 8px 10px; width: 88px;
+}
+.sim select { width: auto; }
+.sim input:focus, .sim select:focus { outline: none; border-color: var(--teal); }
+.sim label {
+  font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--faint);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.sim-steps {
+  font-family: 'Azeret Mono', monospace; font-size: 13px; line-height: 1.9;
+  background: var(--surface); border: 1px dashed var(--border2); border-radius: 8px;
+  padding: 14px 18px; margin-top: 16px; color: var(--dim); min-height: 20px;
+}
+.sim-steps b { color: var(--teal); font-weight: 600; }
+.sim-steps .fin { color: var(--gold); font-weight: 600; }
+.sim-msg { font-size: 13.5px; margin-top: 12px; color: var(--dim); }
+.sim-msg b { color: var(--teal); }
+
+/* ============ PLAYER BAR ============ */
+.player {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border2);
+  padding: 10px 18px 12px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.pbtn {
+  font-family: 'Azeret Mono', monospace; font-size: 13px; cursor: pointer;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--text);
+  border-radius: 8px; padding: 8px 12px; transition: all .15s; min-width: 42px;
+  text-align: center;
+}
+.pbtn:hover { border-color: var(--teal); color: var(--teal); }
+.pbtn--main {
+  width: 52px; height: 52px; border-radius: 50%; font-size: 17px;
+  background: var(--teal); border-color: var(--teal); color: var(--bg); font-weight: 700;
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+}
+.pbtn--main:hover { filter: brightness(1.15); color: var(--bg); transform: scale(1.05); }
+.player select {
+  font-family: 'Azeret Mono', monospace; font-size: 12px;
+  background: var(--surface3); color: var(--text);
+  border: 1px solid var(--border2); border-radius: 7px; padding: 7px 8px; max-width: 190px;
+}
+.player select:focus { outline: none; border-color: var(--teal); }
+.p-meta {
+  flex: 1; min-width: 220px; line-height: 1.5;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.p-now {
+  font-size: 13px; color: var(--text); font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.p-voice { font-family: 'Azeret Mono', monospace; font-size: 10.5px; color: var(--faint); letter-spacing: .4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice .on { color: var(--teal); }
+.p-voice .off { color: var(--orange); }
+
+/* ============ THEME TOGGLE ============ */
+.theme-toggle {
+  position: fixed; top: 18px; right: 20px; z-index: 600;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid var(--border2); background: var(--surface);
+  color: var(--text); cursor: pointer; font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; box-shadow: var(--shadow);
+}
+.theme-toggle:hover { border-color: var(--teal); color: var(--teal); }
+[data-theme="dark"] .tt-sun { display: block; }
+[data-theme="dark"] .tt-moon { display: none; }
+[data-theme="light"] .tt-sun { display: none; }
+[data-theme="light"] .tt-moon { display: block; }
+
+/* ============ FOOTER ============ */
+.foot { margin-top: 90px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--faint); font-size: 12.5px; font-family: 'Azeret Mono', monospace; letter-spacing: .5px; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1000px) {
+  .wrap { grid-template-columns: 1fr; padding: 0 18px; }
+  .toc {
+    position: sticky; top: 0; z-index: 300; grid-row: auto;
+    display: flex; gap: 6px; align-items: center;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    margin: 0 -18px; padding: 10px 18px; max-height: none;
+  }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc-title { display: none; }
+  .toc a { white-space: nowrap; flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; border-radius: 5px; padding: 6px 11px; font-size: 11.5px; }
+  .toc a.active { border-bottom-color: var(--teal); background: var(--teal-dim); }
+  .main { padding-top: 26px; }
+  .sec-head { margin-top: 56px; }
+  .compare { grid-template-columns: 1fr; }
+  body { padding-bottom: 190px; }
+  .player { gap: 8px; padding: 10px 14px; }
+  .p-meta { min-width: 100%; order: 5; }
+  .theme-toggle { top: 12px; right: 14px; width: 38px; height: 38px; }
+  .hero { padding-top: 30px; }
+}
+@media (max-width: 480px) {
+  .memrow { gap: 4px; }
+  .cell { min-width: 52px; padding: 11px 6px; font-size: 13px; }
+  .rd { font-size: 15.5px; }
+  h1 { font-size: 38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="Light / dark toggle" title="Theme badlo">
+  <span class="tt-sun">☀</span><span class="tt-moon">☾</span>
+</button>
+
+<div class="wrap">
+
+<nav class="toc" id="toc">
+  <div class="toc-title">UNIT 1 — CONTENTS</div>
+  <a href="#s0"><span class="n">00</span>Intro & ADT</a>
+  <a href="#s1"><span class="n">01</span>Arrays</a>
+  <a href="#s2"><span class="n">02</span>Sparse Matrix</a>
+  <a href="#s3"><span class="n">03</span>Linked Lists</a>
+  <a href="#s4"><span class="n">04</span>Stacks</a>
+  <a href="#s5"><span class="n">05</span>Queues</a>
+  <a href="#s6"><span class="n">06</span>Time Complexity</a>
+  <a href="#s7"><span class="n">07</span>Q&A</a>
+  <a href="#s8"><span class="n">08</span>Summary</a>
+  <a href="#s9"><span class="n">09</span>Exam Corner</a>
+</nav>
+
+<div class="main">
+
+<header class="hero">
+  <div class="hero-badges">
+    <span class="chip chip--teal">BCS301 · DATA STRUCTURES</span>
+    <span class="chip chip--sky">UNIT 1 · 08 LECTURES</span>
+    <span class="chip chip--gold">HINGLISH AUDIO NOTES</span>
+  </div>
+  <h1>Data Structures <em>Unit 1</em></h1>
+  <p class="hero-sub">Arrays se Linked Lists tak — intro, ADT, memory layout, address formulas aur complexity. Har section ke title ke paas chhota play button hai — <b>sirf wahi section suno</b>, ya neeche player se poora Unit 1 playlist ki tarah chalao. Dark mode default hai, upar ☀/☾ se badal sakte ho.</p>
+  <hr class="hero-hr">
+</header>
+
+<!-- ============================================================ S0 -->
+<section class="sec" id="s0">
+  <div class="sec-head">
+    <span class="sec-num">00</span>
+    <h2>Introduction — Data Structure & ADT</h2>
+    <button class="sec-play" data-sec="s0" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Basic terminology · data organization · abstract data types</p>
+
+  <p class="rd" data-dev="डेटा स्ट्रक्चर क्या होता है? सीधी भाषा में कहें तो डेटा स्ट्रक्चर डेटा को मेमोरी में व्यवस्थित करके रखने का एक तरीका है, ताकि उस पर ऑपरेशन करना सस्ता और आसान हो जाए। जैसे घर में अलमारी में कपड़े, रसोई में बर्तन और पढ़ाई का सामान सही जगह पर रखा जाता है, वैसे ही कंप्यूटर की मेमोरी में डेटा को एक निश्चित ढाँचे में रखा जाता है। इसी ढाँचे को डेटा स्ट्रक्चर कहते हैं।">Socho tumhare ghar me alag-alag cheezein kahan rakhi hoti hain — kapde alamaari me, bartan kitchen me, books desk pe. Agar sab kuch ek bori me daal do, toh kuch bhi dhoondhne me ghanton lagenge. <b>Data Structure bilkul yehi hai — data ko memory me aise organize karna jusse usse operations (insert karna, delete karna, search karna) efficient ho jayein.</b> Sahi dhancha = kaam aasaan, galat dhancha = har operation me jhanjhat.</p>
+
+  <p class="rd" data-dev="डेटा स्ट्रक्चर क्यों ज़रूरी है? मान लीजिए एक कॉलेज में दस हज़ार छात्रों का रिकॉर्ड है। अगर रिकॉर्ड बिना किसी क्रम के रखा है, तो किसी एक छात्र को खोजने के लिए पूरी फाइल छाननी पड़ेगी। लेकिन अगर वही डेटा किसी अच्छे ढाँचे में, जैसे क्रमबद्ध ऐरे या हैश टेबल में रखा जाए, तो खोज बहुत तेज़ी से हो जाती है। प्रोग्राम की स्पीड और मेमोरी दोनों की बचत डेटा स्ट्रक्चर के चुनाव पर निर्भर करती है। इसीलिए यह विषय इतना महत्वपूर्ण है।">Kyun zaroori hai? Maan lo college me 10,000 students ka record hai. Bina kisi order ke rakha hua data ho toh kisi ek student ko dhoondhne ke liye <i>har</i> record check karna padega. Wahi data agar sorted array ya hash table me ho toh search seconds me ho jaayega. <b>Program ki speed aur memory dono data structure ke choice pe depend karti hai</b> — isliye yeh subject har CSE student ka core hai.</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — EXAM ME AISA LIKHO</span>
+    <p><b>Data Structure:</b> A data structure is a systematic way of organizing, storing and managing data in memory so that efficient operations can be performed on it. Data structures are classified as <b>linear</b> (array, linked list, stack, queue) and <b>non-linear</b> (tree, graph).</p>
+  </div>
+
+  <h3 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:24px;margin:34px 0 6px">Basic Terminology — data ki hierarchy</h3>
+
+  <p class="rd" data-dev="डेटा की पदानुक्रम को याद रखिए — बिट, फिर फील्ड, फिर रिकॉर्ड, फिर फाइल, और अंत में डेटाबेस। बिट सबसे छोटी इकाई है, शून्य या एक। फील्ड एक लॉजिकल इकाई है, जैसे रोल नंबर, नाम या मार्क्स। रिकॉर्ड एक इकाई के सभी संबंधित फील्ड्स का समूह है, जैसे किसी एक विद्यार्थी का रोल नंबर, नाम और मार्क्स। फाइल एक ही प्रकार के रिकॉर्ड्स का संग्रह है, और डेटाबेस कई आपस में जुड़ी फाइलों का संग्रह है।">Data ki poori hierarchy ek pyramid hai — yaad rakho: <b>bit → field → record → file → database</b>. Bit sabse chhoti unit (0 ya 1). Field ek logical unit jaise <code>Roll_No</code>, <code>Name</code>, <code>Marks</code>. Record ek entity ke saare related fields ka group — Divyansh ka record: (45, "Divyansh", 88). File same-type records ka collection, aur database multiple judii hui files. C me record <code>struct</code> se banta hai.</p>
+
+  <div class="diagram">
+    <div class="d-cap">DATA KI HIERARCHY — PYRAMID</div>
+    <div style="display:flex;flex-direction:column;gap:7px;align-items:center">
+      <div class="cell" style="min-width:120px;background:var(--gold-dim);border-color:var(--gold);color:var(--gold)">DATABASE</div>
+      <div class="cell" style="min-width:230px;background:var(--sky-dim);border-color:var(--sky);color:var(--sky)">FILE — saare students ke records</div>
+      <div class="cell" style="min-width:330px">RECORD — (Roll, Name, Marks) — ek student</div>
+      <div class="cell" style="min-width:440px;border-color:var(--teal);background:var(--teal-dim);color:var(--teal)">FIELD — Roll_No · Name · Marks (ek property)</div>
+      <div class="cell cell--zero" style="min-width:520px">BIT — 0 / 1 (sabse chhoti unit)</div>
+    </div>
+    <p class="d-note">Upar se neeche aate ho toh <b>detail badhti jaati hai</b>. Data item = single unit of data (jaise ek roll number). Entity = wo cheez jiske baare me data store karte ho (jaise ek student).</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>DATA vs INFORMATION</h4>
+      <p><b>Data</b> = raw, unprocessed facts — "88", "Divyansh". Akele koi matlab nahi.<br><b>Information</b> = processed, meaningful data — "Divyansh top-3 me hai, 88 marks ke saath." Data + processing = Information. Exam me yeh 2-marker ready rakhna.</p>
+    </div>
+    <div class="card card--sky">
+      <h4>LINEAR vs NON-LINEAR</h4>
+      <p><b>Linear:</b> elements ek sequence me — ek ke baad ek (array, linked list, stack, queue).<br><b>Non-linear:</b> hierarchy ya network — tree (parent-child), graph (koi bhi kisi se juda). Yeh classification 2-mark ka favourite hai.</p>
+    </div>
+    <div class="card card--gold">
+      <h4>BUILT-IN DATA TYPES IN C</h4>
+      <p><b>Primary:</b> <code>int</code>, <code>float</code>, <code>char</code>, <code>double</code><br><b>Derived:</b> array, pointer, function<br><b>User-defined:</b> <code>struct</code>, <code>union</code>, <code>enum</code><br>Data Structure in sab se <b>banta</b> hai — built-in nahi hota.</p>
+    </div>
+    <div class="card">
+      <h4>ELEMENTARY DATA ORGANIZATION</h4>
+      <p>Memory me data rakhne ke do tareeke: <b>contiguous</b> (ek ke baad ek, bina gap — array) aur <b>linked</b> (kahin bhi scattered, pointers se juda — linked list). Pura course isi tension pe chalta hai!</p>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:24px;margin:34px 0 6px">ADT — Abstract Data Type</h3>
+
+  <p class="rd" data-dev="ए डी टी यानी एब्स्ट्रैक्ट डेटा टाइप का मतलब है — क्या करना है और कैसे करना है, इन दोनों को अलग रखना। इसे टीवी के रिमोट से समझिए। आपको सिर्फ यह पता है कि बटन दबाने पर चैनल बदल जाता है — यह इंटरफ़ेस है। अंदर का सर्किट कैसे काम करता है, यह इम्प्लीमेंटेशन है, जिसकी आपको ज़रूरत नहीं है। कंपनी कल अंदर का सर्किट बदल दे, तो भी आपका बटन दबाने का तरीका वही रहेगा।">ADT ka core idea: <b>"kya karna hai" (interface) ko "kaise karna hai" (implementation) se alag rakhna.</b> TV ka remote lo — aap sirf jaante ho button dabao → channel change. Andar ka circuit kaise kaam karta hai, aapko farak nahi padta. Remote company kal andar ka circuit badal de, aapka remote dabane ka tareeka same rahega. Yehi abstraction hai — complexity chhupao, sirf zaroori cheez dikhao.</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — EXAM ME AISA LIKHO</span>
+    <p><b>Abstract Data Type (ADT):</b> An ADT is a mathematical model of a data structure that specifies <b>what</b> operations can be performed, but hides <b>how</b> they are implemented. It consists of (1) the data objects, (2) the set of operations (insert, delete, search, traverse), and (3) the interface — independent of any programming implementation.</p>
+  </div>
+
+  <p class="rd" data-dev="ए डी टी का सबसे बड़ा फ़ायदा यह है कि इम्प्लीमेंटेशन बदलने पर यूज़र का कोड नहीं टूटता। लिस्ट का ए डी टी बनाओ — ऑपरेशन्स इंसर्ट, डिलीट और सर्च। अब इसे ऐरे से बनाओ या लिंक्ड लिस्ट से — यूज़र सिर्फ इंसर्ट और डिलीट कॉल करता रहेगा। स्टैक और क्यू भी पहले ए डी टी हैं, फिर उनकी ऐरे और लिंक्ड लिस्ट इम्प्लीमेंटेशन आती हैं। इसीलिए सिलेबस में लिखा है — ऐरे एंड लिंक्ड इम्प्लीमेंटेशन।">Faayda: implementation badlo, user ka code nahi tootega. List ka ADT banao — operations <code>insert()</code>, <code>delete()</code>, <code>search()</code>. Ab ise <b>array se banao ya linked list se</b> — user ko farak hi nahi padta, wahi calls karta rahega. Stack aur Queue bhi pehle ADT hote hain, phir unki array + linked implementations aati hain — isi liye syllabus me har jagah "Array and Linked Implementation" likha hai.</p>
+
+  <pre class="code-block"><span class="cm">// ADT ka idea C me aise dikhta hai:</span>
+<span class="kw">typedef struct</span> {
+    <span class="fn">insert</span>(...);   <span class="cm">// WHAT — interface</span>
+    <span class="fn">delete</span>(...);   <span class="cm">// user ko bas yeh dikh raha hai</span>
+    <span class="fn">search</span>(...);
+} ListADT;
+
+<span class="cm">// HOW — array implementation? linked list? user ko kya pata,</span>
+<span class="cm">// user ko kya farak padta hai. Kal badal denge, kuch nahi tootega.</span></pre>
+</section>
+
+<!-- ============================================================ S1 -->
+<section class="sec" id="s1">
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <h2>Arrays</h2>
+    <button class="sec-play" data-sec="s1" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">1-D · 2-D · memory layout · row/column major · address formulae</p>
+
+  <p class="rd" data-dev="ऐरे क्या है? एक ट्रेन की तरह सोचिए — पचास डिब्बे, सब एक लाइन में, सबका डिज़ाइन एक जैसा, और हर डिब्बे का एक नंबर है। ऐरे ठीक यही है — एक ही टाइप के एलिमेंट्स, मेमोरी में एक के बाद एक, बिना किसी गैप के स्टोर होते हैं, और हर एलिमेंट का एक इंडेक्स होता है। सी भाषा में इंट ऐरे पाँच इस तरह बनता है।">Array socho ek <b>train ke dabbey</b> 🚂 — sab ek line me, sabka design same, har dabbe ka ek number. Wahi array hai: <b>same-type elements, contiguous (bina gap) memory me, har element ka index.</b> <code>int marks[5]</code> = 5 dabbon ki train jisme sirf <code>int</code> type ka data baith sakta hai.</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — EXAM ME AISA LIKHO</span>
+    <p><b>Array:</b> An array is a finite, ordered collection of elements of the <b>same data type</b>, stored in <b>contiguous memory locations</b>, accessed by an index. The base address is the address of the first element; each element occupies a fixed number of bytes called the word size (W).</p>
+  </div>
+
+  <div class="diagram">
+    <div class="d-cap">1-D ARRAY — MEMORY LAYOUT (int A[5], base 1000, W = 4 bytes)</div>
+    <div class="memrow">
+      <div class="memcol"><span class="idx">index 0</span><div class="cell">10</div><span class="addr">1000</span></div>
+      <div class="memcol"><span class="idx">1</span><div class="cell">20</div><span class="addr">1004</span></div>
+      <div class="memcol"><span class="idx">2</span><div class="cell">30</div><span class="addr">1008</span></div>
+      <div class="memcol"><span class="idx">3</span><div class="cell">40</div><span class="addr">1012</span></div>
+      <div class="memcol"><span class="idx">4</span><div class="cell">50</div><span class="addr">1016</span></div>
+    </div>
+    <p class="d-note">Har <code>int</code> 4 bytes leta hai, isliye addresses <b>1000 → 1004 → 1008</b>... ek pattern me badhte hain. Base address <b>B = 1000</b> = pehle element ka pata.</p>
+  </div>
+
+  <p class="rd" data-dev="ऐरे का सुपरपावर है — कॉन्स्टेंट टाइम एक्सेस। तीसरे डिब्बे में क्या है, यह पता करने के लिए पूरी ट्रेन नहीं भरनी पड़ती। बेस एड्रेस पता है, हर एलिमेंट का साइज़ पता है, तो फॉर्मूला लगाओ और सीधे उसी पते पर पहुँच जाओ। इसी से एक डाइमेंशनल एड्रेस फॉर्मूला बनता है — बी प्लस डब्ल्यू गुणा आई माइनस एल। यहाँ बी बेस एड्रेस है, डब्ल्यू वर्ड साइज़, और एल लोअर बाउंड है।">Array ka <b>superpower — O(1) direct access</b>. Teesre dabbe me kya hai? Poori train chalna zaroori nahi — base pata hai, size pata hai, seedha jump maro. Isi se 1-D address formula banta hai: <b>"us element tak jaane ke liye kitne elements paar karne padenge × size + base"</b>. C me lower bound L = 0 hota hai, par exam me kabhi 1-based ya custom bounds (jaise A[−10..50]) dete hain — tab full formula kaam aata hai.</p>
+
+  <div class="formula">Addr(A[i]) = B + W × (i − L)
+    <small><span class="k">B</span> = base address · <span class="k">W</span> = word size (bytes) · <span class="k">L</span> = lower bound · C me L = 0</small>
+  </div>
+
+  <h3 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:24px;margin:34px 0 6px">2-D Arrays — Row Major vs Column Major ⭐</h3>
+
+  <p class="rd" data-dev="दो डाइमेंशनल ऐरे मेमोरी में असल में फ्लैट यानी एक लाइन में स्टोर होता है, क्योंकि मेमोरी एक लंबी लाइन होती है। तो सवाल यह है कि ग्रिड को लाइन में कैसे फैलाएँगे? दो तरीके हैं। रो मेजर में पहली पूरी रो, फिर दूसरी रो — जैसे हम पेज की लाइनें पढ़ते हैं। कॉलम मेजर में पहली पूरी कॉलम, फिर दूसरी कॉलम — जैसे फोर्ट्रान करता है। सी भाषा रो मेजर यूज़ करती है।">2-D array logically ek grid hai, par memory <b>actually flat (ek line)</b> hai — "real" 2-D memory hoti hi nahi. Toh grid ko line me kaise failaayen? <b>Row Major</b>: pehli poori row, phir dusri, phir teesri — bilkul jaise page padhte ho, line by line (C, C++, Python me yehi). <b>Column Major</b>: pehli poori column, phir dusri — Fortran, MATLAB style. Same array, do alag memory arrangement — isi liye address bhi alag aata hai.</p>
+
+  <div class="diagram">
+    <div class="d-cap">2-D ARRAY A[3][4] — FLATTEN KARKE STORE HOTA HAI</div>
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:14px 24px;align-items:center;min-width:560px">
+      <div>
+        <p style="font-family:'Azeret Mono',monospace;font-size:10px;color:var(--faint);letter-spacing:1px;margin-bottom:8px">LOGICAL VIEW</p>
+        <div class="memrow" style="flex-direction:column;gap:5px">
+          <div class="memrow" style="gap:4px"><div class="cell" style="min-width:48px">1</div><div class="cell" style="min-width:48px">2</div><div class="cell" style="min-width:48px">3</div><div class="cell" style="min-width:48px">4</div></div>
+          <div class="memrow" style="gap:4px"><div class="cell" style="min-width:48px">5</div><div class="cell" style="min-width:48px">6</div><div class="cell" style="min-width:48px">7</div><div class="cell" style="min-width:48px">8</div></div>
+          <div class="memrow" style="gap:4px"><div class="cell" style="min-width:48px">9</div><div class="cell" style="min-width:48px">10</div><div class="cell" style="min-width:48px">11</div><div class="cell" style="min-width:48px">12</div></div>
+        </div>
+      </div>
+      <div>
+        <p style="font-family:'Azeret Mono',monospace;font-size:10px;color:var(--sky);letter-spacing:1px;margin-bottom:8px">ROW MAJOR (C में यही)</p>
+        <div class="memrow" style="gap:4px">
+          <div class="cell cell--hl" style="min-width:38px;padding:9px 6px">1</div><div class="cell cell--hl" style="min-width:38px;padding:9px 6px">2</div><div class="cell cell--hl" style="min-width:38px;padding:9px 6px">3</div><div class="cell cell--hl" style="min-width:38px;padding:9px 6px">4</div>
+          <div class="cell" style="min-width:38px;padding:9px 6px">5</div><div class="cell" style="min-width:38px;padding:9px 6px">6</div><div class="cell" style="min-width:38px;padding:9px 6px">7</div><div class="cell" style="min-width:38px;padding:9px 6px">8</div>
+          <div class="cell" style="min-width:38px;padding:9px 6px">9</div><div class="cell" style="min-width:38px;padding:9px 6px">10</div><div class="cell" style="min-width:38px;padding:9px 6px">11</div><div class="cell" style="min-width:38px;padding:9px 6px">12</div>
+        </div>
+        <p style="font-family:'Azeret Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:1px;margin:12px 0 8px">COLUMN MAJOR (Fortran style)</p>
+        <div class="memrow" style="gap:4px">
+          <div class="cell" style="min-width:38px;padding:9px 6px;color:var(--gold);border-color:var(--gold)">1</div><div class="cell" style="min-width:38px;padding:9px 6px">5</div><div class="cell" style="min-width:38px;padding:9px 6px">9</div>
+          <div class="cell" style="min-width:38px;padding:9px 6px;color:var(--gold);border-color:var(--gold)">2</div><div class="cell" style="min-width:38px;padding:9px 6px">6</div><div class="cell" style="min-width:38px;padding:9px 6px">10</div>
+          <div class="cell" style="min-width:38px;padding:9px 6px;color:var(--gold);border-color:var(--gold)">3</div><div class="cell" style="min-width:38px;padding:9px 6px">7</div><div class="cell" style="min-width:38px;padding:9px 6px">11</div>
+          <div class="cell" style="min-width:38px;padding:9px 6px;color:var(--gold);border-color:var(--gold)">4</div><div class="cell" style="min-width:38px;padding:9px 6px">8</div><div class="cell" style="min-width:38px;padding:9px 6px">12</div>
+        </div>
+      </div>
+    </div>
+    <p class="d-note"><b>Row Major</b> = pehli poori row phir agli row · <b>Column Major</b> = pehli poori column phir agli column. Dono me element ki jagah alag — isliye address formula bhi alag.</p>
+  </div>
+
+  <p class="rd" data-dev="एड्रेस फॉर्मूला रटना नहीं है, सोचना है। रो मेजर में किसी एलिमेंट तक पहुँचने के लिए पूछो — उससे पहले कितने एलिमेंट्स आते हैं? उसकी रो से पहले पूरी रोज़ हैं, यानी आई गुणा एन एलिमेंट्स, और उसकी अपनी रो में उससे पहले जे एलिमेंट्स। यही दो जोड़कर डब्ल्यू से गुणा करो और बेस जोड़ दो। कॉलम मेजर में बस पलट दो — जे गुणा एम प्लस आई। जिस ऑर्डर में स्टोर हो रहा है, उसी में पूरी चीज़ आगे आती है।">Formula <b>ratna nahi, sonchna</b> hai. Row major me A[i][j] se pehle kitne elements? <b>i poori rows</b> (har row me N elements) + <b>j elements apni row me</b>. Column major me bas palat do — j poori columns (each of M) + i elements column me. Trick yaad rakho: <b>jis order me store ho raha hai, usi me "poori" cheez aage count hoti hai</b> — row major me N (columns) multiply hota hai, column major me M (rows).</p>
+
+  <div class="formula">ROW MAJOR: &nbsp;Addr(A[i][j]) = B + W × [ i × <span class="k">N</span> + j ]
+    <small><span class="k">N</span> = number of columns · M = number of rows · lower bound 0 maan kar</small>
+  </div>
+  <div class="formula">COLUMN MAJOR: &nbsp;Addr(A[i][j]) = B + W × [ j × <span class="k">M</span> + i ]
+    <small>1-based ya custom bounds ho to i → (i − L₁), j → (j − L₂) kar do — bas!</small>
+  </div>
+  <div class="formula">3-D ROW MAJOR: &nbsp;Addr(A[i][j][k]) = B + W × [ i × <span class="k">n₂n₃</span> + j × <span class="k">n₃</span> + k ]
+    <small>n₂, n₃ = dusri/teesri dimension ke sizes · pattern: har naya dimension ek multiply aur lagata hai</small>
+  </div>
+
+  <div class="callout">
+    <b>Guaranteed numerical:</b> <code>int A[10][20]</code>, base = 2000, W = 4, element <code>A[3][5]</code> dhoondo —<br>
+    Row Major: 2000 + 4 × (3×20 + 5) = 2000 + 4×65 = <b>2260</b> &nbsp;·&nbsp; Column Major: 2000 + 4 × (5×10 + 3) = 2000 + 4×53 = <b>2212</b><br>
+    Same element, alag order me alag jagah — isliye question me order mention hota hai.
+  </div>
+
+  <div class="sim" id="addrSim">
+    <div class="sim-head"><b>⚡ ADDRESS CALCULATOR</b><span>— khud numbers daal ke formula ka mech banao (simulation)</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <label>MODE <select id="acMode"><option value="1d">1-D</option><option value="2d" selected>2-D</option></select></label>
+        <label>BASE <input id="acBase" type="number" value="2000"></label>
+        <label>W (bytes) <input id="acW" type="number" value="4" min="1"></label>
+        <span id="ac2dOnly" style="display:contents">
+          <label>ROWS <input id="acRows" type="number" value="10" min="1"></label>
+          <label>COLS <input id="acCols" type="number" value="20" min="1"></label>
+          <label>i <input id="acI" type="number" value="3" min="0"></label>
+          <label>j <input id="acJ" type="number" value="5" min="0"></label>
+          <label>ORDER <select id="acOrder"><option value="row">Row Major</option><option value="col">Column Major</option></select></label>
+        </span>
+      </div>
+      <div class="sim-controls">
+        <button class="btn btn--go" id="acBtn">CALCULATE</button>
+        <span class="sim-msg" id="acMsg"></span>
+      </div>
+      <div class="sim-steps" id="acSteps">Values daalo aur CALCULATE dabao — step-by-step derivation yahan dikhega. Exam me bhi yahi steps likhne hain.</div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:24px;margin:34px 0 6px">Advantages & Limitations</h3>
+
+  <div class="compare">
+    <div class="cmp-card cmp-card--arr">
+      <h5>✔ ARRAY KI TAAKAT</h5>
+      <ul>
+        <li><b>Random access O(1)</b> — formula se seedha kisi bhi element pe jump</li>
+        <li><b>Memory friendly</b> — sirf data, koi pointer ka overhead nahi</li>
+        <li><b>Cache friendly</b> — contiguous hone ki wajah se CPU cache isse bahut pasand karta hai</li>
+        <li>Simple — 2-D arrays se matrices, tables sab ban jaate hain</li>
+        <li>Fixed size pe best — jaise calendar ke 12 months, 7 din</li>
+      </ul>
+    </div>
+    <div class="cmp-card cmp-card--ll">
+      <h5>✘ ARRAY KI KAMZORI</h5>
+      <ul>
+        <li><b>Size fix</b> — compile time pe decide; full ho gaya toh overflow, kam use hua toh memory waste</li>
+        <li><b>Insertion/deletion O(n)</b> — beech me ghusao toh baad ke sab elements shift karne padte hain</li>
+        <li>Reallocation me pura data copy karna padta hai</li>
+        <li>Same type only — mixed data ke liye struct chahiye</li>
+        <li>Ye dono problems <b>Linked List</b> solve karta hai (section 03)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<!-- ============================================================ S2 -->
+<section class="sec" id="s2">
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <h2>Sparse Matrices</h2>
+    <button class="sec-play" data-sec="s2" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Zyada tar zero · triple representation · memory savings</p>
+
+  <p class="rd" data-dev="स्पार्स मैट्रिक्स वह मैट्रिक्स है जिसमें ज़्यादातर एलिमेंट्स ज़ीरो होते हैं। स्पार्स का मतलब है बिखरा हुआ या पतला। सोचिए हज़ार गुणा हज़ार की मैट्रिक्स में सिर्फ दस नंबर काम के हैं — तो बाकी निन्यानवे लाख ज़ीरो को मेमोरी में रखने का क्या फ़ायदा? इसलिए हम सिर्फ नॉन-ज़ीरो एलिमेंट्स स्टोर करते हैं, साथ में उनकी रो और कॉलम भी — इसी तीन चीज़ों को ट्रिपल कहते हैं।">"Sparse" matlab <b>bikhra hua / patla</b>. Sparse matrix wo hai jisme <b>zyada tar elements zero</b> hain. Socho 1000×1000 ki matrix me sirf 10 numbers kaam ke hain — toh baaki 9,99,990 zeros ko memory me rakhne ka kya faayda? <b>Zeros store karna memory ki barbadi hai.</b> Solution: sirf non-zero elements store karo, unke saath teen cheezein — <i>kaunsi row, kaunsi column, value kitni</i>. Isi triple (row, col, value) format me store karte hain.</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — EXAM ME AISA LIKHO</span>
+    <p><b>Sparse Matrix:</b> A matrix in which the number of zero elements is much larger than the number of non-zero elements. To save memory, only the non-zero elements are stored as triples <b>(row, column, value)</b>, along with a header entry (total rows, total columns, number of non-zero elements).</p>
+  </div>
+
+  <div class="diagram">
+    <div class="d-cap">SPARSE MATRIX — 5×5 ME SIRF 4 NON-ZERO (bold wale kaam ke, dim zeros waste)</div>
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:14px 28px;align-items:start;min-width:600px">
+      <div>
+        <p style="font-family:'Azeret Mono',monospace;font-size:10px;color:var(--faint);letter-spacing:1px;margin-bottom:8px">NORMAL (DENSE) STORAGE</p>
+        <div class="memrow" style="flex-direction:column;gap:4px">
+          <div class="memrow" style="gap:4px"><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell" style="min-width:42px;padding:8px 0">3</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div></div>
+          <div class="memrow" style="gap:4px"><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div></div>
+          <div class="memrow" style="gap:4px"><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell" style="min-width:42px;padding:8px 0">9</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell" style="min-width:42px;padding:8px 0">5</div></div>
+          <div class="memrow" style="gap:4px"><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div></div>
+          <div class="memrow" style="gap:4px"><div class="cell" style="min-width:42px;padding:8px 0">2</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div><div class="cell" style="min-width:42px;padding:8px 0">7</div><div class="cell cell--zero" style="min-width:42px;padding:8px 0">0</div></div>
+        </div>
+      </div>
+      <div>
+        <p style="font-family:'Azeret Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;margin-bottom:8px">TRIPLE (SPARSE) STORAGE</p>
+        <div class="table-wrap" style="margin:0">
+          <div class="table-scroll"><table class="data-table">
+            <thead><tr><th>Row</th><th>Col</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td><b>5</b></td><td><b>5</b></td><td><b>5</b> <span style="color:var(--faint)">← header</span></td></tr>
+              <tr><td>0</td><td>2</td><td>3</td></tr>
+              <tr><td>2</td><td>1</td><td>9</td></tr>
+              <tr><td>2</td><td>4</td><td>5</td></tr>
+              <tr><td>4</td><td>0</td><td>2</td></tr>
+              <tr><td>4</td><td>3</td><td>7</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <p class="d-note" style="border:none;padding-top:10px">Header row batati hai: <b>5×5 matrix, 5 non-zero</b> elements (3, 9, 5, 2, 7). Tip: header ka count likhne se pehle <b>har triple count kar lena</b> — examiner isi ko check karta hai!</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="rd" data-dev="अब मेमोरी का हिसाब करके देखिए — हज़ार गुणा हज़ार की मैट्रिक्स, चार बाइट का इंट। डेंस स्टोरेज में चालीस लाख बाइट लगेंगे। स्पार्स में सिर्फ ग्यारह एंट्रीज़ — एक हेडर और दस नॉन-ज़ीरो, हर एक में तीन वैल्यूज़ — यानी सिर्फ एक सौ बत्तीस बाइट। रियल दुनिया में गूगल का पेज-रैंक, सर्किट सिमुलेशन, सब स्पार्स ही होते हैं। ट्रिपल्स हमेशा रो-मेजर ऑर्डर में सॉर्टेड रखते हैं ताकि ऑपरेशन प्रेडिक्टेबल रहें।">Hisaab dekho — 1000×1000 matrix, int = 4 bytes. Dense: 10,00,000 × 4 = <b>40 lakh bytes</b>. Sparse: sirf (10 non-zero + 1 header) × 3 values × 4 = <b>132 bytes</b>. Real world me Google ka page-rank, circuits, image masks — sab sparse hi hote hain. <b>Rule:</b> triples hamesha <b>row-major sorted</b> rehte hain (pehle row ke, usme col ke hisaab se) — tabhi operations predictable hote hain. Transpose ka smart trick: triples ko column-major order me scan karo (col 0 ke saare, phir col 1 ke...), jisse mile usme row↔col swap karke naye list me daalo — result automatically sorted, bina alag se sorting ke.</p>
+
+  <div class="sim" id="sparseSim">
+    <div class="sim-head"><b>⚡ MEMORY SAVINGS CALCULATOR</b><span>— sparse storage kitni memory bachata hai, khud dekho</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <label>ROWS <input id="spRows" type="number" value="1000" min="1"></label>
+        <label>COLS <input id="spCols" type="number" value="1000" min="1"></label>
+        <label>NON-ZERO <input id="spNZ" type="number" value="10" min="0"></label>
+        <label>W (bytes) <input id="spW" type="number" value="4" min="1"></label>
+        <button class="btn btn--go" id="spBtn">COMPARE</button>
+      </div>
+      <div class="sim-steps" id="spSteps">Numbers badlo aur COMPARE dabao.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ S3 -->
+<section class="sec" id="s3">
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <h2>Linked Lists</h2>
+    <button class="sec-play" data-sec="s3" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Node structure · singly / doubly / circular · insert · delete · traverse</p>
+
+  <p class="rd" data-dev="लिंक्ड लिस्ट ऐरे की दोनों बड़ी प्रॉब्लम्स का सॉल्यूशन है — साइज़ डायनामिक रहता है, और इंसर्शन-डिलीशन में शिफ्टिंग नहीं करनी पड़ती। यहाँ एलिमेंट्स मेमोरी में कहीं भी बिखरे होते हैं, बस पॉइंटर्स से जुड़े रहते हैं। हर नोड में दो हिस्से होते हैं — डेटा और नेक्स्ट। डेटा में असली वैल्यू होती है और नेक्स्ट में अगले नोड का एड्रेस। आख़िरी नोड का नेक्स्ट नल होता है, और सबसे पहले नोड का पता हेड में रहता है।">Array ki dono badi problems ka solution: <b>size dynamic</b> aur <b>insertion/deletion me shifting nahi</b> — sirf pointers badlo. Elements memory me kahin bhi scattered rehte hain, pointers se ek chain me jude. Har node ke 2 hisse: <b>DATA</b> (asli value) + <b>NEXT</b> (agla pata). Train me har dabba fixed tha; yahan har dabba kahin bhi hai, bas har dabbe me agle dabbe ka address likha hai. Pehle node ko <b>head</b> kehte hain, last node ka <code>next = NULL</code>.</p>
+
+  <div class="diagram">
+    <div class="d-cap">SINGLY LINKED LIST — NODES × ARROWS × NULL</div>
+    <div class="head-tag" style="margin-left:8px">HEAD (list ka entry point)</div>
+    <div class="ll-row">
+      <span class="arrow" style="color:var(--gold)">●→</span>
+      <div class="node"><div class="nd nd--data">10<small>DATA</small></div><div class="nd nd--next">2600<small>NEXT</small></div></div>
+      <span class="arrow">→</span>
+      <div class="node"><div class="nd nd--data">20<small>DATA</small></div><div class="nd nd--next">4120<small>NEXT</small></div></div>
+      <span class="arrow">→</span>
+      <div class="node"><div class="nd nd--data">30<small>DATA</small></div><div class="nd nd--next">7050<small>NEXT</small></div></div>
+      <span class="arrow">→</span>
+      <div class="node"><div class="nd nd--data">40<small>DATA</small></div><div class="nd nd--next" style="color:var(--red)">NULL<small>NEXT</small></div></div>
+    </div>
+    <p class="d-note">Nodes memory me <b>scattered</b> hain (2600, 4120, 7050...) — koi bhi jagah ho sakti hai. Joor sirf <b>NEXT pointers</b> se hai. Last node ka next <b>NULL</b> = list khatam.</p>
+  </div>
+
+  <pre class="code-block"><span class="kw">struct</span> Node {
+    <span class="kw">int</span> data;              <span class="cm">// asli value</span>
+    <span class="kw">struct</span> Node *next;     <span class="cm">// agle node ka address</span>
+};
+
+<span class="cm">// naya node banana (dynamic — jitne chahiye, runtime pe):</span>
+<span class="kw">struct</span> Node *newNode = (<span class="kw">struct</span> Node*) <span class="fn">malloc</span>(<span class="fn">sizeof</span>(<span class="kw">struct</span> Node));
+newNode->data = 25;
+newNode->next = NULL;</pre>
+
+  <h3 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:24px;margin:34px 0 6px">Operations — Insert · Delete · Traverse</h3>
+
+  <div class="grid3">
+    <div class="card">
+      <h4>INSERT @ BEGINNING — O(1)</h4>
+      <p>Naya node banao → uska <code>next = head</code> → <code>head = naya node</code>. Bas teen lines, koi shifting nahi. Array me yeh kaam O(n) tha!</p>
+    </div>
+    <div class="card card--sky">
+      <h4>INSERT @ END — O(n)</h4>
+      <p>Last node tak travel karo (<code>temp = temp->next</code> loop) → <code>temp->next = naya node</code>. End tak jaana padta hai isliye O(n).</p>
+    </div>
+    <div class="card card--gold">
+      <h4>INSERT @ POSITION P — O(n)</h4>
+      <p>P−1 tak jao → naye node ka next = current ka next → current ka next = naya node. Link pehle jodo, phir todo — <b>order ulta kiya toh list kho jayegi!</b></p>
+    </div>
+    <div class="card card--orange">
+      <h4>DELETE — O(n)</h4>
+      <p>Target ke <b>pehle</b> node tak jao → uska <code>next</code> target ke next pe point karwa do → <code>free(target)</code>. Head delete ho raha ho toh <code>head = head->next</code>.</p>
+    </div>
+    <div class="card">
+      <h4>TRAVERSE — O(n)</h4>
+      <p><code>temp = head</code> se shuru, jab tak <code>temp != NULL</code>, data print karte jao aur aage badho. Yehi list ka "padhna" hai.</p>
+    </div>
+    <div class="card card--sky">
+      <h4>SEARCH — O(n)</h4>
+      <p>Traverse karte karte har node ka data compare karo. Mil gaya toh return index/wahi node. Best case pehla node Ω(1), worst O(n).</p>
+    </div>
+  </div>
+
+  <p class="rd" data-dev="ऐरे इम्प्लीमेंटेशन में नोड्स एक स्ट्रक्चर ऐरे में रखते हैं और इंडेक्स से लिंक करते हैं — उसमें फ्री लिस्ट भी मेंटेन करनी पड़ती है। पॉइंटर इम्प्लीमेंटेशन में मैलॉक से नोड बनता है, वही प्रैक्टिकल है। दोनों सिलेबस में हैं। अब तीन वेरिएंट याद रखिए — सिंगली में एक ही डायरेक्शन है। डबली में हर नोड में प्रीव और नेक्स्ट दोनों पॉइंटर्स होते हैं, इसलिए दोनों तरफ चल सकते हैं और डिलीट आसान है, लेकिन एक्स्ट्रा पॉइंटर की मेमोरी लगती है। सर्कुलर में आख़िरी नोड वापस हेड को पॉइंट करता है, नल ख़त्म — राउंड-रॉबिन शेड्यूलिंग में इस्तेमाल होता है।">Syllabus me <b>array implementation</b> bhi hai — nodes ek struct array me, index se linked (free list maintain karni padti hai) — aur <b>pointer implementation</b> jo practical hai (<code>malloc</code>/heap). Ab teen variants: <b>Singly</b> — ek hi direction, sirf next. <b>Doubly</b> — har node me <code>prev</code> + <code>next</code> dono; dono taraf travel, delete easy, par extra pointer = extra memory (2 pointers per node). <b>Circular</b> — last node wapas <b>head</b> ko point karta hai; NULL khatam; round-robin scheduling (CPU time-sharing) me use.</p>
+
+  <div class="diagram">
+    <div class="d-cap">DOUBLY LINKED LIST — PREV | DATA | NEXT (train ki dono taraf ke darwaze)</div>
+    <div class="head-tag" style="margin-left:8px">HEAD</div>
+    <div class="ll-row">
+      <span class="arrow" style="color:var(--gold)">●→</span>
+      <div class="node"><div class="nd nd--prev" style="color:var(--red)">NULL<small>PREV</small></div><div class="nd nd--data">10<small>DATA</small></div><div class="nd nd--next">1<small>NEXT</small></div></div>
+      <span class="arrow">⇄</span>
+      <div class="node"><div class="nd nd--prev">0<small>PREV</small></div><div class="nd nd--data">20<small>DATA</small></div><div class="nd nd--next">2<small>NEXT</small></div></div>
+      <span class="arrow">⇄</span>
+      <div class="node"><div class="nd nd--prev">1<small>PREV</small></div><div class="nd nd--data">30<small>DATA</small></div><div class="nd nd--next" style="color:var(--red)">NULL<small>NEXT</small></div></div>
+    </div>
+    <p class="d-note"><b>⇄ dono taraf movement</b> — 20 pe khade ho ke 10 (prev) ya 30 (next) dono dekh sakte ho. Memory cost: har node me ek extra pointer (16 bytes vs 8 on 64-bit).</p>
+  </div>
+
+  <div class="diagram">
+    <div class="d-cap">CIRCULAR LINKED LIST — LAST NODE WAPAS HEAD PE (NULL ki jagah loop)</div>
+    <div class="ll-row">
+      <div class="node"><div class="nd nd--data">10<small>DATA</small></div><div class="nd nd--next">·<small>NEXT</small></div></div>
+      <span class="arrow">→</span>
+      <div class="node"><div class="nd nd--data">20<small>DATA</small></div><div class="nd nd--next">·<small>NEXT</small></div></div>
+      <span class="arrow">→</span>
+      <div class="node"><div class="nd nd--data">30<small>DATA</small></div><div class="nd nd--next">·<small>NEXT</small></div></div>
+      <span class="arrow">↻</span>
+      <div class="node" style="border-color:var(--gold)"><div class="nd nd--data">40<small>LAST NODE</small></div><div class="nd nd--next" style="color:var(--gold)">HEAD<small>NEXT ↑</small></div></div>
+    </div>
+    <p class="d-note">Last node ka next <b>NULL nahi — wapas first node</b>. Kabhi koi "end" nahi milta, isliye traverse me condition lagana hota hai: <code>do { ... } while (temp != head)</code>. Use case: multiple players ka turn (round-robin), music playlist repeat.</p>
+  </div>
+
+  <div class="compare">
+    <div class="cmp-card cmp-card--arr">
+      <h5>ARRAY — CONTIGUOUS TRAIN</h5>
+      <ul>
+        <li>Access: <b>O(1)</b> — index se seedha jump</li>
+        <li>Insert/delete beech me: <b>O(n)</b> — elements shift</li>
+        <li>Size: <b>fixed</b>, compile-time pe decide</li>
+        <li>Memory: sirf data, no pointer overhead</li>
+        <li>Cache: friendly (ek saath milte hain)</li>
+        <li>Best jab: <b>padhna zyada, likhna kam</b> — lookup tables</li>
+      </ul>
+    </div>
+    <div class="cmp-card cmp-card--ll">
+      <h5>LINKED LIST — SCATTERED CHAIN</h5>
+      <ul>
+        <li>Access: <b>O(n)</b> — head se ek-ek karke chalna padta hai</li>
+        <li>Insert/delete beech me: <b>O(1)</b>* — sirf links jodo (*position mil gaye baad)</li>
+        <li>Size: <b>dynamic</b> — jitna chahiye utna</li>
+        <li>Memory: har node me pointer overhead</li>
+        <li>Cache: unfriendly (kahin bhi bikhre hain)</li>
+        <li>Best jab: <b>likhna zyada, padhna kam</b> — undo stacks, queues</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sim" id="llSim">
+    <div class="sim-head"><b>⚡ LINKED LIST SIMULATOR</b><span>— insert/delete/traverse khud karke node jodna seekho</span></div>
+    <div class="sim-body">
+      <div class="head-tag">HEAD</div>
+      <div id="llCanvas" class="ll-row" style="min-height:86px"></div>
+      <div class="sim-controls">
+        <label>VALUE <input id="llVal" type="number" value="7"></label>
+        <button class="btn btn--go" id="llInsF">INSERT @ HEAD</button>
+        <button class="btn" id="llInsE">INSERT @ END</button>
+        <button class="btn btn--warn" id="llDelF">DELETE HEAD</button>
+        <button class="btn" id="llTrav">TRAVERSE</button>
+      </div>
+      <div class="sim-msg" id="llMsg">List khali hai — pehla node insert karo (max 6 nodes).</div>
+    </div>
+  </div>
+</section>
+<!-- ============================================================ S4 -->
+<section class="sec" id="s4">
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <h2>Stacks</h2>
+    <button class="sec-play" data-sec="s4" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">LIFO · push / pop / peek · array + linked implementation · applications</p>
+
+  <p class="rd" data-dev="स्टैक का नियम एक ही है — लास्ट इन, फर्स्ट आउट, यानी एल आई एफ ओ। कैंटीन में प्लेटों का ढेर सोचिए — नई प्लेट ऊपर रखी जाती है, और सबसे ऊपर वाली प्लेट ही पहले उठाई जाती है। बीच से या नीचे से कोई प्लेट नहीं निकाल सकता। स्टैक में भी सिर्फ एक ही तरफ़ से डालो और उसी तरफ़ से निकालो — उस जगह को टॉप कहते हैं।">Stack ka rule ek hi hai — <b>LIFO: Last In, First Out</b>. Canteen me plates ka dher 🍽️ — nayi plate <b>upar</b> rakhi jaati hai, aur sabse upar wali plate hi pehle uthaayi jaati hai. Beech se ya neeche se koi plate nahi nikal sakta. Stack me bhi sirf <b>ek taraf</b> se daalo aur <b>usi taraf</b> se nikaalo — us jagah ka naam <b>TOP</b>. Jo aakhri me gaya, wo pehle bahar aayega — bas, yahi poori kahani hai.</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — EXAM ME AISA LIKHO</span>
+    <p><b>Stack:</b> A stack is a linear data structure in which insertion and deletion are allowed only at one end, called the <b>top</b>. It follows the <b>LIFO</b> (Last-In-First-Out) principle. Primitive operations: <b>push</b> (insert at top), <b>pop</b> (remove from top), <b>peek/top</b> (read top without removing). Overflow = push on full stack; Underflow = pop/peek on empty stack.</p>
+  </div>
+
+  <div class="diagram">
+    <div class="d-cap">STACK — VERTICAL DABBE, SAB KUCH TOP SE</div>
+    <div class="stackwrap">
+      <div class="stackcol">
+        <div class="scell scell--top">40 ← TOP</div>
+        <div class="scell">30</div>
+        <div class="scell">20</div>
+        <div class="scell">10</div>
+        <div class="scell scell--empty">[ empty ]</div>
+      </div>
+      <div class="stackside">
+        <span class="op">PUSH(x) ↑</span> — element top pe daalo, <b>top++</b><br>
+        <span class="op">POP() ↓</span> — top se nikaalo, <b>top−−</b><br>
+        <span class="op">PEEK()</span> — top padho, hatao mat<br><br>
+        Push order: 10, 20, 30, 40<br>
+        Pop order: <b>40, 30, 20, 10</b> — ulta! LIFO 🎯
+      </div>
+    </div>
+  </div>
+
+  <pre class="code-block"><span class="cm">// Array implementation — top = index of latest element</span>
+<span class="kw">int</span> stack[MAX], top = -1;              <span class="cm">// -1 = empty</span>
+
+<span class="kw">void</span> <span class="fn">push</span>(<span class="kw">int</span> x) {
+    <span class="kw">if</span> (top == MAX-1) <span class="fn">printf</span>(<span class="st">"Overflow!"</span>);   <span class="cm">// full</span>
+    <span class="kw">else</span> stack[++top] = x;                   <span class="cm">// O(1)</span>
+}
+<span class="kw">int</span> <span class="fn">pop</span>() {
+    <span class="kw">if</span> (top == -1) <span class="fn">printf</span>(<span class="st">"Underflow!"</span>);    <span class="cm">// empty</span>
+    <span class="kw">else return</span> stack[top--];                 <span class="cm">// O(1)</span>
+}</pre>
+
+  <p class="rd" data-dev="लिंक्ड लिस्ट इम्प्लीमेंटेशन में हर नया नोड हेड पर जुड़ता है — पुश में इंसर्ट ऐट बिगिनिंग, पॉप में डिलीट फ्रॉम बिगिनिंग। फ़ायदा यह कि साइज़ डायनामिक रहता है, ओवरफ्लो नहीं आता। स्टैक की एप्लीकेशन्स बहुत ज़रूरी हैं — रिकर्शन का फंक्शन कॉल स्टैक, एक्सप्रेशन इवैल्यूएशन में पोस्टफिक्स और प्रीफिक्स, यंदो फीचर, ब्राउज़र का बैक बटन, और डीएफएस ट्रैवर्सल।">Linked implementation: <b>push = insert at head</b>, <b>pop = delete from head</b> — dono O(1), aur size dynamic (overflow ka tension khatam). Applications (exam ke liye 5 yaad rakho): <b>recursion</b> ka function call stack, <b>expression evaluation</b> (postfix/prefix conversion — Unit II me detail), <b>undo</b> (Ctrl+Z har app me), <b>browser back button</b>, aur <b>DFS</b> graph traversal. Undo ka logic samjho: har action stack me push hota hai, Ctrl+Z = pop = last action wapas ultiya!</p>
+
+  <div class="sim" id="stackSim">
+    <div class="sim-head"><b>⚡ STACK SIMULATOR</b><span>— push / pop / peek khud karke LIFO mehsoos karo (capacity 5)</span></div>
+    <div class="sim-body">
+      <div class="stackwrap">
+        <div class="stackcol" id="stCanvas" style="min-width:140px"></div>
+        <div class="stackside" id="stSide">top = −1 &nbsp;·&nbsp; stack empty</div>
+      </div>
+      <div class="sim-controls">
+        <label>VALUE <input id="stVal" type="number" value="5"></label>
+        <button class="btn btn--go" id="stPush">PUSH ↑</button>
+        <button class="btn btn--warn" id="stPop">POP ↓</button>
+        <button class="btn" id="stPeek">PEEK</button>
+        <span class="sim-msg" id="stMsg"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ S5 -->
+<section class="sec" id="s5">
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <h2>Queues</h2>
+    <button class="sec-play" data-sec="s5" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">FIFO · enqueue / dequeue · circular · dequeue (DQ) · priority · applications</p>
+
+  <p class="rd" data-dev="क्यू का नियम एफ आई एफ ओ है — फर्स्ट इन, फर्स्ट आउट। टिकट काउंटर की लाइन सोचिए — जो पहले आया वही पहले टिकट लेगा। नए आदमी पीछे लगते हैं, और सेवा सबसे आगे वाले को मिलती है। क्यू में इंसर्शन रियर से और डिलीशन फ्रंट से होता है। इसीलिए दो पॉइंटर्स रखने पड़ते हैं — फ्रंट और रियर।">Queue ka rule — <b>FIFO: First In, First Out</b>. Ticket counter ki line 🎫: jo pehle aaya wahi pehle ticket lega, naye log <b>peeche</b> lagte hain. Isliye queue me insertion <b>REAR</b> se aur deletion <b>FRONT</b> se hota hai — do pointers chahiye (front, rear), stack me sirf top kaafi tha.</p>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — EXAM ME AISA LIKHO</span>
+    <p><b>Queue:</b> A queue is a linear data structure in which insertion is allowed only at the <b>rear</b> and deletion only at the <b>front</b>, following the <b>FIFO</b> (First-In-First-Out) principle. Operations: <b>enqueue</b> (add at rear), <b>dequeue</b> (remove from front), isEmpty, isFull. A <b>circular queue</b> connects the last position back to the first so freed space can be reused.</p>
+  </div>
+
+  <div class="diagram">
+    <div class="d-cap">LINEAR QUEUE — ENTRY REAR SE, EXIT FRONT SE</div>
+    <div class="qwrap">
+      <div class="qptr"><span class="p-front">FRONT ↓</span><span class="p-none">·</span><span class="p-none">·</span><span class="p-none">·</span><span class="p-rear">↑ REAR</span></div>
+      <div class="qrow">
+        <div class="cell cell--hl">10</div>
+        <div class="cell">20</div>
+        <div class="cell">30</div>
+        <div class="cell">40</div>
+        <div class="cell cell--zero">—</div>
+      </div>
+    </div>
+    <p class="d-note"><b>Dequeue</b> hamesha front se (10 niklega pehle) · <b>Enqueue</b> hamesha rear me (41st banda right me lagega). Entry aur exit <b>alag-alag</b> — isliye FIFO. Stack me dono top se the, queue me dono ke ends alag.</p>
+  </div>
+
+  <p class="rd" data-dev="सादी ऐरे क्यू की प्रॉब्लम है — जब फ्रंट से एलिमेंट्स निकलते हैं तो आगे की स्लॉट्स खाली रह जाती हैं, लेकिन रियर आगे बढ़ चुका होता है। क्यू फुल दिखता है पर असल में जगह बर्बाद है। इस वेस्टेज का सॉल्यूशन है सर्कुलर क्यू — ऐरे को गोल मान लो, मॉड्यूलो ऑपरेशन से इंडेक्स घूम कर वापस शुरुआत पे आ जाते हैं। रियर का अगला इंडेक्स रियर प्लस वन मॉड्यूलो साइज़ निकलता है। इससे पूरी मेमोरी रीयूज़ होती है, ओवरफ्लो तभी आता है जब सच में भर गई हो।">Simple array queue ki problem: front se elements nikalne ke baad <b>aage ki slots khaali reh jaati hain</b>, par rear aage badh chuka hota hai — queue "full" dikhta hai jabki jagah waste padi hai. Solution = <b>Circular Queue</b>: array ko gol maan lo, indices <code>(i + 1) % size</code> se wrap ho jaate hain. Rear last tak pahunch ke wapas index 0 pe aa jaata hai. Full memory reuse, koi waste nahi.</p>
+
+  <div class="diagram">
+    <div class="d-cap">CIRCULAR QUEUE — LAST KE BAAD WAHIS PEHLE (modulo magic)</div>
+    <div class="memrow" style="justify-content:center">
+      <div class="memcol"><span class="idx">[0]</span><div class="cell" style="min-width:54px">—</div></div>
+      <div class="memcol"><span class="idx">[1]</span><div class="cell" style="min-width:54px">60</div></div>
+      <div class="memcol"><span class="idx">[2]</span><div class="cell" style="min-width:54px">70</div></div>
+      <div class="memcol"><span class="idx">[3]</span><div class="cell" style="min-width:54px">—</div></div>
+      <div class="memcol"><span class="idx">[4]</span><div class="cell" style="min-width:54px">50</div></div>
+    </div>
+    <p class="d-note"><b>rear = (rear + 1) % 5</b> — index 4 ke baad 5 nahi, <b>0</b> aata hai. 50 aur 60-70 ke beech wali gap reuse ho gayi. Front bhi isi formula se aage badhta hai. Circular queue me full/empty dono me front == rear ho sakta hai — isliye ek counter ya ek khali slot rakh ke difference karte hain (exam me yeh point likhna!).</p>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <h4>DEQUEUE (Double-Ended)</h4>
+      <p>Dono ends se <b>insert + delete</b> dono allowed — 4 operations: insertFront, insertRear, deleteFront, deleteRear. Use: browser history (dono taraf scroll), undo-redo dono.</p>
+    </div>
+    <div class="card card--sky">
+      <h4>PRIORITY QUEUE</h4>
+      <p>Har element ke saath <b>priority number</b>. High priority pehle niklega, chahe baad me aaya ho. Hospital emergency me pehla aaya nahi — <b>sabse serious</b> patient pehle! OS process scheduling ka core.</p>
+    </div>
+    <div class="card card--gold">
+      <h4>APPLICATIONS</h4>
+      <p><b>Printer spooling</b> (documents line me print), <b>CPU scheduling</b> (ready queue round-robin), <b>keyboard buffer</b>, call-center hold line, BFS graph traversal. Sab jagah "line me lag jao" = queue.</p>
+    </div>
+  </div>
+
+  <div class="sim" id="queueSim">
+    <div class="sim-head"><b>⚡ QUEUE SIMULATOR</b><span>— enqueue / dequeue, front-rear movement dekho (capacity 5)</span></div>
+    <div class="sim-body">
+      <div class="qwrap">
+        <div class="qptr" id="qPtrs"></div>
+        <div class="qrow" id="qCanvas"></div>
+      </div>
+      <div class="sim-controls">
+        <label>VALUE <input id="qVal" type="number" value="11"></label>
+        <button class="btn btn--go" id="qEnq">ENQUEUE</button>
+        <button class="btn btn--warn" id="qDeq">DEQUEUE</button>
+        <span class="sim-msg" id="qMsg"></span>
+      </div>
+      <div class="sim-msg" id="qSide" style="color:var(--faint)">front = rear = −1 · queue empty</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ S6 -->
+<section class="sec" id="s6">
+  <div class="sec-head">
+    <span class="sec-num">06</span>
+    <h2>Time Complexity — Asymptotic Notations</h2>
+    <button class="sec-play" data-sec="s6" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Big Oh · Big Omega · Big Theta · time-space trade-off</p>
+
+  <p class="rd" data-dev="दो एल्गोरिद्म सही जवाब देते हैं, तो बेहतर कौन? जो कम समय और कम मेमोरी ले। असली सेकंड में नापा नहीं जाता, क्योंकि वह मशीन पर निर्भर करता है — तेज़ लैपटॉप और पुराना पी सी अलग समय दिखाएंगे। इसलिए हम स्टेप काउंट करते हैं, इनपुट साइज़ एन के फंक्शन के रूप में। इसे ही टाइम कॉम्प्लेक्सिटी कहते हैं। नियम तीन हैं — कॉन्स्टेंट्स हटाओ, लोअर ऑर्डर टर्म्स हटाओ, सिर्फ डॉमिनेंट टर्म रखो।">Do algorithms dono sahi answer de rahe hain — better kaun? Jo kam time/memory le. Par seconds me naapa nahi jaata (fast laptop vs purana PC alag time dikhate hain). Isliye hum <b>step count</b> karte hain — input size n ke function me. 3 golden rules: <b>constants drop</b> (3n+5 → n), <b>lower-order terms drop</b> (n² + 100n → n²), sirf <b>dominant term rakho</b>. Growth dekho, exact numbers nahi.</p>
+
+  <div class="grid3">
+    <div class="card card--gold">
+      <h4>BIG O — UPPER BOUND</h4>
+      <p>"Zyada se zyada itna hi hoga" — worst case ki guarantee. <code>3n + 5 ≤ 4n</code> for n ≥ 5, toh 3n+5 = <b>O(n)</b>. Exam: definition + c, n₀ wala inequality likhna.</p>
+    </div>
+    <div class="card card--sky">
+      <h4>BIG Ω — LOWER BOUND</h4>
+      <p>"Kam se kam itna toh hoga hi" — best case. Linear search me key pehli jagah mile toh Ω(1), nahi toh Ω(n) se kam nahi.</p>
+    </div>
+    <div class="card">
+      <h4>BIG Θ — TIGHT BOUND</h4>
+      <p>"Isi range me rahega" — dono taraf se sandwiched. f(n) O(g) bhi ho aur Ω(g) bhi, toh Θ(g). Exact order.</p>
+    </div>
+  </div>
+
+  <div class="def">
+    <span class="def-label">DEFINITION — EXAM ME AISA LIKHO</span>
+    <p><b>Big-O:</b> f(n) = O(g(n)) if there exist positive constants <b>c</b> and <b>n₀</b> such that f(n) ≤ c·g(n) for all n ≥ n₀. &nbsp;·&nbsp; <b>Big-Ω:</b> f(n) ≥ c·g(n) for all n ≥ n₀. &nbsp;·&nbsp; <b>Big-Θ:</b> c₁·g(n) ≤ f(n) ≤ c₂·g(n) for all n ≥ n₀.</p>
+  </div>
+
+  <p class="rd" data-dev="ग्रोथ रेट लैडर रट लो — वन, लॉग एन, एन, एन लॉग एन, एन स्क्वायर, टू रेज़ टू द एन। कॉन्स्टेंट सबसे तेज़ है — इनपुट कितना भी बढ़ जाए, टाइम वही रहता है, जैसे ऐरे में ए-फाइव लेना। लॉग एन सुपर तेज़ है — एक करोड़ एलिमेंट्स में बाइनरी सर्च को सिर्फ करीब चौबीस स्टेप्स। एन स्क्वायर डेंजरस है — इनपुट दस गुना, टाइम सौ गुना! और टाइम-स्पेस ट्रेड-ऑफ याद रखो — टाइम बचाना हो तो मेमोरी ख़र्च करो, मेमोरी बचानी हो तो टाइम ख़र्च करो, दोनों एक साथ मिनिमम नहीं होते।">Growth ladder <b>yaad kar lo</b>: <b>O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ)</b>. O(1) = input kitna bhi ho time same (array access). O(log n) superfast — 1 crore elements me binary search ~24 steps. O(n²) = danger — input 10× hua toh time 100×! Aur <b>Time-Space Trade-off</b>: time bachana ho toh memory kharch karo (lookup tables, hash maps), memory bachani ho toh time kharch karo (recompute) — dono ek saath minimum nahi ho sakte, balance chunna padta hai.</p>
+
+  <div class="table-wrap">
+    <div class="table-scroll"><table class="data-table">
+      <thead><tr><th>Operation / Algorithm</th><th>Data Structure</th><th>Complexity</th><th>Ek line me kyun</th></tr></thead>
+      <tbody>
+        <tr><td><b>Access A[i]</b></td><td>Array</td><td><b>O(1)</b></td><td>Formula se seedha jump — superpower</td></tr>
+        <tr><td>Search</td><td>Array (unsorted)</td><td><b>O(n)</b></td><td>Ek-ek karke dekhna padta hai</td></tr>
+        <tr><td>Binary search</td><td>Sorted array</td><td><b>O(log n)</b></td><td>Har step me problem aadhi ho jaati hai</td></tr>
+        <tr><td>Insert/delete middle</td><td>Array</td><td><b>O(n)</b></td><td>Baad ke elements shift karne padte hain</td></tr>
+        <tr><td>Insert/delete head</td><td>Linked list</td><td><b>O(1)</b></td><td>Sirf 2-3 pointers jodo/todo</td></tr>
+        <tr><td>Search</td><td>Linked list</td><td><b>O(n)</b></td><td>Seedha jump nahi — head se chalna padta hai</td></tr>
+        <tr><td>Push / pop</td><td>Stack</td><td><b>O(1)</b></td><td>Sirf top se khelna hai</td></tr>
+        <tr><td>Enqueue / dequeue</td><td>Circular queue</td><td><b>O(1)</b></td><td>Front/rear dono pointers ready</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="sim" id="growthSim">
+    <div class="sim-head"><b>⚡ GROWTH CALCULATOR</b><span>— n daalo, dekho har complexity kitni jaldi phat-ti hai</span></div>
+    <div class="sim-body">
+      <div class="sim-controls" style="margin-top:0">
+        <label>INPUT SIZE n <input id="grN" type="number" value="1000" min="2"></label>
+        <button class="btn btn--go" id="grBtn">COMPUTE</button>
+      </div>
+      <div class="table-wrap" style="margin:16px 0 0"><div class="table-scroll"><table class="data-table" id="grTable">
+        <thead><tr><th>f(n)</th><th>n = ?</th><th>Comments</th></tr></thead>
+        <tbody id="grBody"></tbody>
+      </table></div></div>
+    </div>
+  </div>
+</section>
+<!-- ============================================================ S7 -->
+<section class="sec" id="s7">
+  <div class="sec-head">
+    <span class="sec-num">07</span>
+    <h2>Q&A — Expected Exam Questions</h2>
+    <button class="sec-play" data-sec="s7" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Question kholo, khud answer likho, phir model answer se check karo</p>
+
+  <details class="qa" open>
+    <summary>Define data structure. Classify linear and non-linear data structures with examples. <span class="mark mark--2">2 MARKS</span></summary>
+    <div class="qa-body">
+      <p>A data structure is a systematic way of organizing, storing and managing data in memory so that efficient operations (insertion, deletion, searching, traversal) can be performed on it.</p>
+      <p><b>Linear:</b> elements in a sequence, each having one predecessor and one successor — array, linked list, stack, queue. <b>Non-linear:</b> elements arranged in hierarchy or network — tree (parent-child), graph (nodes connected arbitrarily).</p>
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>What is an Abstract Data Type (ADT)? Give an example. <span class="mark mark--2">2 MARKS</span></summary>
+    <div class="qa-body">
+      <p>An ADT is a mathematical model of a data structure that specifies <b>what</b> operations can be performed and what they do, while hiding <b>how</b> they are implemented. It separates specification (interface) from implementation.</p>
+      <p><b>Example:</b> a List ADT offers insert, delete and search operations; it can be implemented using either an array or a linked list without changing the way the user calls the operations. Stack and Queue are also ADTs with array-based and linked implementations.</p>
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>An array A[10][20] is stored in row-major order with base address 2000 and each element of 4 bytes. Calculate the address of A[3][5]. Also compute it for column-major order. <span class="mark mark--5">5 MARKS</span></summary>
+    <div class="qa-body">
+      <p><b>Given:</b> M = 10 rows, N = 20 columns, B = 2000, W = 4, element A[3][5] (0-based).</p>
+      <p><b>Row Major:</b> Addr = B + W × (i × N + j) = 2000 + 4 × (3 × 20 + 5) = 2000 + 4 × 65 = 2000 + 260 = <b>2260</b></p>
+      <p><b>Column Major:</b> Addr = B + W × (j × M + i) = 2000 + 4 × (5 × 10 + 3) = 2000 + 4 × 53 = 2000 + 212 = <b>2212</b></p>
+      <p>Conclusion: the same element occupies a different address under the two storage orders — that is why the question always specifies the order.</p>
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>What is a sparse matrix? Explain its triplet (row, column, value) representation with an example. <span class="mark mark--5">5 MARKS</span></summary>
+    <div class="qa-body">
+      <p>A sparse matrix is a matrix in which the number of zero elements greatly exceeds the non-zero elements. Storing the zeros wastes memory, so only non-zero elements are stored as triples (row, col, value) with a header row (total rows, total columns, count of non-zero entries).</p>
+      <p><b>Example:</b> a 1000×1000 matrix with only 10 non-zero elements needs 1000×1000×4 = 4,000,000 bytes if stored densely, but only (10+1)×3×4 = 132 bytes in triplet form. Triples are kept sorted in row-major order so that operations (transpose, addition) remain predictable.</p>
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>Compare arrays and linked lists — memory, access, insertion/deletion, size, applications. <span class="mark mark--10">10 MARKS</span></summary>
+    <div class="qa-body">
+      <p><b>Memory:</b> array is contiguous; linked list nodes are scattered and carry pointer overhead. <b>Access:</b> array O(1) random access by index formula; linked list O(n) sequential access from head. <b>Insertion/deletion:</b> array needs O(n) shifting of elements; linked list needs only pointer changes (O(1) at head, O(n) only to reach the position). <b>Size:</b> array fixed at compile time; linked list grows/shrinks at runtime via malloc/free. <b>Cache behaviour:</b> arrays are cache-friendly; linked lists are not.</p>
+      <p><b>When to use:</b> arrays when reads dominate and size is known (lookup tables, matrices); linked lists when insertions/deletions dominate or size is unpredictable. A 10-mark answer should include the node structure diagram and one example operation (insert at beginning) for both.</p>
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>Explain stack and queue operations with their real-life applications. Write push/pop algorithms. <span class="mark mark--10">10 MARKS</span></summary>
+    <div class="qa-body">
+      <p><b>Stack (LIFO):</b> single-ended structure — push inserts at top, pop removes from top, peek reads the top. Overflow on push-full, underflow on pop-empty. Applications: function call stack in recursion, postfix/prefix expression evaluation, undo, browser back, DFS.</p>
+      <p><b>Queue (FIFO):</b> insert at rear (enqueue), delete at front (dequeue). Applications: printer spooling, CPU scheduling (round-robin), keyboard buffer, BFS. Circular queue reuses freed front slots via (i+1) % size indexing.</p>
+      <p>Write the array push/pop code from section 04 — with top = −1 initialisation and both boundary checks — full marks.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ S8 -->
+<section class="sec" id="s8">
+  <div class="sec-head">
+    <span class="sec-num">08</span>
+    <h2>Summary — 10 Line ka Nichod</h2>
+    <button class="sec-play" data-sec="s8" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Revision ka last stop — ek nazar me poora unit</p>
+
+  <ol class="one-liners">
+    <li><b>Data structure</b> = data ko memory me organize karne ka tareeka taaki operations efficient ho sakein — linear (array, list, stack, queue) ya non-linear (tree, graph).</li>
+    <li><b>ADT</b> = interface (kya karna hai) alag, implementation (kaise karna hai) alag — remote button vs andar ka circuit.</li>
+    <li><b>Array</b> = same-type elements, contiguous memory, index se — random access O(1) iska superpower.</li>
+    <li><b>1-D address:</b> Addr(A[i]) = B + W×(i−L) · <b>Row Major 2-D:</b> B + W×(i×N + j) · <b>Column Major:</b> B + W×(j×M + i).</li>
+    <li><b>2-D array flat memory</b> me store hota hai — row major pehli poori row, column major pehli poori column (C = row major).</li>
+    <li><b>Sparse matrix</b> = zyada tar zero; sirf non-zero ko (row, col, value) triples me store karo — 40 lakh bytes vs 132 bytes wala magic.</li>
+    <li><b>Linked list</b> = nodes (DATA + NEXT) pointers se jude — dynamic size, insert/delete me shifting nahi.</li>
+    <li><b>Singly / Doubly / Circular</b> — ek direction / prev+next dono / last wapas head pe.</li>
+    <li><b>Stack = LIFO</b> (plates, push/pop/peek top se) · <b>Queue = FIFO</b> (ticket line, rear se in, front se out).</li>
+    <li><b>Big O</b> = zyada se zyada · <b>Ω</b> = kam se kam · <b>Θ</b> = exact range · time bachao toh space kharch karo — trade-off.</li>
+  </ol>
+</section>
+
+<!-- ============================================================ S9 -->
+<section class="sec" id="s9">
+  <div class="sec-head">
+    <span class="sec-num">09</span>
+    <h2>Exam Corner</h2>
+    <button class="sec-play" data-sec="s9" title="Sirf yeh section suno">▶</button>
+  </div>
+  <p class="sec-tag">Saari verbatim definitions ek jaghah + last-minute 15 one-liners</p>
+
+  <div class="defgrid">
+    <div class="defcard"><h6>DATA STRUCTURE</h6><p>A systematic way of organizing, storing and managing data in memory so that efficient operations can be performed on it. Classified as linear and non-linear.</p></div>
+    <div class="defcard"><h6>ADT</h6><p>A mathematical model specifying what operations a data structure supports, independent of implementation — consists of data objects, operations, and interface.</p></div>
+    <div class="defcard"><h6>ARRAY</h6><p>A finite, ordered collection of elements of the same data type stored in contiguous memory locations, accessed by index. Base address = address of first element.</p></div>
+    <div class="defcard"><h6>ROW MAJOR ORDER</h6><p>2-D array storage where the entire first row is stored first, then the second row, and so on. C and C++ use row-major. Addr(A[i][j]) = B + W×(i×N + j).</p></div>
+    <div class="defcard"><h6>COLUMN MAJOR ORDER</h6><p>2-D array storage where the entire first column is stored first, then the second column. Fortran uses it. Addr(A[i][j]) = B + W×(j×M + i).</p></div>
+    <div class="defcard"><h6>SPARSE MATRIX</h6><p>A matrix in which most elements are zero; stored economically as triples (row, column, value) of non-zero elements with a header row (rows, cols, count).</p></div>
+    <div class="defcard"><h6>LINKED LIST</h6><p>A linear data structure of nodes, each holding data and a pointer to the next node; nodes occupy non-contiguous memory and the list is accessed via the head pointer.</p></div>
+    <div class="defcard"><h6>STACK</h6><p>A linear structure where insertion and deletion occur only at one end (top), following LIFO. Operations: push, pop, peek. Errors: overflow, underflow.</p></div>
+    <div class="defcard"><h6>QUEUE</h6><p>A linear structure where insertion occurs at the rear and deletion at the front, following FIFO. Circular queue uses (i+1) % size to reuse space.</p></div>
+    <div class="defcard"><h6>TIME COMPLEXITY</h6><p>The amount of computation an algorithm performs as a function of input size n, expressed via asymptotic notation independent of machine speed.</p></div>
+    <div class="defcard"><h6>BIG-O NOTATION</h6><p>f(n) = O(g(n)) if ∃ constants c > 0, n₀ such that f(n) ≤ c·g(n) for all n ≥ n₀ — the asymptotic upper bound (worst case).</p></div>
+    <div class="defcard"><h6>TIME-SPACE TRADE-OFF</h6><p>Reducing time requires additional memory and vice-versa; one cannot minimise both simultaneously — a balance is chosen per application.</p></div>
+  </div>
+
+  <h3 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:24px;margin:34px 0 6px">Last-minute 15 one-liners 🎯</h3>
+  <ol class="one-liners">
+    <li>bit → field → record → file → database — yehi hierarchy hai.</li>
+    <li>Data + processing = information.</li>
+    <li>C me array index hamesha 0 se, aur row-major store hota hai.</li>
+    <li>1-D: B + W×(i−L) — lower bound na bhoolo!</li>
+    <li>Row major me N (columns) multiply hota hai; column major me M (rows).</li>
+    <li>3-D me bas ek aur term: i×n₂n₃ + j×n₃ + k.</li>
+    <li>Sparse triple ka header: (total rows, total cols, non-zero count).</li>
+    <li>Linked list node = DATA + NEXT; last node ka next = NULL.</li>
+    <li>Doubly = prev + next (extra pointer, dono taraf travel).</li>
+    <li>Circular ka last node head pe — round-robin scheduling.</li>
+    <li>Insert at head O(1); insert at end O(n) — kyunki tak jaana padta hai.</li>
+    <li>Stack: top = −1 means empty; push pe ++top, pop pe top−−.</li>
+    <li>Queue: rear se enqueue, front se dequeue — entry aur exit alag.</li>
+    <li>Circular queue: (i + 1) % size — aage ki khaali slots reuse.</li>
+    <li>O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) — ladder set!</li>
+  </ol>
+
+  <p class="rd" data-dev="अब आप तैयार हैं। एग्ज़ाम से पहले ये पंद्रह वन-लाइनर्स और डेफिनिशन कार्ड दोहरा लीजिए। ऑल द बेस्ट!">Ab tum ready ho — exam se pehle yeh 15 one-liners + definition cards dobara padh lo, aur address calculation ke do numericals haath se solve kar lo. All the best! 🎯</p>
+
+  <p class="foot">BCS301 · DATA STRUCTURES · UNIT 1 — HINGLISH AUDIO NOTES · SUNTE RAHO, PADHTE RAHO</p>
+</section>
+
+</div><!-- /main -->
+</div><!-- /wrap -->
+
+<!-- ============================================================ PLAYER -->
+<div class="player" id="player">
+  <button class="pbtn pbtn--main" id="btnPlay" title="Play / Pause">▶</button>
+  <button class="pbtn" id="btnStop" title="Stop">■</button>
+  <button class="pbtn" id="btnPrev" title="Pichla section">⏮</button>
+  <button class="pbtn" id="btnNext" title="Agla section">⏭</button>
+  <select id="rateSel" title="Speed">
+    <option value="0.75">0.75×</option>
+    <option value="1" selected>1×</option>
+    <option value="1.25">1.25×</option>
+    <option value="1.5">1.5×</option>
+  </select>
+  <select id="voiceSel" title="Voice"><option>Loading voices…</option></select>
+  <div class="p-meta">
+    <div class="p-now" id="pNow">Player ready — kisi section ke ▶ button ya upar Play dabao</div>
+    <div class="p-voice" id="pVoice">Voices check kar rahe hain…</div>
+  </div>
+</div>
+<script>
+(function () {
+'use strict';
+
+/* ============ THEME ============ */
+var root = document.documentElement;
+try { var saved = localStorage.getItem('dsu1-theme'); if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved); } catch (e) {}
+document.getElementById('themeToggle').addEventListener('click', function () {
+  var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem('dsu1-theme', next); } catch (e) {}
+});
+
+/* ============ SCROLL SPY (TOC) ============ */
+(function () {
+  var toc = document.getElementById('toc');
+  var links = toc.querySelectorAll('a');
+  var sections = [];
+  links.forEach(function (link) {
+    var id = link.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if (el) sections.push({ id: id, el: el, link: link });
+  });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        links.forEach(function (l) { l.classList.remove('active'); });
+        var match = sections.find(function (s) { return s.el === entry.target; });
+        if (match) {
+          match.link.classList.add('active');
+          if (window.innerWidth <= 1000) match.link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  sections.forEach(function (s) { obs.observe(s.el); });
+})();
+
+/* ============ AUDIO ENGINE ============ */
+var synth = window.speechSynthesis;
+var SEC_IDS = ['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9'];
+var SEC_NAMES = { s0: 'Intro & ADT', s1: 'Arrays', s2: 'Sparse Matrix', s3: 'Linked Lists', s4: 'Stacks', s5: 'Queues', s6: 'Time Complexity', s7: 'Q&A', s8: 'Summary', s9: 'Exam Corner' };
+
+var units = [];       // {el, sec, idx-in-sec}
+var cur = -1;         // current unit index
+var endSec = null;    // section-play boundary
+var stopFlag = false;
+var keepAlive = null;
+var activeSection = 's0';
+
+var btnPlay = document.getElementById('btnPlay');
+var btnStop = document.getElementById('btnStop');
+var btnPrev = document.getElementById('btnPrev');
+var btnNext = document.getElementById('btnNext');
+var rateSel = document.getElementById('rateSel');
+var voiceSel = document.getElementById('voiceSel');
+var pNow = document.getElementById('pNow');
+var pVoice = document.getElementById('pVoice');
+var allVoices = [];
+var hindiVoice = null;
+
+// build units
+SEC_IDS.forEach(function (sid) {
+  var sec = document.getElementById(sid);
+  if (!sec) return;
+  var rds = sec.querySelectorAll('.rd');
+  var n = 0;
+  rds.forEach(function (el) { units.push({ el: el, sec: sid, inSec: n++ }); });
+});
+
+function firstIndexOfSection(sid) { for (var k = 0; k < units.length; k++) if (units[k].sec === sid) return k; return -1; }
+
+/* ---- voices ---- */
+function isHindi(v) {
+  if (!v) return false;
+  var l = (v.lang || '').toLowerCase();
+  return l.indexOf('hi') === 0 || /hindi|swara|hemant|kalpana|madhur|lekha|prabhat|कल्पना/i.test(v.name || '');
+}
+function refreshVoices() {
+  if (!synth) return;
+  var vs = synth.getVoices() || [];
+  if (!vs.length) return;
+  allVoices = vs;
+  hindiVoice = null;
+  var hindi = [], others = [];
+  vs.forEach(function (v) { (isHindi(v) ? hindi : others).push(v); });
+  hindiVoice = hindi[0] || null;
+  var opts = '';
+  hindi.forEach(function (v) { opts += '<option value="' + encodeURIComponent(v.voiceURI) + '">★ ' + v.name + ' (' + v.lang + ')</option>'; });
+  if (hindi.length && others.length) opts += '<option disabled="disabled">— — —</option>';
+  others.forEach(function (v) { opts += '<option value="' + encodeURIComponent(v.voiceURI) + '">' + v.name + ' (' + v.lang + ')</option>'; });
+  voiceSel.innerHTML = opts;
+  voiceSel.value = encodeURIComponent((hindiVoice || others[0]).voiceURI);
+  updateVoiceStatus();
+}
+function updateVoiceStatus() {
+  if (!allVoices.length) { pVoice.innerHTML = '<span class="off">Voices load nahi hui — Android Chrome / MS Edge try karo</span>'; return; }
+  var v = getSelVoice();
+  if (isHindi(v)) pVoice.innerHTML = '<span class="on">★ ' + v.name + ' — Hindi voice active</span>';
+  else pVoice.innerHTML = '<span class="off">⚠ Hindi voice nahi mili — Android Chrome / MS Edge best hai</span> · using ' + v.name;
+}
+function getSelVoice() {
+  var uri = decodeURIComponent(voiceSel.value || '');
+  for (var k = 0; k < allVoices.length; k++) if (allVoices[k].voiceURI === uri) return allVoices[k];
+  return null;
+}
+if (synth) {
+  refreshVoices();
+  synth.onvoiceschanged = refreshVoices;
+  setTimeout(refreshVoices, 700);
+} else {
+  btnPlay.disabled = btnStop.disabled = btnPrev.disabled = btnNext.disabled = true;
+  pVoice.innerHTML = '<span class="off">Browser speechSynthesis support nahi karta</span>';
+}
+voiceSel.addEventListener('change', updateVoiceStatus);
+
+/* ---- highlight ---- */
+function clearHi() { document.querySelectorAll('.rd.speaking').forEach(function (e) { e.classList.remove('speaking'); }); }
+function highlight(u) {
+  clearHi();
+  u.el.classList.add('speaking');
+  try { u.el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { u.el.scrollIntoView(); }
+}
+
+/* ---- status ---- */
+function snippet(el, len) {
+  var t = (el.innerText || '').replace(/\s+/g, ' ').trim();
+  return t.length > len ? t.slice(0, len) + '…' : t;
+}
+function updateNow(u) {
+  if (!u) { pNow.textContent = 'Player ready — kisi section ke ▶ button ya upar Play dabao'; return; }
+  var per = units.filter(function (x) { return x.sec === u.sec; }).length;
+  pNow.textContent = '▶ ' + SEC_NAMES[u.sec] + ' — para ' + (u.inSec + 1) + '/' + per + ' · ' + snippet(u.el, 58);
+}
+function updateSecButtons(sid) {
+  document.querySelectorAll('.sec-play').forEach(function (b) {
+    var isNow = sid !== null && b.getAttribute('data-sec') === sid;
+    b.textContent = isNow ? '■' : '▶';
+    b.title = isNow ? 'Stop yeh section' : 'Sirf yeh section suno';
+  });
+}
+
+/* ---- speaking ---- */
+function speakUnit(i) {
+  if (stopFlag) return;
+  if (i >= units.length) { finishAll(); return; }
+  var u = units[i];
+  if (endSec !== null && u.sec !== endSec) { finishAll(); return; }
+  cur = i;
+  var v = getSelVoice();
+  var text = isHindi(v) ? (u.el.getAttribute('data-dev') || u.el.innerText) : u.el.innerText;
+  var utt = new SpeechSynthesisUtterance(text);
+  if (v) { utt.voice = v; utt.lang = v.lang; } else { utt.lang = 'hi-IN'; }
+  utt.rate = parseFloat(rateSel.value) || 1;
+  utt.pitch = 1;
+  utt.onstart = function () { highlight(u); updateNow(u); updateSecButtons(u.sec); btnPlay.textContent = '❚❚'; };
+  utt.onend = function () { if (!stopFlag) speakUnit(cur + 1); };
+  utt.onerror = function (ev) {
+    if (ev && ev.error === 'interrupted' || ev && ev.error === 'canceled') return;
+    if (!stopFlag) setTimeout(function () { if (!stopFlag) speakUnit(cur + 1); }, 400);
+  };
+  synth.speak(utt);
+}
+function startKeepAlive() {
+  if (keepAlive) return;
+  var ua = navigator.userAgent || '';
+  var isChrome = /Chrome/.test(ua) && !/Edg|Android|iPhone|iPad/.test(ua);
+  if (isChrome) keepAlive = setInterval(function () {
+    if (synth.speaking && !synth.paused) { synth.pause(); synth.resume(); }
+  }, 12000);
+}
+function stopKeepAlive() { if (keepAlive) { clearInterval(keepAlive); keepAlive = null; } }
+function finishAll() {
+  stopKeepAlive();
+  clearHi();
+  btnPlay.textContent = '▶';
+  updateSecButtons(null);
+  pNow.textContent = 'Khatam ✓ — agla section ya replay ke liye ▶ dabao';
+  endSec = null; cur = -1;
+}
+function hardStop() {
+  stopFlag = true;
+  try { synth.cancel(); } catch (e) {}
+  stopKeepAlive();
+  clearHi();
+  btnPlay.textContent = '▶';
+  updateSecButtons(null);
+  setTimeout(function () { stopFlag = false; }, 60);
+}
+function startFrom(sid, only) {
+  if (!synth) return;
+  hardStop();
+  setTimeout(function () {
+    var idx = firstIndexOfSection(sid);
+    if (idx < 0) { finishAll(); return; }
+    endSec = only ? sid : null;
+    cur = idx - 1;
+    startKeepAlive();
+    speakUnit(idx);
+  }, 80);
+}
+
+btnPlay.addEventListener('click', function () {
+  if (!synth) return;
+  if (synth.speaking && !synth.paused) { synth.pause(); btnPlay.textContent = '▶'; pNow.textContent = '⏸ Paused — phir se dabao to resume'; return; }
+  if (synth.speaking && synth.paused) { synth.resume(); btnPlay.textContent = '❚❚'; return; }
+  startFrom(activeSection, false);
+});
+btnStop.addEventListener('click', function () { hardStop(); cur = -1; updateNow(null); pNow.textContent = 'Stopped — Ready'; });
+btnPrev.addEventListener('click', function () { startFrom(prevSection(), false); });
+btnNext.addEventListener('click', function () { startFrom(nextSection(), false); });
+
+function curSection() {
+  if (cur >= 0 && units[cur]) return units[cur].sec;
+  return activeSection;
+}
+function prevSection() {
+  var i = SEC_IDS.indexOf(curSection());
+  return SEC_IDS[Math.max(0, i - 1)];
+}
+function nextSection() {
+  var i = SEC_IDS.indexOf(curSection());
+  return SEC_IDS[Math.min(SEC_IDS.length - 1, i + 1)];
+}
+
+document.querySelectorAll('.sec-play').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var sid = b.getAttribute('data-sec');
+    if (b.textContent === '■') { hardStop(); pNow.textContent = 'Stopped'; return; }
+    startFrom(sid, true);
+  });
+});
+
+// track active section from scroll for smart play start
+(function () {
+  var obs2 = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) { if (en.isIntersecting) activeSection = en.target.id; });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  SEC_IDS.forEach(function (sid) { var el = document.getElementById(sid); if (el) obs2.observe(el); });
+})();
+
+/* ============ ADDRESS CALCULATOR ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var mode = $('acMode'), steps = $('acSteps'), msg = $('acMsg');
+  mode.addEventListener('change', function () {
+    $('ac2dOnly').style.display = mode.value === '2d' ? 'contents' : 'none';
+  });
+  $('acBtn').addEventListener('click', function () {
+    var B = +$('acBase').value, W = +$('acW').value;
+    if (!W || W < 1) { steps.innerHTML = '<span style="color:var(--orange)">Word size W ≥ 1 hona chahiye!</span>'; return; }
+    var html = '';
+    if (mode.value === '1d') {
+      var i = +$('acI').value;
+      if (i < 0) { steps.innerHTML = '<span style="color:var(--orange)">i ≥ 0 rakho (0-based)</span>'; return; }
+      var addr = B + W * i;
+      html = '<b>1-D:</b> Addr(A[' + i + ']) = B + W × i<br>' +
+        'elements pehle = i = <b>' + i + '</b><br>' +
+        'offset = W × i = ' + W + ' × ' + i + ' = <b>' + (W * i) + '</b> bytes<br>' +
+        '<span class="fin">✔ Addr = ' + B + ' + ' + (W * i) + ' = ' + addr + '</span>';
+    } else {
+      var M = +$('acRows').value, N = +$('acCols').value, i2 = +$('acI').value, j2 = +$('acJ').value, ord = $('acOrder').value;
+      if (M < 1 || N < 1) { steps.innerHTML = '<span style="color:var(--orange)">Rows/Cols ≥ 1 rakho</span>'; return; }
+      if (i2 < 0 || i2 >= M || j2 < 0 || j2 >= N) { steps.innerHTML = '<span style="color:var(--orange)">Index range me nahi hai! (0 ≤ i < ' + M + ', 0 ≤ j < ' + N + ')</span>'; return; }
+      if (ord === 'row') {
+        var e1 = i2 * N + j2;
+        html = '<b>ROW MAJOR:</b> Addr = B + W × (i×N + j)<br>' +
+          'poori rows pehle: i × N = ' + i2 + ' × ' + N + ' = <b>' + (i2 * N) + '</b> elements<br>' +
+          'apni row me pehle: j = <b>' + j2 + '</b> elements<br>' +
+          'total = ' + (i2 * N) + ' + ' + j2 + ' = <b>' + e1 + '</b> elements pehle<br>' +
+          'offset = ' + e1 + ' × ' + W + ' = <b>' + (e1 * W) + '</b> bytes<br>' +
+          '<span class="fin">✔ Addr = ' + B + ' + ' + (e1 * W) + ' = ' + (B + e1 * W) + '</span>';
+      } else {
+        var e2 = j2 * M + i2;
+        html = '<b>COLUMN MAJOR:</b> Addr = B + W × (j×M + i)<br>' +
+          'poori columns pehle: j × M = ' + j2 + ' × ' + M + ' = <b>' + (j2 * M) + '</b> elements<br>' +
+          'apni column me upar: i = <b>' + i2 + '</b> elements<br>' +
+          'total = ' + (j2 * M) + ' + ' + i2 + ' = <b>' + e2 + '</b> elements pehle<br>' +
+          'offset = ' + e2 + ' × ' + W + ' = <b>' + (e2 * W) + '</b> bytes<br>' +
+          '<span class="fin">✔ Addr = ' + B + ' + ' + (e2 * W) + ' = ' + (B + e2 * W) + '</span>';
+      }
+    }
+    steps.innerHTML = html;
+    msg.textContent = 'Yehi steps exam me likhne hain — formula, substitute, answer. ✔';
+  });
+})();
+
+/* ============ SPARSE CALCULATOR ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  $('spBtn').addEventListener('click', function () {
+    var r = +$('spRows').value, c = +$('spCols').value, nz = +$('spNZ').value, w = +$('spW').value;
+    if (r < 1 || c < 1 || nz < 0 || w < 1 || nz > r * c) { $('spSteps').innerHTML = '<span style="color:var(--orange)">Inputs check karo — non-zero elements rows×cols se zyada nahi ho sakte!</span>'; return; }
+    var dense = r * c * w;
+    var sparse = (nz + 1) * 3 * w;
+    var save = Math.max(0, 100 - (sparse / dense * 100));
+    var fmt = function (x) { return x.toLocaleString('en-IN'); };
+    $('spSteps').innerHTML =
+      '<b>DENSE:</b> ' + r + ' × ' + c + ' × ' + w + ' = <b>' + fmt(dense) + ' bytes</b><br>' +
+      '<b>SPARSE:</b> (' + nz + ' + 1 header) × 3 values × ' + w + ' = <b>' + fmt(sparse) + ' bytes</b><br>' +
+      '<span class="fin">✔ Bachat: ' + save.toFixed(save < 1 && save > 0 ? 4 : 2) + '% — ' + (save > 90 ? 'yahi to sparse ka jaadu hai! 🪄' : 'kam non-zero = zyada bachat') + '</span>';
+  });
+})();
+
+/* ============ LINKED LIST SIMULATOR ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var nodes = [], busy = false, MAXN = 6;
+  function render() {
+    var cv = $('llCanvas');
+    var html = nodes.length ? '' : '<span style="color:var(--faint);font-size:13px;font-family:\'Azeret Mono\',monospace">[ empty list — head = NULL ]</span>';
+    nodes.forEach(function (v, idx) {
+      html += '<div class="node" data-ll="' + idx + '"><div class="nd nd--data">' + v + '<small>DATA</small></div><div class="nd nd--next">' + (idx === nodes.length - 1 ? 'NULL' : '·') + '<small>NEXT</small></div></div>';
+      if (idx < nodes.length - 1) html += '<span class="arrow">→</span>';
+    });
+    if (nodes.length) html += '<span class="null-tag"></span>';
+    cv.innerHTML = html;
+  }
+  $('llInsF').addEventListener('click', function () {
+    if (busy) return;
+    if (nodes.length >= MAXN) { $('llMsg').innerHTML = '<b style="color:var(--orange)">List bhar gayi (max ' + MAXN + ') — pehle delete karo. Yeh demo limitation hai; real linked list infinite hoti hai!</b>'; return; }
+    var v = +$('llVal').value;
+    nodes.unshift(v);
+    render();
+    $('llMsg').innerHTML = '<b>insertAtHead(' + v + ')</b> — naya node banao → next = head → head = naya. Sirf pointer changes, <b>O(1)</b>.';
+  });
+  $('llInsE').addEventListener('click', function () {
+    if (busy) return;
+    if (nodes.length >= MAXN) { $('llMsg').innerHTML = '<b style="color:var(--orange)">List bhar gayi (max ' + MAXN + ')</b>'; return; }
+    var v = +$('llVal').value;
+    nodes.push(v);
+    render();
+    $('llMsg').innerHTML = '<b>insertAtEnd(' + v + ')</b> — head se last tak travel (O(n)) → last->next = naya node. End tak jaana pada, isliye <b>O(n)</b>.';
+  });
+  $('llDelF').addEventListener('click', function () {
+    if (busy) return;
+    if (!nodes.length) { $('llMsg').innerHTML = '<b style="color:var(--orange)">Underflow — list khali hai (head = NULL)!</b>'; return; }
+    var v = nodes.shift();
+    render();
+    $('llMsg').innerHTML = '<b>deleteHead()</b> — ' + v + ' nikla → head = head->next → free(old head). <b>O(1)</b>.';
+  });
+  $('llTrav').addEventListener('click', function () {
+    if (busy || !nodes.length) { if (!nodes.length) $('llMsg').innerHTML = 'List khali hai — kuch traverse nahi hoga!'; return; }
+    busy = true;
+    var els = document.querySelectorAll('[data-ll]');
+    els.forEach(function (e) { e.style.outline = 'none'; });
+    $('llMsg').innerHTML = 'Traversing… temp = head se shuru';
+    var i = 0;
+    (function step() {
+      if (i > 0) els[i - 1].style.outline = 'none';
+      if (i >= els.length) {
+        busy = false;
+        $('llMsg').innerHTML = '<b>Traversal complete</b> — ' + els.length + ' nodes, ' + els.length + ' steps ⇒ <b>O(n)</b>. Last node ka next NULL tha, loop wahin ruka.';
+        return;
+      }
+      els[i].style.outline = '2px solid var(--teal)';
+      $('llMsg').innerHTML = 'temp = ' + nodes[i] + ' … print(' + nodes[i] + ') · temp = temp->next';
+      i++;
+      setTimeout(step, 750);
+    })();
+  });
+  render();
+})();
+
+/* ============ STACK SIMULATOR ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var st = [], CAP = 5;
+  function render() {
+    var html = '';
+    for (var k = CAP - 1; k >= 0; k--) {
+      if (k < st.length) html += '<div class="scell' + (k === st.length - 1 ? ' scell--top' : '') + '">' + st[k] + (k === st.length - 1 ? ' ← TOP' : '') + '</div>';
+      else html += '<div class="scell scell--empty">[ ' + (k === 0 ? 'bottom' : 'empty') + ' ]</div>';
+    }
+    $('stCanvas').innerHTML = html;
+    $('stSide').innerHTML = 'top = ' + (st.length - 1) + ' &nbsp;·&nbsp; ' + (st.length ? st.length + '/5 elements' : 'stack empty');
+  }
+  $('stPush').addEventListener('click', function () {
+    if (st.length >= CAP) { $('stMsg').innerHTML = '<b style="color:var(--orange)">OVERFLOW! top == ' + (CAP - 1) + ' — array full, push possible nahi.</b>'; return; }
+    var v = +$('stVal').value;
+    st.push(v);
+    render();
+    $('stMsg').innerHTML = '<b>push(' + v + ')</b> — top pe daala, top ab index ' + (st.length - 1) + ' pe. O(1).';
+  });
+  $('stPop').addEventListener('click', function () {
+    if (!st.length) { $('stMsg').innerHTML = '<b style="color:var(--orange)">UNDERFLOW! top == −1 — stack khali, pop possible nahi.</b>'; return; }
+    var v = st.pop();
+    render();
+    $('stMsg').innerHTML = '<b>pop()</b> — ' + v + ' bahar aaya (last aaya tha, first gaya — LIFO!). top ab ' + (st.length - 1) + '.';
+  });
+  $('stPeek').addEventListener('click', function () {
+    if (!st.length) { $('stMsg').innerHTML = '<b style="color:var(--orange)">Stack khali — peek kya karega!</b>'; return; }
+    $('stMsg').innerHTML = '<b>peek()</b> — top pe hai <b>' + st[st.length - 1] + '</b> (remove kiye bina padha).';
+  });
+  render();
+})();
+
+/* ============ QUEUE SIMULATOR ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var CAP = 5, arr = [], front = -1, rear = -1;
+  function render() {
+    var cells = '', ptrs = '';
+    for (var k = 0; k < CAP; k++) {
+      var used = (k >= front && k <= rear && front !== -1);
+      cells += '<div class="cell' + (used ? '' : ' cell--zero') + '" style="min-width:56px">' + (used ? arr[k] : '—') + '</div>';
+      var tag = 'p-none';
+      if (front === k && rear === k) tag = '';
+      ptrs += '<span class="' + (front === k ? 'p-front' : (rear === k ? 'p-rear' : 'p-none')) + '"' + (front === k && rear === k ? ' style="color:var(--sky)"' : '') + '>' +
+        (front === k && rear === k ? 'FRONT+REAR' : (front === k ? 'FRONT ↓' : (rear === k ? '↑ REAR' : '·'))) + '</span>';
+    }
+    $('qCanvas').innerHTML = cells;
+    $('qPtrs').innerHTML = ptrs;
+    var count = front === -1 ? 0 : (rear - front + 1);
+    $('qSide').innerHTML = 'front = ' + front + ' · rear = ' + rear + ' · elements = ' + count +
+      (front > 0 ? ' · <span style="color:var(--orange)">0…' + (front - 1) + ' slots waste (khaali par reuse nahi) — yahi circular queue ki wajah hai!</span>' : '');
+  }
+  $('qEnq').addEventListener('click', function () {
+    if (rear === CAP - 1) {
+      if (front > 0) { $('qMsg').innerHTML = '<b style="color:var(--orange)">Rear end pe hai — aage ' + front + ' slots KHAALI hain par linear queue use nahi kar sakti! Isliye circular queue chahiye ((i+1) % size).</b>'; }
+      else { $('qMsg').innerHTML = '<b style="color:var(--orange)">OVERFLOW — queue full (rear == ' + (CAP - 1) + ').</b>'; }
+      return;
+    }
+    var v = +$('qVal').value;
+    if (front === -1) front = 0;
+    arr[++rear] = v;
+    render();
+    $('qMsg').innerHTML = '<b>enqueue(' + v + ')</b> — rear pe daala, rear = ' + rear + '. O(1).';
+  });
+  $('qDeq').addEventListener('click', function () {
+    if (front === -1 || front > rear) { $('qMsg').innerHTML = '<b style="color:var(--orange)">UNDERFLOW — queue khali!</b>'; return; }
+    var v = arr[front++];
+    if (front > rear) { front = rear = -1; }
+    render();
+    $('qMsg').innerHTML = '<b>dequeue()</b> — ' + v + ' bahar aaya (jo sabse pehle aaya tha — FIFO!). front = ' + front + '.';
+  });
+  render();
+})();
+
+/* ============ GROWTH CALCULATOR ============ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (x) {
+    if (x === Infinity) return '∞';
+    if (x >= 1e15) return x.toExponential(2).replace('e+', ' × 10^');
+    return Math.round(x).toLocaleString('en-IN');
+  };
+  $('grBtn').addEventListener('click', function () {
+    var n = Math.max(2, Math.floor(+$('grN').value));
+    if (!n || n < 2) n = 2;
+    $('grN').value = n;
+    var lg = Math.ceil(Math.log2(n));
+    var nl = Math.round(n * Math.log2(n));
+    var sq = n * n;
+    var ex = n <= 60 ? Math.pow(2, n) : Infinity;
+    var rows = [
+      ['<b>log₂ n</b>', fmt(lg), 'binary search — itne hi steps me mil jayega'],
+      ['<b>n</b>', fmt(n), 'linear search — ek-ek karke poora scan'],
+      ['<b>n log₂ n</b>', fmt(nl), 'merge sort / quick sort ka average'],
+      ['<b>n²</b>', fmt(sq), 'double loop (bubble sort) — gussa mat ho jana 😅'],
+      ['<b>2ⁿ</b>', n <= 60 ? fmt(ex) : '2^' + n, 'brute force subsets — universe hi chhota chahiye']
+    ];
+    var html = '';
+    rows.forEach(function (r) { html += '<tr><td>' + r[0] + '</td><td><b>' + r[1] + '</b></td><td style="color:var(--dim)">' + r[2] + '</td></tr>'; });
+    $('grBody').innerHTML = html;
+  });
+  $('grBtn').click();
+})();
+
+})();
+</script>
+
+<div class="dsnav" role="navigation" aria-label="Page navigation">
+  <span class="dsnav-b dsnav-off">←</span>
+  <a class="dsnav-b" href="../index.html" title="Sab pages (Home)">⌂</a>
+  <a class="dsnav-b" href="../unit3/DS_Unit3_Session1.html" title="Agla page (→)">→</a>
+</div>
+<style>
+/* ===== DS page nav (auto-injected) ===== */
+.dsnav{position:fixed;right:14px;bottom:78px;z-index:650;display:flex;gap:6px;align-items:center;
+  background:rgba(10,14,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:6px 8px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);opacity:.6;transition:opacity .2s ease, transform .2s ease;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.dsnav:hover{opacity:1;transform:translateY(-2px)}
+.dsnav-b{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:15px;line-height:1;
+  transition:background .15s ease,color .15s ease}
+.dsnav-b:hover{background:#ff9f45;color:#101820}
+.dsnav-b.dsnav-off{opacity:.25;pointer-events:none}
+.dsnav-tip{font-size:10px;letter-spacing:.8px;color:rgba(255,255,255,.45);padding:0 4px;white-space:nowrap}
+@media (max-width:640px){.dsnav-tip{display:none}.dsnav{right:10px;bottom:70px;padding:5px 6px}.dsnav-b{width:30px;height:30px;font-size:14px}}
+@media print{.dsnav{display:none!important}}
+</style>
+<script>
+(function(){
+  var PREV=null, NEXT="../unit3/DS_Unit3_Session1.html";
+  document.addEventListener('keydown', function(e){
+    var t=e.target||{};
+    if(/INPUT|TEXTAREA|SELECT/.test(t.tagName||'')) return;
+    if(e.key==='ArrowRight' && NEXT) window.location.href=NEXT;
+    else if(e.key==='ArrowLeft' && PREV) window.location.href=PREV;
+    else if(e.key==='Home') window.location.href='../index.html';
+  });
+})();
+</script>
+
+</body>
+</html>

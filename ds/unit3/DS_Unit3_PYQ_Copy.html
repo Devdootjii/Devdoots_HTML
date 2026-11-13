@@ -601,9 +601,10 @@ h1 em { font-style: normal; color: var(--gold); }
   background:rgba(18,48,110,.045);
 }
 .copy-page .sketch{
+  display:block;width:fit-content;
   border:1.6px solid var(--ink);border-radius:6px 3px 7px 2px;
   padding:10px 12px;margin:8px 0 4px;background:rgba(255,255,255,.6);
-  display:inline-block;max-width:100%;
+  display:block;width:fit-content;max-width:100%;
 }
 .copy-page .sketch .cap{font-family:'Caveat',cursive;font-size:16px;color:var(--pencil);margin-top:6px;text-align:center}
 .copy-page .row{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
@@ -2847,7 +2848,11 @@ buildPool(); paintBoard();
   function curPage(frame) { return frame.querySelector('.copy-page.on'); }
   function btn(frame, dir) { return frame.querySelector(dir > 0 ? '.cp-next' : '.cp-prev'); }
 
+  var lastTurn = 0;
   function turn(frame, dir) {
+    var now = Date.now();
+    if (now - lastTurn < 350) return false;   /* pointer + touch dono se double turn na ho */
+    lastTurn = now;
     var b = btn(frame, dir);
     if (!b || b.disabled) return false;
     stopSpeak();
@@ -2938,6 +2943,27 @@ buildPool(); paintBoard();
     stack.addEventListener('pointerup', endDrag);
     stack.addEventListener('pointercancel', endDrag);
     stack.addEventListener('pointerleave', endDrag);
+
+    /* touch fallback — purane mobile browsers ke liye */
+    var td = null;
+    stack.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) return;
+      var t = e.touches[0];
+      td = { x: t.clientX, y: t.clientY, dx: 0, moved: false };
+    }, { passive: true });
+    stack.addEventListener('touchmove', function (e) {
+      if (!td || e.touches.length !== 1) return;
+      var t = e.touches[0];
+      var dx = t.clientX - td.x, dy = t.clientY - td.y;
+      if (!td.moved && Math.abs(dx) < 12) return;
+      if (Math.abs(dy) > Math.abs(dx) && !td.moved) { td = null; return; }
+      td.moved = true; td.dx = dx;
+    }, { passive: true });
+    stack.addEventListener('touchend', function () {
+      if (!td) return;
+      var d = td; td = null;
+      if (Math.abs(d.dx) > 60) turn(frame, d.dx < 0 ? 1 : -1);
+    });
   });
 
   /* ---------- 3. TTS ---------- */

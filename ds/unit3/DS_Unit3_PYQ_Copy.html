@@ -6,7 +6,7 @@
 <title>Unit 3 — PYQ + Handwritten Answer Copy (detailed) | Team Devdoots</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Rubik:wght@400;500;600&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Rubik:wght@400;500;600&family=Roboto+Mono:wght@400;500;700&family=Patrick+Hand&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 /* ================= TOKENS ================= */
 :root, [data-theme="dark"] {
@@ -675,6 +675,70 @@ h1 em { font-style: normal; color: var(--gold); }
 .copy-page .fc-ar b{color:#111;font-size:13px}
 .copy-page .fc-row{display:flex;gap:26px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
 .copy-page .fc-note{font-family:'Caveat',cursive;font-size:16px;color:#5b6470;margin-top:4px}
+
+
+/* ================= READABLE HANDWRITING (answers) ================= */
+.copy-page,
+.copy-page p, .copy-page li, .copy-page td, .copy-page th,
+.copy-page .code, .copy-page .def, .copy-page .cell, .copy-page .fc-box {
+  font-family: 'Patrick Hand', 'Kalam', cursive !important;
+}
+.copy-page p, .copy-page li { font-size: 18px !important; line-height: var(--line) !important; }
+.copy-page .code { font-size: 16.5px !important; line-height: 27px !important; }
+.copy-page table.hw { font-size: 16.5px !important; }
+.copy-page table.hw th { font-size: 17px !important; }
+
+/* ================= QUESTION ON THE COPY PAGE (different hand) ================= */
+.copy-page .cq {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.35;
+  color: #111;
+  margin: 0 0 10px;
+  padding: 0 0 8px;
+  border-bottom: 1.6px dashed rgba(17,17,17,.45);
+  letter-spacing: .2px;
+}
+.copy-page .cq .cq-qn { color: #b3261e; }
+.copy-page .cq .cq-mk {
+  font-family: 'Patrick Hand', cursive; font-size: 13px; color: #b3261e;
+  border: 1.2px solid rgba(179,38,30,.5); border-radius: 4px; padding: 0 5px; margin-left: 6px;
+  white-space: nowrap;
+}
+
+/* ================= PAGE TURN (swipe) ================= */
+.copy-stack { position: relative; touch-action: pan-y; overflow: hidden; }
+.copy-page { will-change: transform; backface-visibility: hidden; }
+.copy-page.turning { box-shadow: -14px 0 26px rgba(0,0,0,.28); }
+.copy-stack::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,.16), transparent 22%, transparent 78%, rgba(0,0,0,.16));
+  transition: opacity .2s;
+}
+.copy-stack.swiping::after { opacity: 1; }
+
+/* swipe hint */
+.copy-bar .sw-hint {
+  font-family: 'Roboto Mono', monospace; font-size: 9.5px; letter-spacing: 1px;
+  color: var(--faint); opacity: .8; margin-right: 4px;
+}
+@media (max-width: 640px) { .copy-bar .sw-hint { display: none; } }
+
+/* ================= TTS BUTTON ================= */
+.copy-bar .cp-tts {
+  font-family: 'Roboto Mono', monospace; font-size: 11px; line-height: 1;
+  background: var(--surface2); color: var(--text); border: 1px solid var(--border2);
+  border-radius: 7px; padding: 6px 9px; cursor: pointer; transition: all .18s;
+}
+.copy-bar .cp-tts:hover { border-color: var(--gold); color: var(--gold); }
+.copy-bar .cp-tts.speaking { background: var(--gold); color: #101820; border-color: var(--gold); }
+.copy-page .reading { background: linear-gradient(transparent 60%, rgba(255,214,74,.45) 60%); }
+
+/* ================= DARK / LIGHT for the paper ================= */
+[data-theme="dark"] .copy-page { box-shadow: 0 14px 40px rgba(0,0,0,.55); }
+[data-theme="light"] .copy-page { box-shadow: 0 10px 30px rgba(20,40,70,.18); }
+[data-theme="dark"] .copy-stack { background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.05)); }
 
 </style>
 </head>
@@ -2747,6 +2811,190 @@ buildPool(); paintBoard();
 
 })();
 </script>
+
+<script>
+/* ============================================================
+   COPY PAGE EXTRAS — question on page · swipe turn · TTS
+   ============================================================ */
+(function () {
+  var frames = Array.prototype.slice.call(document.querySelectorAll('.copy-frame'));
+
+  /* ---------- 1. QUESTION ko copy page pe likho (alag handwriting) ---------- */
+  frames.forEach(function (frame, idx) {
+    var host = frame.closest('.pyq') || frame.parentElement;
+    var qEl = host ? host.querySelector('.pyq-q') : null;
+    if (!qEl) return;
+    var clone = qEl.cloneNode(true);
+    var mkEl = clone.querySelector('.mk');
+    var marks = mkEl ? mkEl.textContent.trim() : '';
+    if (mkEl) mkEl.remove();
+    var qText = clone.textContent.replace(/\s+/g, ' ').trim();
+    var numMatch = qText.match(/^Q\s*(\d+)[.\s]*/i);
+    var qn = numMatch ? 'Q' + numMatch[1] + '.' : ('Q' + (idx + 1) + '.');
+    if (numMatch) qText = qText.replace(/^Q\s*\d+[.\s]*/i, '');
+
+    var firstPage = frame.querySelector('.copy-page');
+    if (!firstPage || firstPage.querySelector('.cq')) return;
+
+    var div = document.createElement('div');
+    div.className = 'cq';
+    div.innerHTML = '<span class="cq-qn">' + qn + '</span> ' + qText +
+                    (marks ? ' <span class="cq-mk">' + marks + '</span>' : '');
+    firstPage.insertBefore(div, firstPage.firstChild);
+  });
+
+  /* ---------- 2. PAGE TURN — swipe (right to left) ---------- */
+  function curPage(frame) { return frame.querySelector('.copy-page.on'); }
+  function btn(frame, dir) { return frame.querySelector(dir > 0 ? '.cp-next' : '.cp-prev'); }
+
+  function turn(frame, dir) {
+    var b = btn(frame, dir);
+    if (!b || b.disabled) return false;
+    stopSpeak();
+    var old = curPage(frame);
+    if (old) {
+      var a = old.animate(
+        [{ transform: 'translateX(0) rotate(0deg)', opacity: 1 },
+         { transform: 'translateX(' + (-dir * 88) + '%) rotate(' + (-dir * 2) + 'deg)', opacity: 0 }],
+        { duration: 220, easing: 'cubic-bezier(.4,0,.7,1)' }
+      );
+      a.onfinish = function () { a.cancel(); };
+    }
+    setTimeout(function () {
+      b.click();
+      var now = curPage(frame);
+      if (now) {
+        var b2 = now.animate(
+          [{ transform: 'translateX(' + (dir * 88) + '%) rotate(' + (dir * 2) + 'deg)', opacity: 0 },
+           { transform: 'translateX(0) rotate(0deg)', opacity: 1 }],
+          { duration: 280, easing: 'cubic-bezier(.2,.8,.3,1)' }
+        );
+        b2.onfinish = function () { b2.cancel(); };
+      }
+    }, 200);
+    return true;
+  }
+
+  frames.forEach(function (frame) {
+    var stack = frame.querySelector('.copy-stack');
+    if (!stack) return;
+
+    /* hint + TTS button in the bar */
+    var bar = frame.querySelector('.copy-bar');
+    if (bar && !bar.querySelector('.cp-tts')) {
+      var hint = document.createElement('span');
+      hint.className = 'sw-hint';
+      hint.textContent = 'swipe ← →';
+      var tts = document.createElement('button');
+      tts.className = 'cp-tts';
+      tts.type = 'button';
+      tts.title = 'Sun kar padho (TTS)';
+      tts.textContent = '🔊 Suno';
+      tts.addEventListener('click', function () { toggleSpeak(frame, tts); });
+      var nav = bar.querySelector('.copy-nav');
+      if (nav) {
+        bar.insertBefore(hint, nav);
+        bar.insertBefore(tts, nav);
+      } else {
+        bar.appendChild(hint); bar.appendChild(tts);
+      }
+    }
+
+    /* pointer drag = real page turn */
+    var drag = null;
+    stack.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      drag = { x: e.clientX, y: e.clientY, dx: 0, el: curPage(frame), moved: false };
+    });
+    stack.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.moved && Math.abs(dx) < 10) return;
+      if (Math.abs(dy) > Math.abs(dx) && !drag.moved) { drag = null; return; }
+      drag.moved = true; drag.dx = dx;
+      stack.classList.add('swiping');
+      if (drag.el) {
+        drag.el.style.transition = 'none';
+        drag.el.style.transform = 'translateX(' + (dx * .72) + 'px) rotate(' + (dx * .012) + 'deg)';
+        drag.el.style.opacity = Math.max(.35, 1 - Math.abs(dx) / 620);
+      }
+      e.preventDefault();
+    }, { passive: false });
+
+    function endDrag() {
+      if (!drag) return;
+      var d = drag; drag = null;
+      stack.classList.remove('swiping');
+      if (!d.el) return;
+      d.el.style.transition = '';
+      d.el.style.opacity = '';
+      if (Math.abs(d.dx) > 70) {
+        d.el.style.transform = '';
+        turn(frame, d.dx < 0 ? 1 : -1);
+      } else {
+        d.el.style.transform = '';
+      }
+    }
+    stack.addEventListener('pointerup', endDrag);
+    stack.addEventListener('pointercancel', endDrag);
+    stack.addEventListener('pointerleave', endDrag);
+  });
+
+  /* ---------- 3. TTS ---------- */
+  var synth = window.speechSynthesis;
+  var speakingFrame = null, speakingBtn = null, voice = null;
+
+  function pickVoice() {
+    if (!synth) return;
+    var vs = synth.getVoices() || [];
+    voice = vs.find(function (v) { return /en-IN/i.test(v.lang); }) ||
+            vs.find(function (v) { return /en-GB|en-US/i.test(v.lang); }) || null;
+  }
+  if (synth) {
+    pickVoice();
+    if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = pickVoice;
+  }
+
+  function stopSpeak() {
+    if (!synth) return;
+    synth.cancel();
+    if (speakingBtn) { speakingBtn.classList.remove('speaking'); speakingBtn.textContent = '🔊 Suno'; }
+    speakingFrame = null; speakingBtn = null;
+  }
+
+  function toggleSpeak(frame, btnEl) {
+    if (!synth) { alert('Is browser me voice support nahi hai. Chrome / Edge try karo.'); return; }
+    if (speakingFrame === frame) { stopSpeak(); return; }
+    stopSpeak();
+    var page = curPage(frame);
+    if (!page) return;
+
+    var text = page.innerText.replace(/\n{2,}/g, '\n').replace(/[ \t]{2,}/g, ' ').trim();
+    if (!text) return;
+
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-IN';
+    if (voice) u.voice = voice;
+    u.rate = 0.98;
+    u.pitch = 1;
+    u.onend = function () { if (speakingFrame === frame) stopSpeak(); };
+    u.onerror = function () { if (speakingFrame === frame) stopSpeak(); };
+
+    speakingFrame = frame; speakingBtn = btnEl;
+    btnEl.classList.add('speaking');
+    btnEl.textContent = '⏹ Ruko';
+    synth.speak(u);
+  }
+
+  /* page change / navigation pe awaaz band */
+  window.addEventListener('beforeunload', stopSpeak);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) stopSpeak(); });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('.cp-prev, .cp-next, .toc a')) stopSpeak();
+  }, true);
+})();
+</script>
+
 
 <div class="dsnav" role="navigation" aria-label="Page navigation">
   <a class="dsnav-b" href="DS_Unit3_MasterSheet.html" title="Pichla page (←)">←</a>

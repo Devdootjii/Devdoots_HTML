@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Important Questions — Answers + Explanation | Team Devdoots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Rubik:wght@400;500;600&family=Roboto+Mono:wght@400;500;700&family=Patrick+Hand&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================= TOKENS ================= */
+:root, [data-theme="dark"] {
+  --bg: #101316;
+  --surface: #181d22;
+  --surface2: #1f262d;
+  --surface3: #28313a;
+  --border: rgba(240,245,255,0.09);
+  --border2: rgba(240,245,255,0.19);
+  --text: #eef3f8;
+  --dim: #a8b6c4;
+  --faint: #74838f;
+  --gold: #4d9dff;
+  --gold-dim: rgba(77,157,255,0.14);
+  --blue: #ffd24a;
+  --blue-dim: rgba(255,210,74,0.14);
+  --coral: #ff6b6b;
+  --coral-dim: rgba(255,107,107,0.14);
+  --emerald: #6ee7a8;
+  --emerald-dim: rgba(110,231,168,0.14);
+  --shadow: 0 12px 36px rgba(0,0,0,0.55);
+}
+[data-theme="light"] {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --surface2: #f9fbfd;
+  --surface3: #eaf0f7;
+  --border: rgba(20,40,70,0.12);
+  --border2: rgba(20,40,70,0.22);
+  --text: #131a24;
+  --dim: #52626f;
+  --faint: #8798a5;
+  --gold: #1a5fb4;
+  --gold-dim: rgba(26,95,180,0.12);
+  --blue: #8a6a00;
+  --blue-dim: rgba(138,106,0,0.14);
+  --coral: #c02a2a;
+  --coral-dim: rgba(192,42,42,0.12);
+  --emerald: #0f7a4a;
+  --emerald-dim: rgba(15,122,74,0.13);
+  --shadow: 0 12px 30px rgba(20,45,80,0.13);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Rubik', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  font-size: 16px; line-height: 1.72;
+  overflow-wrap: break-word;
+  padding-bottom: 150px;
+  background-image:
+    radial-gradient(ellipse 900px 420px at 75% -90px, var(--gold-dim), transparent 62%),
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: auto, 44px 44px, 44px 44px;
+}
+body.audio-off { padding-bottom: 44px; }
+::selection { background: var(--gold-dim); }
+
+/* ================= LAYOUT ================= */
+.wrap { max-width: 1460px; margin: 0 auto; display: grid; grid-template-columns: 232px minmax(0,1fr); gap: 0 54px; padding: 0 30px; position: relative; z-index: 1; }
+.main { min-width: 0; padding: 26px 0 70px; }
+body.noside .toc { display: none !important; }
+body.noside .wrap { grid-template-columns: minmax(0,1fr); }
+body.noside .main { max-width: 1180px; margin: 0 auto; }
+
+/* ================= TOC ================= */
+.toc { position: sticky; top: 22px; align-self: start; max-height: calc(100dvh - 70px); overflow-y: auto; padding: 22px 0 26px; grid-row: 1 / -1; }
+.toc::-webkit-scrollbar { width: 3px; }
+.toc::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+.toc-title { font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--faint); padding-bottom: 11px; margin-bottom: 9px; border-bottom: 1px solid var(--border); }
+.toc a { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; color: var(--dim); text-decoration: none; padding: 5px 10px; border-radius: 6px; border-left: 2px solid transparent; transition: all .15s; line-height: 1.45; margin-bottom: 1px; }
+.toc a .n { font-family: 'Roboto Mono', monospace; font-size: 10px; color: var(--faint); }
+.toc a:hover { color: var(--text); background: var(--surface); }
+.toc a.active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-dim); }
+.toc a.active .n { color: var(--gold); }
+
+/* ================= DOCK ================= */
+.dock {
+  position: sticky; top: 10px; z-index: 420;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border2); border-radius: 13px;
+  padding: 8px 12px; margin: 0 0 22px; box-shadow: var(--shadow);
+}
+.dock-timer { font-family: 'Roboto Mono', monospace; font-size: 22px; font-weight: 600; color: var(--gold); min-width: 76px; letter-spacing: 1px; }
+.dock-timer.warn { color: var(--coral); }
+.dock-blk { font-size: 12.5px; color: var(--dim); max-width: 270px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dock-name { font-family: 'Archivo', system-ui, sans-serif; font-weight: 800; font-size: 19px; color: var(--blue); min-width: 74px; letter-spacing: .3px; }
+.dock-name.spinning { opacity: .5; }
+.dbtn { font-family: 'Roboto Mono', monospace; font-size: 12px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 7px 11px; transition: all .15s; }
+.dbtn:hover { border-color: var(--gold); color: var(--gold); }
+.dbtn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.dbtn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.dbtn--blue { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+.dbtn--ok { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-dim); }
+.dbtn--bad { border-color: var(--coral); color: var(--coral); background: var(--coral-dim); }
+.dock-sep { width: 1px; height: 24px; background: var(--border2); margin: 0 3px; }
+.dock-spacer { flex: 1 1 16px; min-width: 0; }
+.dock-q { display: none; margin: -12px 0 22px; border: 1px solid var(--blue); border-left: 3px solid var(--blue); border-radius: 0 0 13px 13px; background: color-mix(in srgb, var(--blue-dim) 70%, var(--surface)); padding: 14px 18px; }
+.dock-q.show { display: block; }
+.dock-q .who { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.dock-q .dq { font-size: 15px; font-weight: 600; line-height: 1.55; }
+.dock-q .da { font-size: 13.5px; line-height: 1.65; color: var(--emerald); margin-top: 9px; display: none; }
+.dock-q .da.show { display: block; }
+@media (max-width: 1000px) {
+  .dock { top: 50px; padding: 7px 9px; gap: 6px; }
+  .dock-blk { display: none; }
+  .dock-timer { font-size: 18px; min-width: 64px; }
+  .dock-name { font-size: 16px; min-width: 56px; }
+  .dock-sep { display: none; }
+}
+.timeup-banner { position: fixed; bottom: 118px; left: 50%; transform: translate(-50%, 420%); z-index: 950; background: var(--coral); color: #240b06; font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 15px; letter-spacing: .8px; padding: 12px 24px; border-radius: 11px; box-shadow: 0 12px 36px rgba(0,0,0,.45); transition: transform .32s cubic-bezier(.2,.9,.3,1.4); white-space: nowrap; }
+.timeup-banner.show { transform: translate(-50%, 0); }
+@keyframes tuPulse { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+body.timeup::after { content: ''; position: fixed; inset: 0; z-index: 900; pointer-events: none; background: radial-gradient(ellipse at center, rgba(255,122,107,0.28), rgba(255,122,107,0.08) 60%, transparent 80%); animation: tuPulse .5s ease-in-out 7; }
+@keyframes tuShake { 0%,100%{transform:translateX(0)} 15%{transform:translateX(-7px)} 30%{transform:translateX(7px)} 45%{transform:translateX(-5px)} 60%{transform:translateX(5px)} 80%{transform:translateX(-3px)} }
+.dock.timeup { animation: tuShake .55s ease-in-out 4; border-color: var(--coral) !important; }
+@media (max-width: 1000px) { .timeup-banner { bottom: 170px; } }
+
+/* ================= HERO ================= */
+.hero { padding: 30px 0 6px; }
+.hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { font-family: 'Roboto Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 12px; border-radius: 5px; border: 1px solid var(--border2); }
+.chip--gold { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+.chip--blue { color: var(--blue); border-color: var(--blue); background: var(--blue-dim); }
+.chip--em { color: var(--emerald); border-color: var(--emerald); background: var(--emerald-dim); }
+h1 { font-family: 'Archivo', system-ui, sans-serif; font-weight: 800; font-size: clamp(38px, 5.2vw, 60px); line-height: 1.02; letter-spacing: -1.4px; }
+h1 em { font-style: normal; color: var(--gold); }
+.hero-sub { font-size: 17px; color: var(--dim); max-width: 62ch; margin-top: 14px; }
+.hero-hr { height: 1px; background: linear-gradient(90deg, var(--gold), transparent 72%); border: none; margin: 28px 0 0; opacity: .5; }
+
+/* ================= SECTION HEAD ================= */
+.sec { scroll-margin-top: 54px; }
+.sec-head { display: flex; align-items: center; gap: 15px; margin: 70px 0 8px; flex-wrap: wrap; }
+.sec-num { font-family: 'Roboto Mono', monospace; font-size: 12px; font-weight: 600; color: #1b1405; background: var(--gold); border-radius: 6px; padding: 4px 9px; letter-spacing: 1px; flex-shrink: 0; }
+h2 { font-family: 'Archivo', system-ui, sans-serif; font-weight: 800; font-size: clamp(28px, 3.2vw, 38px); line-height: 1.1; letter-spacing: -0.8px; flex: 1; min-width: 200px; }
+.sec-play { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--gold); background: var(--gold-dim); color: var(--gold); font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; font-family: 'Roboto Mono', monospace; }
+.sec-play:hover { background: var(--gold); color: #1b1405; }
+.sec-tag { font-family: 'Roboto Mono', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1.6px; margin: 0 0 22px; }
+
+/* ================= READING TEXT ================= */
+.rd { font-size: 16.5px; line-height: 1.78; color: var(--text); max-width: 74ch; margin: 18px 0; padding: 4px 14px 4px 16px; border-left: 3px solid transparent; border-radius: 0 8px 8px 0; transition: background .35s, border-color .35s; }
+.rd.speaking { background: var(--gold-dim); border-left-color: var(--gold); }
+.rd b, .rd strong { color: var(--gold); font-weight: 600; }
+.rd i { color: var(--blue); font-style: normal; }
+.rd code { font-family: 'Roboto Mono', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 6px; border-radius: 4px; }
+
+/* ================= BOXES ================= */
+.def { background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 11px; padding: 16px 20px 14px; margin: 22px 0; max-width: 78ch; }
+.def-label { font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 7px; }
+.def p { font-size: 15.5px; line-height: 1.66; }
+.def p b { color: var(--gold); }
+.memo { background: linear-gradient(150deg, var(--emerald-dim), var(--surface) 60%); border: 1px solid var(--emerald); border-left: 4px solid var(--emerald); border-radius: 11px; padding: 15px 19px; margin: 22px 0; max-width: 78ch; }
+.memo-label { font-family: 'Roboto Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--emerald); display: block; margin-bottom: 7px; }
+.memo p, .memo li { font-size: 14.5px; line-height: 1.68; }
+.memo b { color: var(--emerald); }
+.memo ul, .memo ol { padding-left: 1.25em; }
+.callout { border-radius: 11px; padding: 14px 18px; margin: 22px 0; max-width: 78ch; font-size: 15px; line-height: 1.66; border: 1px solid var(--coral); background: var(--coral-dim); }
+.callout b { color: var(--coral); }
+.callout--info { border-color: var(--blue); background: var(--blue-dim); }
+.callout--info b { color: var(--blue); }
+
+/* ================= CARDS ================= */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(252px,1fr)); gap: 14px; margin: 22px 0; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(212px,1fr)); gap: 14px; margin: 22px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 16px 18px; min-width: 0; }
+.card h4 { font-family: 'Roboto Mono', monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.6px; margin-bottom: 9px; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+.card h4::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.card p, .card li { font-size: 14px; line-height: 1.62; color: var(--dim); }
+.card p b, .card li b { color: var(--text); }
+.card ul { padding-left: 1.2em; }
+.card--blue h4 { color: var(--blue); }
+.card--em h4 { color: var(--emerald); }
+.card--coral h4 { color: var(--coral); }
+
+/* ================= DIAGRAM ================= */
+.diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 22px 20px 18px; margin: 24px 0; overflow-x: auto; }
+.d-cap { font-family: 'Roboto Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 1.4px; text-transform: uppercase; color: var(--faint); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.d-cap::before { content: ''; width: 7px; height: 7px; background: var(--gold); border-radius: 50%; }
+.memrow { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+.memcol { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.idx { font-family: 'Roboto Mono', monospace; font-size: 11px; color: var(--blue); }
+.cell { min-width: 62px; padding: 13px 10px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 7px; font-family: 'Roboto Mono', monospace; font-size: 15px; font-weight: 600; }
+.cell--hl { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.cell--zero { color: var(--faint); opacity: .55; }
+.addr { font-family: 'Roboto Mono', monospace; font-size: 11px; color: var(--faint); }
+.d-note { margin-top: 16px; font-size: 13.5px; color: var(--dim); line-height: 1.62; border-top: 1px dashed var(--border2); padding-top: 12px; }
+.d-note b { color: var(--gold); }
+.d-note code { font-family: 'Roboto Mono', monospace; color: var(--blue); font-size: .9em; }
+.formula { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-family: 'Roboto Mono', monospace; font-size: 14.5px; color: var(--gold); overflow-x: auto; line-height: 1.7; max-width: 78ch; }
+.formula small { display: block; color: var(--faint); font-size: 12px; margin-top: 6px; line-height: 1.6; }
+.formula .k { color: var(--blue); }
+
+/* ================= TABLES ================= */
+.table-wrap { border: 1px solid var(--border); border-radius: 13px; overflow: hidden; margin: 22px 0; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.55; }
+.data-table thead { position: sticky; top: 0; z-index: 2; }
+.data-table th { background: var(--surface3); font-family: 'Roboto Mono', monospace; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.3px; color: var(--dim); text-align: left; padding: 11px 15px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.data-table td { padding: 11px 15px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.data-table tbody tr:nth-child(even) { background: var(--surface2); }
+.data-table tbody tr:hover { background: var(--gold-dim); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table td b { color: var(--gold); }
+.data-table td code { font-family: 'Roboto Mono', monospace; font-size: 12px; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+.data-table td.num, .data-table th.num { text-align: right; font-family: 'Roboto Mono', monospace; font-variant-numeric: tabular-nums; }
+
+/* ================= CODE ================= */
+.code-block { font-family: 'Roboto Mono', monospace; font-size: 13px; line-height: 1.62; background: #0c1424; border: 1px solid var(--border2); border-left: 3px solid var(--gold); border-radius: 10px; padding: 16px 18px; margin: 20px 0; overflow-x: auto; white-space: pre-wrap; word-break: break-word; color: #dfe7f5; max-width: 78ch; }
+[data-theme="light"] .code-block { background: #f3f6fc; color: #1a2436; }
+.code-block .cm { color: #6b7a99; }
+.code-block .kw { color: #6fb3e0; }
+.code-block .st { color: #e8b44a; }
+.code-block .fn { color: #3fc9a0; }
+
+/* ================= COMPARE ================= */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+.cmp-card { border: 1px solid var(--border2); border-radius: 12px; overflow: hidden; min-width: 0; background: var(--surface); }
+.cmp-card h5 { font-family: 'Roboto Mono', monospace; font-size: 11.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 18px; }
+.cmp-card--a h5 { background: var(--blue-dim); color: var(--blue); border-bottom: 2px solid var(--blue); }
+.cmp-card--b h5 { background: var(--emerald-dim); color: var(--emerald); border-bottom: 2px solid var(--emerald); }
+.cmp-card ul { list-style: none; padding: 14px 18px; }
+.cmp-card li { font-size: 13.5px; line-height: 1.62; color: var(--dim); padding: 4px 0 4px 16px; position: relative; }
+.cmp-card li::before { content: '›'; position: absolute; left: 0; color: var(--faint); font-weight: 700; }
+.cmp-card li b { color: var(--text); }
+@media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
+
+/* ================= Q&A ================= */
+.qa { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin: 18px 0; overflow: hidden; }
+.qa summary { padding: 16px 20px; cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: 15.5px; font-weight: 600; }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary:hover { background: var(--surface2); }
+.qa summary::after { content: '+'; font-family: 'Roboto Mono', monospace; color: var(--gold); margin-left: auto; font-size: 17px; }
+.qa[open] summary::after { content: '−'; }
+.mark { font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 5px; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
+.mark--2 { background: var(--blue-dim); color: var(--blue); }
+.mark--5 { background: var(--gold-dim); color: var(--gold); }
+.mark--10 { background: var(--coral-dim); color: var(--coral); }
+.qa-body { padding: 4px 20px 18px; border-top: 1px solid var(--border); }
+.qa-body p { font-size: 14.5px; line-height: 1.72; color: var(--dim); margin: 12px 0; max-width: 78ch; }
+.qa-body p b { color: var(--text); }
+.qa-body code { font-family: 'Roboto Mono', monospace; font-size: .86em; background: var(--surface3); color: var(--blue); padding: 1px 5px; border-radius: 4px; }
+
+/* ================= SUMMARY / EXAM ================= */
+.one-liners { counter-reset: ol; display: grid; gap: 9px; margin: 22px 0; max-width: 84ch; }
+.one-liners li { list-style: none; counter-increment: ol; position: relative; padding: 9px 14px 9px 46px; font-size: 14.5px; line-height: 1.62; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--dim); }
+.one-liners li::before { content: counter(ol, decimal-leading-zero); position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-family: 'Roboto Mono', monospace; font-size: 11px; font-weight: 600; color: var(--gold); }
+.one-liners li b { color: var(--text); }
+.defgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(292px,1fr)); gap: 14px; margin: 24px 0; }
+.defcard { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold); border-radius: 10px; padding: 15px 17px; min-width: 0; }
+.defcard h6 { font-family: 'Roboto Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
+.defcard p { font-size: 13.5px; line-height: 1.62; color: var(--dim); }
+.defcard p b { color: var(--text); }
+
+/* ================= SIM SHELL ================= */
+.sim { border: 1px solid var(--gold); border-radius: 13px; overflow: hidden; margin: 26px 0; background: linear-gradient(165deg, var(--gold-dim), var(--surface) 42%); }
+.sim-head { padding: 13px 20px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface2); }
+.sim-head b { font-family: 'Roboto Mono', monospace; font-size: 12px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold); }
+.sim-head span { font-size: 12.5px; color: var(--faint); }
+.sim-body { padding: 20px; }
+.sim-controls { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+.sim-controls label { font-family: 'Roboto Mono', monospace; font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; flex-wrap: wrap; }
+.btn { font-family: 'Roboto Mono', monospace; font-size: 12px; font-weight: 500; padding: 8px 15px; border-radius: 7px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); transition: all .15s; }
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn--go { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 600; }
+.btn--go:hover { color: #1b1405; filter: brightness(1.1); }
+.btn--ok { border-color: var(--emerald) !important; background: var(--emerald-dim) !important; color: var(--emerald) !important; }
+.btn--bad { border-color: var(--coral) !important; background: var(--coral-dim) !important; color: var(--coral) !important; }
+.btn--warn { border-color: var(--coral); color: var(--coral); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.sim input, .sim select { font-family: 'Roboto Mono', monospace; font-size: 13px; background: var(--surface); border: 1px solid var(--border2); color: var(--text); border-radius: 7px; padding: 8px 10px; width: 92px; }
+.sim select { width: auto; max-width: 100%; }
+.sim input:focus, .sim select:focus { outline: none; border-color: var(--gold); }
+.sim-steps { font-family: 'Roboto Mono', monospace; font-size: 13px; line-height: 1.9; background: var(--surface); border: 1px dashed var(--border2); border-radius: 8px; padding: 14px 18px; margin-top: 16px; color: var(--dim); min-height: 20px; }
+.sim-steps b { color: var(--gold); font-weight: 600; }
+.sim-msg { font-size: 13.5px; margin-top: 12px; color: var(--dim); }
+.sim-msg b { color: var(--gold); }
+
+/* ================= NEW VIZ: SEARCH BEAM ================= */
+.beam-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.beam-cell { min-width: 54px; padding: 13px 6px; text-align: center; background: var(--surface3); border: 1px solid var(--border2); border-radius: 8px; font-family: 'Roboto Mono', monospace; font-size: 15px; font-weight: 600; transition: all .22s; position: relative; }
+.beam-cell .tag { display: block; font-size: 9px; font-weight: 500; letter-spacing: 1px; color: var(--faint); margin-top: 4px; }
+.beam-cell.scan { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); box-shadow: 0 0 0 3px var(--blue-dim); }
+.beam-cell.out { opacity: .26; }
+.beam-cell.mid { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.beam-cell.hit { border-color: var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.beam-meter { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-family: 'Roboto Mono', monospace; font-size: 12.5px; color: var(--dim); }
+.beam-meter b { color: var(--gold); }
+
+/* ================= NEW VIZ: HASH BUCKETS ================= */
+.buckets { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+.bk-row { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.bk-idx { font-family: 'Roboto Mono', monospace; font-size: 11px; color: var(--faint); min-width: 46px; text-align: right; }
+.bk-slot { flex: 1; min-width: 0; border: 1px solid var(--border2); border-radius: 7px; padding: 7px 10px; background: var(--surface3); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-family: 'Roboto Mono', monospace; font-size: 13px; transition: all .25s; }
+.bk-slot.new { border-color: var(--gold); background: var(--gold-dim); }
+.bk-slot.coll { border-color: var(--coral); background: var(--coral-dim); }
+.bk-key { border-radius: 5px; padding: 2px 9px; font-size: 12px; border: 1px solid var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+.bk-key.probe { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.bk-empty { color: var(--faint); font-size: 12px; }
+.lf-meter { height: 10px; border-radius: 6px; background: var(--surface3); border: 1px solid var(--border2); overflow: hidden; margin-top: 8px; }
+.lf-fill { height: 100%; background: linear-gradient(90deg, var(--emerald), var(--gold)); transition: width .3s; }
+
+/* ================= NEW VIZ: SORT RACE ================= */
+.race { display: flex; flex-direction: column; gap: 14px; }
+.lane { border: 1px solid var(--border2); border-radius: 11px; padding: 12px 14px; background: var(--surface2); }
+.lane.done { border-color: var(--emerald); }
+.lane__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 9px; }
+.lane__name { font-family: 'Roboto Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--blue); }
+.lane__meta { font-family: 'Roboto Mono', monospace; font-size: 11.5px; color: var(--dim); }
+.lane__meta b { color: var(--gold); }
+.lane.done .lane__name { color: var(--emerald); }
+.lane__bars { display: flex; align-items: flex-end; gap: 4px; height: 78px; }
+.lane__bar { flex: 1 1 0; min-width: 6px; background: var(--surface3); border: 1px solid var(--border2); border-radius: 3px 3px 0 0; transition: height .18s ease, background .15s ease; }
+.lane__bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.lane__bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.lane__bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+
+/* ================= NEW VIZ: SORT STEPPER (code sync) ================= */
+.step-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 860px) { .step-grid { grid-template-columns: 1fr; } }
+.step-bars { display: flex; align-items: flex-end; gap: 5px; height: 170px; padding: 22px 2px 0; }
+.step-bar { flex: 1 1 0; max-width: 58px; min-width: 12px; background: var(--surface3); border: 1px solid var(--border2); border-bottom: none; border-radius: 5px 5px 0 0; position: relative; transition: height .2s, background .18s, border-color .18s; }
+.step-bar i { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-family: 'Roboto Mono', monospace; font-size: 10px; font-style: normal; color: var(--dim); }
+.step-bar.cmp { background: var(--blue-dim); border-color: var(--blue); }
+.step-bar.swp { background: var(--gold-dim); border-color: var(--gold); }
+.step-bar.piv { background: var(--coral-dim); border-color: var(--coral); }
+.step-bar.fix { background: var(--emerald-dim); border-color: var(--emerald); }
+.step-code { font-family: 'Roboto Mono', monospace; font-size: 12.5px; line-height: 1.8; background: #0c1424; border: 1px solid var(--border2); border-radius: 10px; padding: 12px 14px; overflow-x: auto; }
+[data-theme="light"] .step-code { background: #f3f6fc; }
+.step-code .ln { display: block; padding: 1px 8px; border-radius: 5px; border-left: 3px solid transparent; white-space: pre; color: #93a3bd; }
+[data-theme="light"] .step-code .ln { color: #5a6b86; }
+.step-code .ln.on { background: var(--gold-dim); border-left-color: var(--gold); color: var(--text); }
+.step-code .ln b { color: var(--blue); font-weight: 600; }
+.step-vars { display: flex; gap: 9px; flex-wrap: wrap; margin: 12px 0 0; }
+.step-vars div { font-family: 'Roboto Mono', monospace; font-size: 12.5px; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border2); background: var(--surface3); color: var(--dim); }
+.step-vars div b { color: var(--gold); font-size: 14px; }
+.step-vars div.chg { border-color: var(--gold); background: var(--gold-dim); }
+.step-vars div.chg b { color: var(--gold); }
+
+/* ================= CHART ================= */
+.chart-card { border: 1px solid var(--border2); border-radius: 13px; background: var(--surface); padding: 16px 16px 14px; margin: 22px 0; }
+.chart-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.chart-card__head b { font-family: 'Roboto Mono', monospace; font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+.chart-card__head .sim-controls { margin: 0; }
+.chart-wrap { position: relative; width: 100%; height: 320px; }
+.chart-wrap canvas { width: 100%; height: 100%; display: block; }
+@media (max-width: 620px) { .chart-wrap { height: 250px; } }
+.chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-family: 'Roboto Mono', monospace; font-size: 11px; color: var(--dim); }
+.chart-legend span { display: flex; align-items: center; gap: 6px; }
+.chart-legend em { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+.chart-note { font-size: 13px; color: var(--faint); margin-top: 10px; line-height: 1.6; }
+
+/* ================= SCORE ROUND ================= */
+.score-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.score-tbl th { font-family: 'Roboto Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--border2); white-space: nowrap; }
+.score-tbl td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+.score-tbl td b { color: var(--gold); }
+.score-tbl td.num { text-align: right; font-family: 'Roboto Mono', monospace; }
+.score-tbl tr.top td { background: var(--gold-dim); }
+.spin-q { border: 1px solid var(--blue); border-radius: 12px; background: var(--surface2); padding: 16px 18px; margin-top: 16px; text-align: left; }
+.spin-q .who { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.spin-q .qtext { font-size: 16px; font-weight: 600; line-height: 1.55; }
+.spin-q .qans { font-size: 14px; line-height: 1.65; color: var(--emerald); margin-top: 10px; display: none; border-top: 1px dashed var(--border2); padding-top: 10px; }
+.spin-q .qans.show { display: block; }
+.picker-name { font-family: 'Archivo', system-ui, sans-serif; font-weight: 800; font-size: 50px; line-height: 1.1; color: var(--blue); min-height: 58px; }
+.picker-name.spinning { opacity: .5; }
+.result-overlay { position: fixed; inset: 0; z-index: 960; background: rgba(6,10,20,.88); backdrop-filter: blur(7px); display: none; align-items: center; justify-content: center; padding: 22px; }
+.result-overlay.show { display: flex; }
+.result-card { background: var(--surface); border: 2px solid var(--gold); border-radius: 16px; padding: 26px 30px; max-width: 660px; width: 100%; max-height: 88vh; overflow: auto; box-shadow: 0 22px 60px rgba(0,0,0,.5); }
+.result-card h3 { font-family: 'Archivo', system-ui, sans-serif; font-weight: 800; font-size: 32px; color: var(--gold); margin-bottom: 4px; }
+.result-card .sub { color: var(--dim); font-size: 14px; margin-bottom: 18px; }
+.result-card .win { font-size: 15px; margin: 16px 0; padding: 12px 16px; border-radius: 10px; background: var(--emerald-dim); border: 1px solid var(--emerald); }
+.result-card .win b { color: var(--emerald); }
+.chk { display: flex; gap: 11px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); margin-bottom: 7px; cursor: pointer; }
+.chk input { margin-top: 3px; accent-color: var(--gold); width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
+.chk span { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.chk.on { border-color: var(--gold); background: var(--gold-dim); }
+.chk.on span { color: var(--text); }
+.blk { display: flex; gap: 12px; align-items: flex-start; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; cursor: pointer; transition: all .15s; }
+.blk:hover { border-color: var(--gold); }
+.blk.on { border-color: var(--gold); background: var(--gold-dim); box-shadow: 0 0 0 1px var(--gold); }
+.blk .t { font-family: 'Roboto Mono', monospace; font-size: 11px; color: var(--blue); min-width: 58px; flex-shrink: 0; }
+.blk .d { font-size: 13.5px; line-height: 1.5; color: var(--dim); min-width: 0; }
+.blk .d b { color: var(--text); display: block; font-size: 14.5px; }
+.timer-big { font-family: 'Roboto Mono', monospace; font-size: 58px; font-weight: 600; letter-spacing: 2px; color: var(--gold); line-height: 1; }
+.timer-big.warn { color: var(--coral); }
+
+/* ================= PLAYER (chhupa hua by default) ================= */
+.player {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border2); padding: 10px 18px 12px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  transition: transform .32s ease, opacity .32s ease;
+}
+body.audio-off .player { transform: translateY(115%); opacity: 0; pointer-events: none; }
+body.audio-off .sec-play { display: none; }
+.pbtn { font-family: 'Roboto Mono', monospace; font-size: 13px; cursor: pointer; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); border-radius: 8px; padding: 8px 12px; transition: all .15s; min-width: 42px; text-align: center; }
+.pbtn:hover { border-color: var(--gold); color: var(--gold); }
+.pbtn--main { width: 52px; height: 52px; border-radius: 50%; font-size: 17px; background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 700; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+.player select { font-family: 'Roboto Mono', monospace; font-size: 12px; background: var(--surface3); color: var(--text); border: 1px solid var(--border2); border-radius: 7px; padding: 7px 8px; max-width: 100%; }
+.p-meta { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 2px; }
+.p-now { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice { font-family: 'Roboto Mono', monospace; font-size: 10.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-voice .on { color: var(--emerald); }
+.p-voice .off { color: var(--coral); }
+
+/* ================= THEME TOGGLE ================= */
+.theme-toggle { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface3); color: var(--text); cursor: pointer; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+[data-theme="dark"] .tt-sun { display: block; } [data-theme="dark"] .tt-moon { display: none; }
+[data-theme="light"] .tt-sun { display: none; } [data-theme="light"] .tt-moon { display: block; }
+
+/* ================= FOOTER ================= */
+.foot { margin-top: 80px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--faint); font-size: 12.5px; font-family: 'Roboto Mono', monospace; letter-spacing: .5px; }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1000px) {
+  .wrap { grid-template-columns: 1fr; padding: 0 18px; }
+  .toc { position: sticky; top: 0; z-index: 300; grid-row: auto; display: flex; gap: 6px; align-items: center; overflow-x: auto; -webkit-overflow-scrolling: touch; background: color-mix(in srgb, var(--bg) 93%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); margin: 0 -18px; padding: 10px 60px 10px 18px; max-height: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc-title { display: none; }
+  .toc a { white-space: nowrap; flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; border-radius: 5px; padding: 6px 11px; font-size: 11.5px; }
+  .toc a.active { border-bottom-color: var(--gold); background: var(--gold-dim); }
+  .main { padding-top: 20px; }
+  .sec-head { margin-top: 54px; }
+  .player { gap: 8px; padding: 10px 14px; }
+  .p-meta { min-width: 100%; order: 5; }
+  body.audio-off .player { transform: translateY(130%); }
+}
+@media (max-width: 480px) {
+  .memrow { gap: 4px; }
+  .cell { min-width: 50px; padding: 11px 6px; font-size: 13px; }
+  .rd { font-size: 15.5px; }
+  .beam-cell { min-width: 46px; font-size: 13px; padding: 10px 4px; }
+  .timer-big { font-size: 42px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } html { scroll-behavior: auto; } }
+
+/* ================= NEON PEN ================= */
+#penCanvas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 380; pointer-events: none; touch-action: none;
+}
+body.pen-on #penCanvas { pointer-events: auto; cursor: crosshair; }
+body.pen-on { user-select: none; -webkit-user-select: none; }
+.pen-bar {
+  position: fixed; left: 50%; bottom: 14px; transform: translate(-50%, 150%);
+  z-index: 470; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--gold); border-radius: 13px; padding: 9px 12px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.5); transition: transform .28s ease;
+  max-width: calc(100vw - 24px);
+}
+body.pen-on .pen-bar { transform: translate(-50%, 0); }
+.pen-bar .sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); cursor: pointer; flex-shrink: 0; transition: transform .15s; }
+.pen-bar .sw:hover { transform: scale(1.12); }
+.pen-bar .sw.sel { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 0 14px currentColor; }
+.pen-bar .pbtn2 {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; cursor: pointer;
+  border: 1px solid var(--border2); background: var(--surface3); color: var(--text);
+  border-radius: 8px; padding: 6px 10px; transition: all .15s;
+}
+.pen-bar .pbtn2:hover { border-color: var(--gold); color: var(--gold); }
+.pen-bar .pbtn2.on { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.pen-hint {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--faint);
+  letter-spacing: .4px; white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .pen-bar { gap: 6px; padding: 8px 10px; bottom: 10px; }
+  .pen-bar .sw { width: 22px; height: 22px; }
+  .pen-hint { display: none; }
+}
+/* lean class page tweaks */
+.board-tbl td { height: 34px; }
+.board-tbl td.blank { background: color-mix(in srgb, var(--gold-dim) 45%, transparent); }
+.plan-step { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); margin-bottom: 8px; }
+.plan-step .tm { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); min-width: 54px; flex-shrink: 0; }
+.plan-step .tx { font-size: 14px; line-height: 1.55; color: var(--dim); }
+.plan-step .tx b { color: var(--text); display: block; font-size: 14.5px; margin-bottom: 2px; }
+
+/* mobile: banner ko viewport me rakho */
+@media (max-width: 620px) {
+  .timeup-banner { font-size: 12.5px; padding: 10px 14px; white-space: normal; max-width: 92vw; text-align: center; }
+}
+
+/* ambient canvas ko fix karo (warna wo block ban ke content dhakel deta hai) */
+#ambient { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: .62; }
+.wrap { position: relative; z-index: 1; }
+
+
+/* ================= PYQ BLOCKS ================= */
+.pyq { border: 1px solid var(--border2); border-left: 3px solid var(--gold); border-radius: 12px; background: var(--surface); margin: 18px 0; overflow: hidden; }
+.pyq-q {
+  padding: 14px 18px; background: var(--gold-dim); font-size: 14.5px; font-weight: 600; line-height: 1.6; color: var(--text);
+  border-bottom: 1px solid var(--border2);
+}
+.mk {
+  display: inline-block; font-family: 'Roboto Mono', monospace; font-size: 9.5px; letter-spacing: 1px;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 5px; margin-right: 8px; vertical-align: 1px;
+  background: var(--surface3); color: var(--dim); border: 1px solid var(--border2);
+}
+.mk--2 { background: var(--blue-dim); color: var(--blue); border-color: var(--blue); }
+.mk--7 { background: var(--gold-dim); color: var(--gold); border-color: var(--gold); }
+.mk--10 { background: var(--coral-dim); color: var(--coral); border-color: var(--coral); }
+.pyq-a { padding: 14px 18px; font-size: 14px; line-height: 1.7; color: var(--dim); }
+.pyq-a p { margin: 0 0 10px; }
+.pyq-a p:last-child { margin-bottom: 0; }
+.pyq-a b { color: var(--text); }
+.pyq-a code { font-family: 'Roboto Mono', monospace; font-size: 12.5px; background: var(--surface3); padding: 1px 6px; border-radius: 4px; color: var(--gold); }
+.pyq-a .code-block { margin: 10px 0 0; }
+
+/* ================= CODE COLOURS (graphite palette) ================= */
+.code-block { background: #0d1116; color: #eef3f8; white-space: pre-wrap; word-break: break-word; font-size: 12.3px; max-width: 100%; }
+[data-theme="light"] .code-block { background: #f6f8fb; color: #131a24; }
+.code-block .cm { color: #74838f; }
+.code-block .kw { color: #4d9dff; }
+.code-block .fn { color: #ffd24a; }
+.code-block .st { color: #6ee7a8; }
+.step-code { background: #0d1116; }
+[data-theme="light"] .step-code { background: #f6f8fb; }
+.step-code .ln { color: #8fa0ad; }
+[data-theme="light"] .step-code .ln { color: #52626f; }
+.step-code .ln.on { background: var(--gold-dim); border-left-color: var(--gold); color: var(--text); }
+
+/* headings + anchors */
+h1, h2, h3 { font-family: 'Archivo', system-ui, sans-serif; letter-spacing: -0.6px; }
+h1 em { font-style: normal; color: var(--gold); }
+.sec { scroll-margin-top: 120px; }
+@media (max-width: 1000px) { .sec { scroll-margin-top: 140px; } }
+.picker-name { font-family: 'Archivo', system-ui, sans-serif; font-weight: 800; }
+
+/* dry-run blocks ko apne andar scroll karwao (mobile pe page na phaile) */
+.pyq-a { overflow-x: auto; }
+.pyq-a > div { max-width: 100%; }
+
+
+/* ============ EMBEDDED ANSWER-COPY (white sheet inside dark page) ============ */
+.copy-frame{
+  margin:0;border-top:1px dashed var(--border2);
+  background:linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.05));
+}
+.copy-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:8px 14px;background:var(--surface3);border-bottom:1px solid var(--border2);
+  font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);
+}
+.copy-bar b{color:var(--gold)}
+.copy-nav{display:flex;gap:6px;align-items:center}
+.copy-nav button{
+  font-family:'Roboto Mono',monospace;font-size:12px;cursor:pointer;
+  background:var(--surface2);border:1px solid var(--border2);color:var(--text);
+  padding:3px 10px;border-radius:6px;line-height:1.4;
+}
+.copy-nav button:hover{border-color:var(--gold);color:var(--gold)}
+.copy-nav button:disabled{opacity:.35;cursor:default}
+.copy-stack{padding:16px 16px 20px;display:flex;justify-content:center}
+
+.copy-page{
+  --ink:#12306e; --ink2:#1b4b9c; --red:#b3261e; --pencil:#5b6470; --rule:#d7e3f4; --line:31px;
+  display:none;position:relative;width:100%;max-width:720px;
+  background:#fffdf7;color:var(--ink);
+  font-family:'Kalam',cursive;
+  padding:22px 22px 44px 58px;
+  border-radius:2px;
+  box-shadow:0 10px 28px rgba(0,0,0,.42), 0 1px 0 rgba(255,255,255,.5) inset;
+  background-image:repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--line) - 1px), var(--rule) calc(var(--line) - 1px), var(--rule) var(--line));
+  background-position:0 22px;
+}
+.copy-page.on{display:block}
+.copy-page::before{content:'';position:absolute;top:0;bottom:0;left:44px;width:1.6px;background:var(--red);opacity:.5}
+.copy-page p,.copy-page li{
+  font-family:'Kalam',cursive;font-size:17px;line-height:var(--line);color:var(--ink);margin:0;
+}
+.copy-page b{color:var(--ink2);font-weight:700}
+.copy-page .sub{
+  font-family:'Caveat',cursive;font-weight:700;font-size:20px;line-height:var(--line);
+  color:var(--ink2);margin:4px 0 0;
+}
+.copy-page ul{margin:0;padding-left:22px}
+.copy-page li{list-style:none;position:relative}
+.copy-page li::before{content:'•';position:absolute;left:-16px;color:var(--ink)}
+.copy-page .hl{background:linear-gradient(transparent 62%, #ffe98a 62%, #ffe98a 92%, transparent 92%)}
+.copy-page .code{
+  font-family:'Kalam',cursive;font-size:16px;line-height:27px;
+  border-left:2.5px solid var(--ink);padding-left:12px;margin:6px 0;
+  background:rgba(18,48,110,.045);
+}
+.copy-page .sketch{
+  border:1.6px solid var(--ink);border-radius:6px 3px 7px 2px;
+  padding:10px 12px;margin:8px 0 4px;background:rgba(255,255,255,.6);
+  display:inline-block;max-width:100%;
+}
+.copy-page .sketch .cap{font-family:'Caveat',cursive;font-size:16px;color:var(--pencil);margin-top:6px;text-align:center}
+.copy-page .row{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.copy-page .cell{
+  border:1.5px solid var(--ink);border-radius:3px 5px 3px 6px;
+  min-width:40px;padding:3px 7px;text-align:center;font-size:16px;line-height:1.4;
+}
+.copy-page .cell.idx{border:none;min-width:auto;padding:0 3px;font-size:13px;color:var(--pencil)}
+.copy-page .cell.fill{background:rgba(255,233,138,.55)}
+.copy-page .arrow{font-size:17px;color:var(--ink);margin:0 2px}
+.copy-page table.hw{width:100%;border-collapse:collapse;margin:6px 0;font-size:16px}
+.copy-page table.hw th,.copy-page table.hw td{border:1.5px solid var(--ink);padding:4px 7px;text-align:left;line-height:1.45}
+.copy-page table.hw th{font-family:'Caveat',cursive;font-size:17px;font-weight:700;color:var(--ink2);background:rgba(18,48,110,.05)}
+.copy-page .pnum{
+  position:absolute;right:16px;bottom:12px;font-family:'Caveat',cursive;font-size:16px;color:var(--pencil);
+}
+@media (max-width:820px){
+  .copy-page{padding:18px 14px 40px 46px;--line:29px}
+  .copy-page p,.copy-page li{font-size:16px}
+  .copy-page::before{left:34px}
+  .copy-stack{padding:10px 8px 14px}
+}
+
+/* dark-wrap: plain HTML cards reused from copy content */
+.dark-wrap table.hw{width:100%;border-collapse:collapse;margin:12px 0;font-family:'Rubik',sans-serif;font-size:13.5px}
+.dark-wrap table.hw th,.dark-wrap table.hw td{border:1px solid var(--border2);padding:8px 10px;text-align:left;color:var(--dim)}
+.dark-wrap table.hw th{background:var(--surface3);color:var(--text);font-weight:600}
+.dark-wrap .sub{font-family:'Archivo',sans-serif;font-weight:700;font-size:18px;color:var(--text);margin:22px 0 8px}
+.dark-wrap p{font-size:14px;line-height:1.75;color:var(--dim)}
+.dark-wrap b{color:var(--text)}
+.dark-wrap ul{padding-left:20px;margin:6px 0}
+.dark-wrap li{font-size:14px;line-height:1.85;color:var(--dim)}
+.dark-wrap .code{font-family:'Roboto Mono',monospace;font-size:12.5px;line-height:1.9;border-left:2px solid var(--gold);padding-left:14px;background:var(--surface2);color:var(--dim);margin:10px 0;overflow-x:auto}
+
+/* dark-wrap headings */
+.dark-wrap .qhead{font-family:'Archivo',sans-serif;font-weight:800;font-size:26px;color:var(--text);margin:0 0 10px;line-height:1.3}
+.dark-wrap .qhead + p{color:var(--dim)}
+
+/* ============ BLACK PEN headings + flowcharts (copy page) ============ */
+.copy-page .sub{
+  color:#111 !important;font-family:'Caveat',cursive;font-weight:700;font-size:22px;
+  line-height:var(--line);margin:6px 0 2px;display:inline-block;
+  border-bottom:1.4px solid rgba(17,17,17,.35);padding-bottom:1px;
+}
+.copy-page .def{
+  border:1.6px solid #111;border-radius:4px;padding:8px 12px;margin:8px 0;
+  background:rgba(255,255,255,.55);font-size:16.5px;
+}
+.copy-page .def b{color:#111}
+.copy-page .qno{font-family:'Caveat',cursive;font-size:20px;color:#111;font-weight:700}
+
+/* flowchart */
+.copy-page .fc{display:flex;flex-direction:column;align-items:center;gap:2px;margin:10px 0;padding:10px 8px;border:1.5px dashed rgba(18,48,110,.45);border-radius:8px}
+.copy-page .fc-box{
+  border:1.7px solid #111;border-radius:8px;padding:5px 14px;font-size:15.5px;
+  background:rgba(255,255,255,.75);text-align:center;line-height:1.35;max-width:92%;
+}
+.copy-page .fc-term{border-radius:22px;background:rgba(18,48,110,.08)}
+.copy-page .fc-dia{
+  position:relative;width:150px;height:74px;display:flex;align-items:center;justify-content:center;margin:2px 0;
+}
+.copy-page .fc-dia::before{
+  content:'';position:absolute;left:50%;top:50%;width:96px;height:96px;
+  transform:translate(-50%,-50%) rotate(45deg) scale(.62);
+  border:1.7px solid #111;border-radius:6px;background:rgba(255,255,255,.7);
+}
+.copy-page .fc-dia span{position:relative;font-size:14.5px;text-align:center;line-height:1.25;max-width:120px}
+.copy-page .fc-ar{font-size:15px;color:#12306e;line-height:1.1}
+.copy-page .fc-ar b{color:#111;font-size:13px}
+.copy-page .fc-row{display:flex;gap:26px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+.copy-page .fc-note{font-family:'Caveat',cursive;font-size:16px;color:#5b6470;margin-top:4px}
+
+
+/* ================= READABLE HANDWRITING (answers) ================= */
+.copy-page,
+.copy-page p, .copy-page li, .copy-page td, .copy-page th,
+.copy-page .code, .copy-page .def, .copy-page .cell, .copy-page .fc-box {
+  font-family: 'Patrick Hand', 'Kalam', cursive !important;
+}
+.copy-page p, .copy-page li { font-size: 18px !important; line-height: var(--line) !important; }
+.copy-page .code { font-size: 16.5px !important; line-height: 27px !important; }
+.copy-page table.hw { font-size: 16.5px !important; }
+.copy-page table.hw th { font-size: 17px !important; }
+
+/* ================= QUESTION ON THE COPY PAGE (different hand) ================= */
+.copy-page .cq {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.35;
+  color: #111;
+  margin: 0 0 10px;
+  padding: 0 0 8px;
+  border-bottom: 1.6px dashed rgba(17,17,17,.45);
+  letter-spacing: .2px;
+}
+.copy-page .cq .cq-qn { color: #b3261e; }
+.copy-page .cq .cq-mk {
+  font-family: 'Patrick Hand', cursive; font-size: 13px; color: #b3261e;
+  border: 1.2px solid rgba(179,38,30,.5); border-radius: 4px; padding: 0 5px; margin-left: 6px;
+  white-space: nowrap;
+}
+
+/* ================= PAGE TURN (swipe) ================= */
+.copy-stack { position: relative; touch-action: pan-y; overflow: hidden; }
+.copy-page { will-change: transform; backface-visibility: hidden; }
+.copy-page.turning { box-shadow: -14px 0 26px rgba(0,0,0,.28); }
+.copy-stack::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,.16), transparent 22%, transparent 78%, rgba(0,0,0,.16));
+  transition: opacity .2s;
+}
+.copy-stack.swiping::after { opacity: 1; }
+
+/* swipe hint */
+.copy-bar .sw-hint {
+  font-family: 'Roboto Mono', monospace; font-size: 9.5px; letter-spacing: 1px;
+  color: var(--faint); opacity: .8; margin-right: 4px;
+}
+@media (max-width: 640px) { .copy-bar .sw-hint { display: none; } }
+
+/* ================= TTS BUTTON ================= */
+.copy-bar .cp-tts {
+  font-family: 'Roboto Mono', monospace; font-size: 11px; line-height: 1;
+  background: var(--surface2); color: var(--text); border: 1px solid var(--border2);
+  border-radius: 7px; padding: 6px 9px; cursor: pointer; transition: all .18s;
+}
+.copy-bar .cp-tts:hover { border-color: var(--gold); color: var(--gold); }
+.copy-bar .cp-tts.speaking { background: var(--gold); color: #101820; border-color: var(--gold); }
+.copy-page .reading { background: linear-gradient(transparent 60%, rgba(255,214,74,.45) 60%); }
+
+/* ================= DARK / LIGHT for the paper ================= */
+[data-theme="dark"] .copy-page { box-shadow: 0 14px 40px rgba(0,0,0,.55); }
+[data-theme="light"] .copy-page { box-shadow: 0 10px 30px rgba(20,40,70,.18); }
+[data-theme="dark"] .copy-stack { background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.05)); }
+
+
+/* ================= EXPLANATION BLOCK (normal HTML, upar) ================= */
+.expl{
+  margin:0; padding:14px 16px; border-top:1px dashed var(--border2);
+  background:linear-gradient(180deg, rgba(77,157,255,.06), transparent 70%);
+}
+.expl-h{
+  font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:1.6px; text-transform:uppercase;
+  color:var(--gold); margin-bottom:8px;
+}
+.expl p{ font-size:13.5px; line-height:1.75; color:var(--dim); margin:0 0 8px; }
+.expl p:last-child{ margin-bottom:0; }
+.expl ul{ margin:0 0 8px; padding-left:20px; }
+.expl li{ font-size:13.5px; line-height:1.7; color:var(--dim); margin-bottom:4px; }
+.expl b{ color:var(--text); }
+.expl i{ color:var(--faint); }
+
+</style>
+</head>
+<body class="audio-off">
+<canvas id="ambient" aria-hidden="true"></canvas>
+
+<div class="wrap">
+<canvas id="penCanvas" aria-hidden="true"></canvas>
+
+<nav class="toc" id="toc">
+  <div class="toc-title">UNIT 3 · PYQ + COPY</div>
+  <a href="#s0"><span class="n">00</span>Kaise use karo</a>
+  <a href="#s1"><span class="n">01</span>Searching + Hashing</a>
+  <a href="#s2"><span class="n">02</span>Sorting</a>
+  <a href="#s3"><span class="n">03</span>Stack + Queue</a>
+  <a href="#s4"><span class="n">04</span>Recursion</a>
+  <a href="#s5"><span class="n">05</span>Repeated + 2027</a>
+  <a href="#s6"><span class="n">06</span>Question round</a>
+</nav>
+
+<div class="main">
+
+<div class="dock" id="dock">
+  <span class="dock-timer" id="dkTimer">40:00</span>
+  <button class="dbtn dbtn--go" id="dkStart" title="Timer">▶</button>
+  <button class="dbtn" id="dkNext" title="Agla block">⏭</button>
+  <span class="dock-blk" id="dkBlk">Block select karo (neeche plan se)</span>
+  <span class="dock-sep"></span>
+  <button class="dbtn dbtn--blue" id="dkSpin" title="Student + sawaal">🎯 SPIN</button>
+  <span class="dock-name" id="dkName">—</span>
+  <button class="dbtn dbtn--ok" id="dkOk" title="Sahi">✓</button>
+  <button class="dbtn dbtn--bad" id="dkBad" title="Galat">✕</button>
+  <span class="dock-sep"></span>
+  <button class="dbtn" id="dkPen" title="Neon pen">✏️ PEN</button>
+  <span class="dock-spacer"></span>
+  <button class="dbtn" id="dkSide" title="Sidebar chhupao">⇤ SIDEBAR</button>
+  <button class="dbtn" id="dkAudio" title="Audio player">🎧 AUDIO</button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Theme toggle"><span class="tt-sun">☀</span><span class="tt-moon">☾</span></button>
+</div>
+
+<div class="dock-q" id="dkQCard">
+  <div class="who" id="dkQWho"></div>
+  <div class="dq" id="dkQText"></div>
+  <div class="da" id="dkQAns"></div>
+  <div class="sim-controls" style="margin-top:12px">
+    <button class="btn btn--go" id="dkQShow">Jawab dekho</button>
+    <button class="btn btn--ok" id="dkQOk">✓ Sahi</button>
+    <button class="btn btn--bad" id="dkQBad">✕ Galat</button>
+    <button class="btn" id="dkQNext">🎲 Agla</button>
+    <button class="btn btn--warn" id="dkQClose">Band</button>
+  </div>
+</div>
+
+<div class="pen-bar" id="penBar">
+  <span class="pen-hint">NEON PEN</span>
+  <span class="sw sel" data-c="#4d9dff" style="background:#4d9dff;color:#4d9dff"></span>
+  <span class="sw" data-c="#ffd24a" style="background:#ffd24a;color:#ffd24a"></span>
+  <span class="sw" data-c="#6ee7a8" style="background:#6ee7a8;color:#6ee7a8"></span>
+  <span class="sw" data-c="#ff6b6b" style="background:#ff6b6b;color:#ff6b6b"></span>
+  <span class="sw" data-c="#c9a8ff" style="background:#c9a8ff;color:#c9a8ff"></span>
+  <button class="pbtn2" id="penThin" title="Patli">thin</button>
+  <button class="pbtn2 on" id="penMed" title="Medium">med</button>
+  <button class="pbtn2" id="penThick" title="Moti">thick</button>
+  <button class="pbtn2" id="penErase" title="Eraser">eraser</button>
+  <button class="pbtn2" id="penUndo" title="Undo">undo</button>
+  <button class="pbtn2" id="penClear" title="Clear">clear</button>
+  <span class="pen-hint" style="color:var(--gold)">page ke saath scroll hota hai ✓</span>
+</div>
+
+<header class="hero">
+  <div class="hero-badges">
+    <span class="chip chip--gold">UNIT 3 · PYQ + COPY</span>
+    <span class="chip chip--blue">17 SAWAAL · HANDWRITTEN SOLUTIONS</span>
+    <span class="chip chip--em">2026-27</span>
+  </div>
+  <h1>Important <em>Questions</em> — answers + samjho</h1>
+  <p class="hero-sub">15 sawaal — har ek ka <b>explanation</b> (upar, normal style me) aur <b>handwritten answer copy</b> (neeche, page-wise). Swipe se page palto, 🔊 se sun lo.</p>
+  <hr class="hero-hr">
+</header>
+
+<!-- ============================================================ S0 -->
+<section class="sec" id="s0">
+  <div class="sec-head">
+    <span class="sec-num">00</span>
+    <h2>Kaise use karo</h2>
+  </div>
+  <p class="sec-tag">Do hisse: HTML page (sawaal) + copy page (jawab)</p>
+
+  <div class="grid2">
+    <div class="card card--em">
+      <h4>SAWAAL — normal page pe</h4>
+      <p>Har question ek card me hai — marks aur saal ke tag ke saath. Yeh wahi sawaal hain jo <b>2020–2026</b> ke AKTU papers me aaye.</p>
+    </div>
+    <div class="card">
+      <h4>JAWAB — AKTU copy ke page pe</h4>
+      <p>Safed ruled page, neeli syahi, heading, table aur diagram — <b>bilkul waisa hi jaisa exam me likhna hai</b>. Lambe jawab 2 page me hain: <b>◀ ▶</b> se palto.</p>
+    </div>
+  </div>
+
+  <div class="callout callout--info">
+    <b>Copy page pe kya-kya dekhna hai:</b> <b>heading</b> (Q. no. + question), <b>Ans.</b>, <b>step table</b>, <b>diagram (Fig.)</b>, aur <b>complexity line</b>. Bas isi order me likhna hai — examiner yahi dekhta hai.
+  </div>
+
+  <div id="planSteps"></div>
+</section>
+<section class="sec" id="s1"><div class="sec-head"><span class="sec-num">01</span><h2>Searching + Hashing</h2></div><p class="sec-tag">Q1, Q2, Q3, Q12, Q13 — searching aur hashing ke sawaal</p><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q1.</b> Differentiate between Sequential Search and Binary Search.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> do searching methods ka <b>fark</b> batana hai — kaun kab kaam aata hai.</p>
+  <p><b>Sochne ka tarika:</b> dono ka ek hi kaam hai (element dhoondhna), par <b>condition</b> aur <b>speed</b> alag.</p>
+  <ul>
+    <li>Sequential = ek-ek karke check karo (jaise kitaab ke har page pe dekhna)</li>
+    <li>Binary = beech se check karo, aadha hata do (jaise dictionary me word dhoondhna)</li>
+  </ul>
+  <p><b>Exam me:</b> 5-6 point ka table + ek chhota example. Table me <b>condition, complexity, comparisons</b> zaroor likho.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>3</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Searching</b> ka matlab hai kisi list me ek particular element ko dhoondhna. Iske do basic tareeke hain — <b>sequential (linear) search</b> aur <b>binary search</b>.</p><div class="def"><b>Sequential search:</b> list ke pehle element se shuru karke har element ko target se compare karte hain, jab tak element mil na jaye ya list khatam na ho jaye.</div><div class="def"><b>Binary search:</b> list ko baar-baar do hisson me baant kar target ko dhoondhte hain. Iske liye list ka <b>sorted hona zaroori</b> hai.</div><div class="sub">1. Main Differences</div></div><div class="copy-page"><table class="hw"><tr><th>Point</th><th>Sequential Search</th><th>Binary Search</th></tr><tr><td>Condition</td><td>Koi zaroorat nahi (sorted/unsorted dono)</td><td><b>List sorted honi chahiye</b></td></tr><tr><td>Kaam ka tareeka</td><td>Ek-ek element check karta hai</td><td>Beech (mid) se compare, aadha hissa hata deta hai</td></tr><tr><td>Worst case time</td><td><b>O(n)</b></td><td><b>O(log<sub>2</sub> n)</b></td></tr><tr><td>Best case</td><td>O(1) (pehla element hi mil jaye)</td><td>O(1) (beech me hi mil jaye)</td></tr><tr><td>Comparisons (n = 1000)</td><td>1000 tak</td><td>10 tak (2<sup>10</sup> = 1024)</td></tr><tr><td>Data structure</td><td>Array, linked list (dono)</td><td>Sirf array (random access chahiye)</td></tr><tr><td>Use kab</td><td>Chhoti ya unsorted list</td><td>Badi sorted list</td></tr></table><div class="sub">2. Example — 30 dhoondhna hai</div><p><b>List:</b> 10, 20, 30, 40, 50</p><p><b>Sequential:</b> 10 ✕ → 20 ✕ → <b>30 ✔</b> = <b>3 comparisons</b></p><p><b>Binary:</b> mid = (0+4)/2 = 2 → a[2] = 30 → <b>mil gaya, 1 comparison</b> ✔</p><p><b>Formula:</b> mid = (low + high) / 2. Agar target &lt; a[mid] → high = mid − 1, warna low = mid + 1.</p><div class="sub">3. Binary Search ka dry run — 40 dhoondhna hai</div></div><div class="copy-page"><p><b>List:</b> 10, 20, 30, 40, 50, 60, 70 (index 0–6), target = 40</p><table class="hw"><tr><th>Step</th><th>low</th><th>high</th><th>mid</th><th>a[mid]</th><th>Decision</th></tr><tr><td>1</td><td>0</td><td>6</td><td>3</td><td>40</td><td>mil gaya ✔</td></tr></table><p><b>Note:</b> agar 25 dhoondhte toh — step 1: mid = 3 → 40 &gt; 25 → high = 2; step 2: mid = 1 → 20 &lt; 25 → low = 2; step 3: mid = 2 → 30 &gt; 25 → high = 1 → low &gt; high → <b>not found</b>.</p><div class="sub">Conclusion</div><p>Chhoti/unsorted list ke liye <b>sequential</b> simple aur theek hai; badi <b>sorted</b> list me <b>binary search</b> lakh guna fast hai — kyunki har step me data aadha ho jata hai.</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q2.</b> Describe the role of an index table in Index Sequential Search.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> Index Sequential Search me "index table" ka <b>kaam</b> kya hai — yeh samjhana hai.</p>
+  <p><b>Analogy:</b> kitaab ke aakhir me <b>index</b> hota hai — "Hashing — page 120". Tum 300 page nahi padhte, seedha index dekhte ho, phir us page ke aas-paas dhoondhte ho. Bas wahi kaam index table karta hai.</p>
+  <p><b>Exam me:</b> 1) file ko blocks me baanta jata hai, 2) index table me har block ki <b>pehli key + address</b> hoti hai, 3) search pehle index me, phir us block ke andar.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>2</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Index Sequential Search</b> ek aisa searching technique hai jo <b>sequential search</b> aur <b>binary search</b> dono ka mixture hai. Isme sorted file ko chhote-chhote <b>blocks</b> me baant diya jata hai aur har block ke liye ek entry ek alag table me rakhi jati hai — isi ko <b>index table</b> kehte hain.</p><div class="def"><b>Index table:</b> ek chhoti table jisme har block ki <b>starting key</b> aur us block ka <b>address</b> hota hai. Yeh batati hai ki kaunsa record kis block me milega.</div><div class="sub">1. Role (kaam) of Index Table</div><ul><li><b>Block locate karna:</b> target key kis block me hai, yeh index table se pata chalta hai — poora file scan nahi karna padta.</li><li><b>Search area chhota karna:</b> pehle index me binary search hoti hai, phir sirf us ek block me sequential search — isliye time kam lagta hai.</li><li><b>Address dena:</b> index entry me block ka starting address hota hai, jisse direct us block pe jump kar sakte hain.</li><li><b>Maintenance aasan:</b> naya record aane pe sirf index table update karni hoti hai, poora structure nahi.</li></ul><div class="sub">2. Structure</div><p><b>File (sorted):</b> 10, 15, 20 | 25, 30, 35 | 40, 45, 50 | 55</p></div><div class="copy-page"><p><b>Index table:</b></p><table class="hw"><tr><th>Block</th><th>Starting key</th><th>Address (index)</th></tr><tr><td>1</td><td>10</td><td>0</td></tr><tr><td>2</td><td>25</td><td>3</td></tr><tr><td>3</td><td>40</td><td>6</td></tr><tr><td>4</td><td>55</td><td>9</td></tr></table><div class="sub">3. Search kaise hota hai</div><ul><li><b>Step 1:</b> index table me dekho ki target kis block ke range me hai (yahan binary search lag sakti hai).</li><li><b>Step 2:</b> us block ka address lo aur seedha wahan jao.</li><li><b>Step 3:</b> us block ke andar <b>sequential search</b> karo.</li></ul><p><b>Example:</b> 35 dhoondhna hai → index me dekha: 25 ≤ 35 &lt; 40 → <b>block 2</b> → block 2 (25, 30, 35) me sequential → <b>35 mil gaya</b> (index 5).</p><div class="sub">Conclusion</div><p>Index table ki wajah se search sirf <b>ek block</b> tak seemit rehti hai. Isliye complexity lagbhag <b>O(√n)</b> ho jati hai — plain sequential (O(n)) se kaafi behtar, aur binary search jitna strict sorted structure bhi nahi chahiye.</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q12.</b> Explain Index Sequential Search with a suitable example. Apply the searching technique to locate the element 35 in the following list and explain the indexing process. [10, 15, 20, 25, 30, 35, 40, 45, 50, 55]</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> index sequential search samjhana hai <b>aur</b> usi se 35 dhoondh ke dikhana hai.</p>
+  <p><b>Kaise socho:</b> list ko <b>blocks</b> me baanto (yahan 3-3 ka), har block ki pehli key index table me daalo, phir 35 ke liye pehle index dekho.</p>
+  <p><b>Exam me:</b> index table ka diagram + 3 step (index → block → sequential) — poore marks yahin se aate hain.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>2</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Index Sequential Search</b> me sorted file ko blocks me baant kar ek <b>index table</b> banayi jati hai. Search pehle index table me hoti hai, phir sirf usi block me — isliye yeh plain sequential search se bahut fast hai.</p><div class="sub">1. Indexing process (3 step)</div><ul><li><b>Step 1:</b> sorted file ko block size <b>s</b> me baanto (yahan s = 3).</li><li><b>Step 2:</b> har block ki <b>pehli key</b> aur uska <b>address</b> index table me likho.</li><li><b>Step 3:</b> search ke waqt: index me dekho → block choose karo → us block me sequential search.</li></ul><div class="sub">2. List ko blocks me baanto</div><p><b>List:</b> 10, 15, 20, 25, 30, 35, 40, 45, 50, 55</p><table class="hw"><tr><th>Block</th><th>Elements</th><th>Index range</th></tr><tr><td>1</td><td>10, 15, 20</td><td>0 – 2</td></tr><tr><td>2</td><td>25, 30, 35</td><td>3 – 5</td></tr><tr><td>3</td><td>40, 45, 50</td><td>6 – 8</td></tr><tr><td>4</td><td>55</td><td>9</td></tr></table><div class="sub">3. Index table</div></div><div class="copy-page"><table class="hw"><tr><th>Block</th><th>Starting key</th><th>Address</th></tr><tr><td>1</td><td>10</td><td>0</td></tr><tr><td>2</td><td>25</td><td>3</td></tr><tr><td>3</td><td>40</td><td>6</td></tr><tr><td>4</td><td>55</td><td>9</td></tr></table><div class="sub">4. 35 dhoondhna hai</div><ul><li><b>Step 1 (index):</b> 25 ≤ 35 &lt; 40 → target <b>block 2</b> me hai.</li><li><b>Step 2 (jump):</b> block 2 ka address 3 → seedha index 3 pe jao.</li><li><b>Step 3 (sequential):</b> 25 ✕ → 30 ✕ → <b>35 ✔ mil gaya</b> (index 5).</li></ul><p><b>Total comparisons:</b> index me 2 + block me 3 = <b>5</b>. Plain sequential me 6 lagte (10,15,20,25,30,35) — bade data me fark bahut bada ho jata hai.</p><div class="sub">5. Complexity</div><p>Agar n records aur block size √n ho toh comparisons ≈ <b>√n + √n = O(√n)</b> — sequential se behtar, binary se dheema par structure simple rehta hai.</p><div class="sub">Conclusion</div><p>Index table search ko <b>ek block</b> tak seemit kar deti hai. Yeh tab useful hai jab data bahut bada ho aur baar-baar update hota ho (index update karna aasan hai).</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q3.</b> Define hashing and explain the concept of collision in hashing.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> do cheezein — (a) hashing kya hai, (b) collision kya hai.</p>
+  <p><b>Collision ka matlab:</b> do alag keys ka <b>same ghar</b> aa jana. Jaise roll number 23 aur 33, dono ka "last digit 3" — dono ko seat 3 milegi. Do log ek hi seat pe — yahi collision hai.</p>
+  <p><b>Exam me:</b> definition + formula <b>h(k) = k mod m</b> + ek collision ka example + resolution ke naam (chaining / probing).</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>3</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Hashing</b> ek aisi technique hai jisme key ko seedha <b>index (address)</b> me badal diya jata hai — bina comparison kiye. Isse insertion, deletion aur searching teeno <b>average O(1)</b> time me ho jate hain.</p><div class="def"><b>Definition:</b> Hashing is the process of mapping a key value into the address of a hash table using a mathematical function called the hash function, so that records can be searched without comparing the keys.</div><div class="sub">1. Basic Terms</div><ul><li><b>Key (k):</b> jisse record pehchana jata hai (roll no., account no.)</li><li><b>Hash table:</b> array of size <b>m</b> (index 0 se m−1)</li><li><b>Hash function h(k):</b> key ko index me badalne wala formula — <b>h(k) = k mod m</b></li><li><b>Bucket / slot:</b> hash table ki ek position</li><li><b>Load factor α:</b> n/m (kitna table bhara hai)</li></ul><div class="sub">2. Example</div><p><b>m = 10, h(k) = k mod 10</b></p><table class="hw"><tr><th>Key</th><th>Calculation</th><th>Index</th></tr><tr><td>23</td><td>23 mod 10</td><td>3</td></tr><tr><td>45</td><td>45 mod 10</td><td>5</td></tr><tr><td>68</td><td>68 mod 10</td><td>8</td></tr></table><div class="sub">3. Collision</div></div><div class="copy-page"><p><b>Collision</b> tab hota hai jab <b>do alag keys ka hash value same</b> aa jaye — matlab dono ko ek hi index milta hai.</p><p><b>Example:</b> h(23) = 23 mod 10 = <b>3</b> aur h(43) = 43 mod 10 = <b>3</b> → dono ki jagah index 3 → <b>collision</b>.</p><table class="hw"><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td>Value</td><td>—</td><td>—</td><td>—</td><td><b>23 / 43 ?</b></td><td>—</td></tr></table><div class="sub">4. Collision kyun hota hai</div><ul><li>Hash table chhoti hoti hai (m keys se kam slots)</li><li>Hash function kai keys ke liye same remainder deta hai</li><li>Pigeonhole principle: n items, m boxes — n &gt; m ho toh kisi box me 2 items pakka honge</li></ul><div class="sub">5. Resolution ke tareeke</div><table class="hw"><tr><th>Method</th><th>Kya karta hai</th></tr><tr><td><b>Chaining</b></td><td>har index pe ek linked list — same index wali keys list me jud jati hain</td></tr><tr><td><b>Linear probing</b></td><td>seat bhara ho toh agla khaali seat (h(k)+i) mod m</td></tr><tr><td><b>Quadratic probing</b></td><td>(h(k) + i²) mod m</td></tr><tr><td><b>Double hashing</b></td><td>(h(k) + i·h2(k)) mod m</td></tr></table><div class="sub">Conclusion</div></div><div class="copy-page"><p>Hashing O(1) average deta hai, par collision ki wajah se worst case <b>O(n)</b> ho sakta hai. Isliye achha hash function aur theek load factor (≤ 0.75) rakhna zaroori hai.</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q13.</b> Insert the keys 23, 43, 13, 27, 33, 53 into a hash table of size 10 using the hash function h(k) = k mod 10. Resolve collisions using Linear Probing and show the final hash table.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> 6 keys ko table me daalna hai; jagah bhari ho toh <b>agla khaali seat</b> (linear probing) lena hai.</p>
+  <p><b>Kaise socho:</b> pehle <b>h(k) = k mod 10</b> nikalo, seat khaali ho toh wahin rakho; bhara ho toh <b>ek-ek aage</b> badho (circular — 9 ke baad 0).</p>
+  <p><b>Exam me:</b> har key ke liye ek row — "key, h(k), probe, final seat". Aakhir me table.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>2</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Given:</b> m = 10, h(k) = k mod 10, collision resolution = <b>linear probing</b><br>Formula: <b>h<sub>i</sub>(k) = (h(k) + i) mod m</b>, i = 0, 1, 2 …</p><div class="sub">1. Step-by-step insertion</div><table class="hw"><tr><th>Key</th><th>h(k) = k mod 10</th><th>Seat check</th><th>Final seat</th></tr><tr><td>23</td><td>3</td><td>3 khaali</td><td><b>3</b></td></tr><tr><td>43</td><td>3</td><td>3 bhara → 4 khaali</td><td><b>4</b></td></tr><tr><td>13</td><td>3</td><td>3, 4 bhare → 5 khaali</td><td><b>5</b></td></tr><tr><td>27</td><td>7</td><td>7 khaali</td><td><b>7</b></td></tr><tr><td>33</td><td>3</td><td>3, 4, 5 bhare → 6 khaali</td><td><b>6</b></td></tr><tr><td>53</td><td>3</td><td>3, 4, 5, 6, 7 bhare → 8 khaali</td><td><b>8</b></td></tr></table><div class="sub">2. Final hash table</div><table class="hw"><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th></tr><tr><td>Value</td><td>—</td><td>—</td><td>—</td><td><b>23</b></td><td><b>43</b></td><td><b>13</b></td><td><b>33</b></td><td><b>27</b></td><td><b>53</b></td><td>—</td></tr></table><div class="sub">3. Kitne probes lage</div></div><div class="copy-page"><table class="hw"><tr><th>Key</th><th>Probes</th></tr><tr><td>23</td><td>1</td></tr><tr><td>43</td><td>2</td></tr><tr><td>13</td><td>3</td></tr><tr><td>27</td><td>1</td></tr><tr><td>33</td><td>4</td></tr><tr><td>53</td><td>6</td></tr></table><p><b>Total probes</b> = 1+2+3+1+4+6 = <b>17</b> · <b>Average</b> = 17/6 ≈ <b>2.83</b></p><div class="sub">4. Load factor</div><p>α = n/m = 6/10 = <b>0.6</b> — 0.75 se kam, isliye table theek hai. Agar α badhega toh probing lambi hoti jayegi (clustering).</p><div class="sub">Conclusion</div><p>Linear probing simple hai par <b>primary clustering</b> banata hai — yahan 53 ko 6 probes lagane pade kyunki 3 se 7 tak sab bhar gaya tha.</p></div></div></div></div></section>
+<section class="sec" id="s2"><div class="sec-head"><span class="sec-num">02</span><h2>Sorting</h2></div><p class="sec-tag">Q4, Q6, Q7 — insertion/selection ka fark, heap sort, quick sort</p><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q4.</b> Differentiate between Insertion Sort and Selection Sort.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> do sorting algorithms ka <b>fark</b> — kaam karne ka tareeka, complexity, aur kab kaunsa.</p>
+  <p><b>Yaad rakhne ka hook:</b><br>
+  • <b>Insertion</b> = taash ke patte — naya card uthao, sahi jagah <b>daalo</b> (bade cards khisakte hain).<br>
+  • <b>Selection</b> = sabse chhota <b>chuno</b>, aage rakho (swap).</p>
+  <p><b>Exam me:</b> table me <b>idea, best, average, worst, swaps, stable</b> — yeh 6 point likho, poore marks.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>3</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p>Dono <b>comparison based</b> sorting algorithms hain aur dono ki worst case complexity <b>O(n²)</b> hai — par kaam karne ka tareeka aur behaviour bilkul alag hai.</p><div class="def"><b>Insertion sort:</b> array ko sorted aur unsorted hisson me baant kar, har naya element ko uske sahi position pe <b>insert</b> karta hai (bade elements ek-ek shift hote hain).</div><div class="def"><b>Selection sort:</b> har pass me <b>sabse chhota</b> element dhoondh kar us pass ki pehli jagah se <b>swap</b> karta hai.</div><div class="sub">1. Difference table</div></div><div class="copy-page"><table class="hw"><tr><th>Point</th><th>Insertion Sort</th><th>Selection Sort</th></tr><tr><td>Basic idea</td><td>Card uthao aur sahi jagah daalo</td><td>Sabse chhota chuno aur aage rakho</td></tr><tr><td>Kaam</td><td>Shift karke jagah banata hai</td><td>Sirf swap karta hai</td></tr><tr><td>Best case</td><td><b>O(n)</b> (already sorted)</td><td>O(n²) (best me bhi poora scan)</td></tr><tr><td>Average / Worst</td><td>O(n²) / O(n²)</td><td>O(n²) / O(n²)</td></tr><tr><td>Swaps</td><td>Zyada (shifts)</td><td><b>Sabse kam — max n−1</b></td></tr><tr><td>Stable</td><td><b>Haan ✔</b></td><td><b>Nahi ✕</b></td></tr><tr><td>In-place</td><td>Haan</td><td>Haan</td></tr><tr><td>Kab better</td><td>Chhoti ya lagbhag sorted list</td><td>Jab <b>swaps mehnga</b> ho (bada record)</td></tr></table><div class="sub">2. Chhota example — [30, 10, 20]</div><p><b>Insertion:</b> 30 | 10 aaya → 30 shift → [10, 30] | 20 aaya → 30 shift → <b>[10, 20, 30]</b></p><p><b>Selection:</b> pass 1 → min = 10 (index 1) → swap(30,10) → [10, 30, 20]; pass 2 → min = 20 → swap(30,20) → <b>[10, 20, 30]</b></p><div class="sub">3. Kab kaunsa use karein</div></div><div class="copy-page"><ul><li>Data lagbhag sorted hai → <b>Insertion</b> (best case O(n))</li><li>Swaps costly hain (bade records) → <b>Selection</b> (kam swaps)</li><li>Stability chahiye → <b>Insertion</b></li></ul><div class="sub">Conclusion</div><p>Dono simple aur chhote data ke liye theek hain, par <b>insertion</b> practically behtar hai kyunki sorted/nearly-sorted data pe yeh O(n) tak pahunch jata hai aur stable bhi hai.</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">10 Marks</span> <b>Q6.</b> Construct a Max Heap using the following elements and apply Heap Sort to arrange them in ascending order. Show the heap construction and each deletion/extraction step. [40, 10, 30, 50, 60, 15, 20]</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> pehle array ko <b>max-heap</b> banao, phir ek-ek karke max nikaal ke end me rakho.</p>
+  <p><b>Do phases:</b><br>
+  • <b>Phase 1 — build heap:</b> neeche se heapify (i = n/2−1 se 0 tak).<br>
+  • <b>Phase 2 — sort:</b> root (max) ko last se swap karo, size 1 kam karo, phir heapify.</p>
+  <p><b>Exam me:</b> har step ka <b>array + tree</b> dikhao. "Heapify kaunse node pe, kaun swap hua" likhna mat bhoolo.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>3</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Given:</b> [40, 10, 30, 50, 60, 15, 20], n = 7</p><p><b>Max-heap property:</b> har parent apne dono bachchon se <b>bada</b> ho. Array me: left child = 2i+1, right = 2i+2.</p><div class="sub">Phase 1 — Build Max Heap</div><p>Heapify neeche se shuru hota hai: <b>i = n/2 − 1 = 2</b> se 0 tak.</p><table class="hw"><tr><th>i</th><th>Node</th><th>Children</th><th>Action</th><th>Array after</th></tr><tr><td>2</td><td>a[2] = 30</td><td>15, 20</td><td>30 bada hai → koi swap nahi</td><td>40, 10, 30, 50, 60, 15, 20</td></tr><tr><td>1</td><td>a[1] = 10</td><td>50, 60</td><td>60 sabse bada → <b>swap(1,4)</b></td><td>40, 60, 30, 50, 10, 15, 20</td></tr><tr><td>0</td><td>a[0] = 40</td><td>60, 30</td><td>60 bada → <b>swap(0,1)</b></td><td>60, 40, 30, 50, 10, 15, 20</td></tr><tr><td>1</td><td>a[1] = 40</td><td>50, 10</td><td>50 bada → <b>swap(1,3)</b></td><td>60, 50, 30, 40, 10, 15, 20</td></tr></table><p><b>Max heap ban gaya:</b></p><div class="sketch"><b>60, 50, 30, 40, 10, 15, 20</b><div class="cap">root 60 = sabse bada ✔</div></div><div class="sub">Phase 2 — Extraction (heap sort)</div></div><div class="copy-page"><table class="hw"><tr><th>Step</th><th>Swap (root ↔ last)</th><th>Heapify ke baad array</th><th>Sorted part</th></tr><tr><td>1</td><td>60 ↔ 20</td><td>50, 40, 30, 20, 10, 15</td><td><b>60</b></td></tr><tr><td>2</td><td>50 ↔ 15</td><td>40, 20, 30, 15, 10</td><td><b>50, 60</b></td></tr><tr><td>3</td><td>40 ↔ 10</td><td>30, 20, 10, 15</td><td><b>40, 50, 60</b></td></tr><tr><td>4</td><td>30 ↔ 15</td><td>20, 15, 10</td><td><b>30, 40, 50, 60</b></td></tr><tr><td>5</td><td>20 ↔ 10</td><td>15, 10</td><td><b>20, 30, 40, 50, 60</b></td></tr><tr><td>6</td><td>15 ↔ 10</td><td>10</td><td><b>15, 20, 30, 40, 50, 60</b></td></tr></table><div class="sub">Step-by-step detail (pehla extraction)</div><p>1. Root (60) ko last element (20) se swap karo → [20, 50, 30, 40, 10, 15 | <b>60</b>]</p><p>2. Ab sirf pehle 6 elements ka heap banao: 20 vs bachche 50, 30 → 50 bada → swap(0,1) → [50, 20, 30, 40, 10, 15]</p><p>3. 20 ke bachche 40, 10 → 40 bada → swap(1,3) → [50, 40, 30, 20, 10, 15] ✔ heap theek</p><div class="sub">Final Answer</div><div class="sketch"><b>10, 15, 20, 30, 40, 50, 60</b><div class="cap">ascending order ✔</div></div><div class="sub">Complexity</div></div><div class="copy-page"><table class="hw"><tr><th>Phase</th><th>Time</th></tr><tr><td>Build heap</td><td><b>O(n)</b></td></tr><tr><td>Har extraction (n−1 baar)</td><td>O(log n)</td></tr><tr><td>Total</td><td><b>O(n log n)</b> — best, average, worst teeno</td></tr></table><p><b>Space:</b> O(1) — in-place. <b>Stable:</b> nahi ✕</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">10 Marks</span> <b>Q7.</b> Sort the following elements using Quick Sort. Consider the last element as the pivot in each partition. Show the partitioning steps and analyze the time complexity. [35, 20, 45, 10, 30, 15, 40]</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> quick sort lagana hai, <b>last element ko pivot</b> maan kar, aur har partition dikhana hai.</p>
+  <p><b>Partition ka rule (Lomuto):</b> ek pointer <b>i</b> rakho; j chalta hai — agar a[j] ≤ pivot toh i++ karke swap. Aakhir me pivot ko i+1 pe rakho.</p>
+  <p><b>Exam me:</b> har partition ke baad array likho + pivot ki final position. Complexity me <b>worst case kyun O(n²)</b> — yeh zaroor likho.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>3</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Given:</b> [35, 20, 45, 10, 30, 15, 40] · pivot = <b>last element</b> (Lomuto partition)</p><div class="sub">Partition 1 — pivot = 40 (index 6)</div><table class="hw"><tr><th>j</th><th>a[j]</th><th>a[j] ≤ 40 ?</th><th>i</th><th>Array</th></tr><tr><td>0</td><td>35</td><td>haan</td><td>0</td><td>35, 20, 45, 10, 30, 15, 40</td></tr><tr><td>1</td><td>20</td><td>haan</td><td>1</td><td>35, 20, 45, 10, 30, 15, 40</td></tr><tr><td>2</td><td>45</td><td>nahi</td><td>1</td><td>35, 20, 45, 10, 30, 15, 40</td></tr><tr><td>3</td><td>10</td><td>haan</td><td>2</td><td>35, 20, <b>10</b>, <b>45</b>, 30, 15, 40</td></tr><tr><td>4</td><td>30</td><td>haan</td><td>3</td><td>35, 20, 10, <b>30</b>, <b>45</b>, 15, 40</td></tr><tr><td>5</td><td>15</td><td>haan</td><td>4</td><td>35, 20, 10, 30, <b>15</b>, <b>45</b>, 40</td></tr></table><p><b>Pivot ko sahi jagah rakho:</b> swap(a[i+1], a[6]) = swap(45, 40)</p><div class="sketch"><b>35, 20, 10, 30, 15, [40], 45</b><div class="cap">pivot 40 index 5 pe ✔ (left chhote, right bade)</div></div><div class="sub">Partition 2 — left part [35, 20, 10, 30, 15], pivot = 15</div></div><div class="copy-page"><table class="hw"><tr><th>j</th><th>a[j]</th><th>≤ 15 ?</th><th>Array</th></tr><tr><td>0</td><td>35</td><td>nahi</td><td>35, 20, 10, 30, 15</td></tr><tr><td>1</td><td>20</td><td>nahi</td><td>35, 20, 10, 30, 15</td></tr><tr><td>2</td><td>10</td><td>haan</td><td><b>10</b>, 20, <b>35</b>, 30, 15</td></tr><tr><td>3</td><td>30</td><td>nahi</td><td>10, 20, 35, 30, 15</td></tr></table><p>swap(a[1], a[4]) = swap(20, 15)</p><div class="sketch"><b>10, [15], 35, 30, 20</b><div class="cap">pivot 15 index 1 pe ✔</div></div><div class="sub">Partition 3 — [35, 30, 20], pivot = 20</div><p>35 &gt; 20, 30 &gt; 20 → koi swap nahi. swap(a[0], a[2]) = swap(35, 20)</p><div class="sketch"><b>[20], 30, 35</b><div class="cap">pivot 20 index 0 pe</div></div><p>Ab [30, 35] bacha: pivot 35 → 30 ≤ 35 → swap(a[0],a[0]); swap(a[1],a[1]) → <b>30, 35</b> ✔</p><div class="sub">Final Answer</div><div class="sketch"><b>10, 15, 20, 30, 35, 40, 45</b><div class="cap">sorted ✔</div></div><div class="sub">Time Complexity analysis</div></div><div class="copy-page"><table class="hw"><tr><th>Case</th><th>Recurrence</th><th>Time</th><th>Kab</th></tr><tr><td>Best</td><td>T(n) = 2T(n/2) + O(n)</td><td><b>O(n log n)</b></td><td>pivot beech me gire</td></tr><tr><td>Average</td><td>T(n) = 2T(n/2) + O(n)</td><td><b>O(n log n)</b></td><td>random data</td></tr><tr><td>Worst</td><td>T(n) = T(n−1) + O(n)</td><td><b>O(n²)</b></td><td>already sorted + last pivot</td></tr></table><p><b>Space:</b> O(log n) (recursion stack) · <b>Stable:</b> nahi ✕</p><div class="sub">Conclusion</div><p>Quick sort average me sabse fast in-place sorting hai, par <b>worst case O(n²)</b> tab aata hai jab pivot hamesha sabse chhota/bada ho — isliye random ya median pivot behtar hota hai.</p></div></div></div></div></section>
+<section class="sec" id="s3"><div class="sec-head"><span class="sec-num">03</span><h2>Stack + Queue</h2></div><p class="sec-tag">Q5, Q8, Q9, Q14, Q15 — stack ADT, C program, postfix, circular queue, infix→postfix</p><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q5.</b> Illustrate the PUSH and POP operations on a Stack ADT with a suitable example.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> Stack me PUSH (daalna) aur POP (nikalna) kaise hota hai — example se dikhana hai.</p>
+  <p><b>Analogy:</b> plate ka dher — jo plate <b>sabse upar</b> rakhi, wahi pehle uthegi. Isi liye stack = <b>LIFO</b> (Last In, First Out).</p>
+  <p><b>Exam me:</b> ADT ke operations likho, phir 3 push + 1 pop ka <b>step-by-step diagram</b> (top pointer ke saath).</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>2</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Stack</b> ek <b>linear data structure</b> hai jisme insertion aur deletion <b>ek hi end</b> (top) se hoti hai. Iski property hai <b>LIFO</b> — jo last me aaya, wahi pehle bahar jayega.</p><div class="def"><b>Stack ADT:</b> ek aisa abstract data type jiske saath yeh operations kiye ja sakte hain — <b>PUSH</b>, <b>POP</b>, <b>PEEK/TOP</b>, <b>isEmpty</b>, <b>isFull</b>.</div><div class="sub">1. Operations</div><table class="hw"><tr><th>Operation</th><th>Kaam</th><th>Condition</th></tr><tr><td><b>PUSH(S, x)</b></td><td>element x ko top pe daalta hai</td><td>stack full ho toh <b>overflow</b></td></tr><tr><td><b>POP(S)</b></td><td>top element nikal ke return karta hai</td><td>stack khaali ho toh <b>underflow</b></td></tr><tr><td><b>PEEK(S)</b></td><td>top element dekhta hai (nikalta nahi)</td><td>khaali ho toh error</td></tr><tr><td><b>isEmpty / isFull</b></td><td>top == −1 / top == MAX−1</td><td>—</td></tr></table><div class="sub">2. Example — PUSH 10, 20, 30 phir POP</div><p><b>Step 0:</b> top = −1 (khaali)</p><div class="sketch"><b>[ ]</b> &nbsp; top = −1<div class="cap">Initial</div></div><p><b>Step 1: PUSH(10)</b> → top = 0</p></div><div class="copy-page"><div class="sketch"><b>[ 10 ]</b> ← top<div class="cap">10 top pe</div></div><p><b>Step 2: PUSH(20)</b> → top = 1</p><div class="sketch"><b>[ 10 | 20 ]</b> ← top<div class="cap">20 upar</div></div><p><b>Step 3: PUSH(30)</b> → top = 2</p><div class="sketch"><b>[ 10 | 20 | 30 ]</b> ← top<div class="cap">30 sabse upar</div></div><p><b>Step 4: POP()</b> → <b>30 return</b>, top = 1</p><div class="sketch"><b>[ 10 | 20 ]</b> ← top<div class="cap">30 nikal gaya (LIFO)</div></div><div class="sub">3. Observations</div><ul><li>PUSH me top pehle <b>+1</b> hota hai, phir element rakha jata hai</li><li>POP me element hataya jata hai, phir top <b>−1</b> hota hai</li><li>POP ne <b>30</b> nikala — jo last me daala gaya tha (LIFO ✔)</li></ul><div class="sub">Conclusion</div><p>Stack ka use <b>function calls</b> (recursion), <b>expression evaluation</b>, <b>undo</b>, aur <b>bracket matching</b> me hota hai — har jagah jahan "wapas pichhli cheez" chahiye hoti hai.</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q8.</b> Implement a stack using an array in C and demonstrate the PUSH and POP operations by inserting the elements 10, 20, 30 and removing one element. Illustrate the resulting stack after each operation.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> array se stack banao (C me), phir 10, 20, 30 push karo aur ek pop karo — har step ka stack dikhana hai.</p>
+  <p><b>Do hisse:</b> (1) program, (2) dry run — har operation ke baad array + top.</p>
+  <p><b>Exam me:</b> code ke saath <b>top pointer</b> ka diagram — examiner wahi dekhta hai.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>2</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p>Stack ko array se implement karne ke liye ek <b>array</b> aur ek <b>top</b> variable chahiye. top = −1 ka matlab stack khaali hai.</p><div class="sub">1. C Program</div><div class="code">#include &lt;stdio.h&gt;<br>#define MAX 5                 /* stack ka size */<br>int stack[MAX];               /* stack array */<br>int top = -1;                 /* khaali stack */<br><br>void push(int x) {<br>    if (top == MAX - 1) {     /* stack full? */<br>        printf("Overflow\n"); return;<br>    }<br>    stack[++top] = x;         /* top badhao, phir rakho */<br>    printf("Pushed %d\n", x);<br>}<br><br>int pop() {<br>    if (top == -1) {          /* stack khaali? */<br>        printf("Underflow\n"); return -1;<br>    }<br>    return stack[top--];      /* value do, phir top ghatao */<br>}<br><br>void display() {<br>    printf("Stack: ");<br>    for (int i = 0; i &lt;= top; i++) printf("%d ", stack[i]);<br>    printf(" (top = %d)\n", top);<br>}<br><br>int main() {<br>    push(10); display();<br>    push(20); display();<br>    push(30); display();<br>    printf("Popped: %d\n", pop()); display();<br>    return 0;<br>}</div><div class="sub">2. Dry run — har operation ke baad</div></div><div class="copy-page"><table class="hw"><tr><th>Operation</th><th>Stack (bottom → top)</th><th>top</th></tr><tr><td>Initial</td><td>[ ]</td><td>−1</td></tr><tr><td>push(10)</td><td>[ 10 ]</td><td>0</td></tr><tr><td>push(20)</td><td>[ 10, 20 ]</td><td>1</td></tr><tr><td>push(30)</td><td>[ 10, 20, 30 ]</td><td>2</td></tr><tr><td>pop() → 30</td><td>[ 10, 20 ]</td><td>1</td></tr></table><div class="sub">3. Output</div><div class="code">Pushed 10<br>Stack: 10  (top = 0)<br>Pushed 20<br>Stack: 10 20  (top = 1)<br>Pushed 30<br>Stack: 10 20 30  (top = 2)<br>Popped: 30<br>Stack: 10 20  (top = 1)</div><div class="sub">4. Important points</div><ul><li>PUSH me pehle <b>top++</b>, phir value — warna galat jagah likha jayega</li><li>POP me pehle <b>value</b> lo, phir top−−</li><li>Overflow: top == MAX−1 · Underflow: top == −1</li><li>Saare operations <b>O(1)</b></li></ul><div class="sub">Conclusion</div><p>Array se stack banana sabse simple hai — par size pehle se fix karna padta hai. Isliye dynamic chahiye toh <b>linked list</b> se stack banate hain.</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q9.</b> Evaluate the following postfix expression using a stack. Show the stack contents after each operation: 5 6 2 + * 12 4 / −</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> postfix expression ko stack se solve karna hai — har step ka stack dikhana hai.</p>
+  <p><b>Rule:</b> number aaye → push. Operator aaye → <b>do</b> pop karo (pehla = right, doosra = left), operation karo, result push.</p>
+  <p><b>Trap:</b> subtraction/division me <b>order</b> — <code>a − b</code> me a pehle nikla hua (neeche wala) hota hai. Ulta karoge toh galat.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>2</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Expression:</b> 5 6 2 + * 12 4 / −</p><div class="sub">Step-by-step evaluation</div><table class="hw"><tr><th>Step</th><th>Symbol</th><th>Action</th><th>Stack (bottom → top)</th></tr><tr><td>1</td><td>5</td><td>push 5</td><td>5</td></tr><tr><td>2</td><td>6</td><td>push 6</td><td>5, 6</td></tr><tr><td>3</td><td>2</td><td>push 2</td><td>5, 6, 2</td></tr><tr><td>4</td><td>+</td><td>pop 2, 6 → 6+2 = 8 → push</td><td>5, 8</td></tr><tr><td>5</td><td>*</td><td>pop 8, 5 → 5×8 = 40 → push</td><td>40</td></tr><tr><td>6</td><td>12</td><td>push 12</td><td>40, 12</td></tr><tr><td>7</td><td>4</td><td>push 4</td><td>40, 12, 4</td></tr><tr><td>8</td><td>/</td><td>pop 4, 12 → 12/4 = 3 → push</td><td>40, 3</td></tr><tr><td>9</td><td>−</td><td>pop 3, 40 → 40−3 = 37 → push</td><td>37</td></tr></table><div class="sub">Answer</div><div class="sketch"><b>Result = 37</b><div class="cap">stack me sirf ek value bachi ✔</div></div><div class="sub">Verification (infix me badal kar)</div><p>Postfix 5 6 2 + * 12 4 / − ka infix roop:</p><div class="code">5 * (6 + 2) - (12 / 4)<br>= 5 * 8 - 3<br>= 40 - 3<br>= 37  ✔</div><div class="sub">Dhyan rakhne wali baatein</div></div><div class="copy-page"><ul><li>Operator pe hamesha <b>do</b> values pop hoti hain</li><li>Pehla pop = <b>right operand</b>, doosra = <b>left operand</b> (jaise 40−3, 3 nahi − 40)</li><li>Expression khatam hone pe stack me <b>ek hi</b> value bachni chahiye — wahi answer hai</li></ul><div class="sub">Conclusion</div><p>Postfix evaluation me <b>parentheses ki zaroorat nahi</b> hoti aur precedence ka jhanjhat bhi nahi — isliye compilers isi form ka use karte hain.</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q14.</b> A circular queue of size 5 initially contains the elements 10, 20, 30, 40 and 50. After deleting two elements, the values 60 and 70 are inserted into the queue. Analyse how the circular arrangement reuses vacant positions and illustrate the final queue configuration with FRONT and REAR pointers.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> circular queue me delete ke baad khaali hui jagah kaise <b>reuse</b> hoti hai — 60 aur 70 daal ke dikhana hai.</p>
+  <p><b>Key:</b> rear = (rear + 1) % size. 9 ke baad 0 — isliye "circular". Simple queue me jagah hoti hui bhi "full" ka error aa jata hai; circular me nahi.</p>
+  <p><b>Exam me:</b> har step ka array + FRONT/REAR — 5 rows banao, poore marks.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>3</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Circular queue</b> me last position ke baad wapas pehli position aati hai. Isse delete hone ke baad bachi jagah <b>dobara use</b> ho sakti hai — simple linear queue me yeh waste ho jati thi.</p><p><b>Size = 5</b> · Formulas: <b>rear = (rear + 1) % 5</b>, <b>front = (front + 1) % 5</b></p><div class="sub">1. Initial state — 5 elements (full)</div><table class="hw"><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td>Value</td><td><b>10</b></td><td><b>20</b></td><td><b>30</b></td><td><b>40</b></td><td><b>50</b></td></tr></table><p><b>front = 0</b>, <b>rear = 4</b> → queue FULL (5/5)</p><div class="sub">2. Delete 10 aur 20</div><p><b>Delete 1:</b> front = (0+1) % 5 = <b>1</b> → 10 gayab</p><table class="hw"><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td>Value</td><td><i>khaali</i></td><td><b>20</b></td><td>30</td><td>40</td><td>50</td></tr></table><p><b>Delete 2:</b> front = (1+1) % 5 = <b>2</b> → 20 gayab</p><table class="hw"><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td>Value</td><td><i>khaali</i></td><td><i>khaali</i></td><td><b>30</b></td><td>40</td><td>50</td></tr></table></div><div class="copy-page"><p>Ab <b>front = 2</b>, <b>rear = 4</b> → 2 jagah khaali hai (index 0, 1)</p><div class="sub">3. Insert 60 aur 70 (circular reuse)</div><p><b>Insert 60:</b> rear = (4+1) % 5 = <b>0</b> → index 0 pe 60 (yahan circular ghooma!)</p><table class="hw"><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td>Value</td><td><b>60</b></td><td><i>khaali</i></td><td>30</td><td>40</td><td>50</td></tr></table><p><b>Insert 70:</b> rear = (0+1) % 5 = <b>1</b> → index 1 pe 70</p><table class="hw"><tr><th>Index</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td>Value</td><td><b>60</b></td><td><b>70</b></td><td><b>30</b></td><td><b>40</b></td><td><b>50</b></td></tr></table><div class="sub">4. Final configuration</div><div class="sketch"><b>front = 2 &nbsp;·&nbsp; rear = 1</b><br>Queue (front se): <b>30, 40, 50, 60, 70</b><div class="cap">5 elements — dobara FULL</div></div><p><b>Note:</b> rear front se <b>peeche</b> hai (1 &lt; 2) — isi ka matlab hai queue ghoom chuki hai. Full condition: <b>(rear + 1) % size == front</b>.</p><div class="sub">5. Circular kyun better hai</div></div><div class="copy-page"><table class="hw"><tr><th>Point</th><th>Simple queue</th><th>Circular queue</th></tr><tr><td>Delete ke baad jagah</td><td>waste ho jati hai</td><td><b>reuse hoti hai</b></td></tr><tr><td>Full kab</td><td>rear == size−1</td><td>(rear+1) % size == front</td></tr><tr><td>Memory</td><td>kam efficient</td><td><b>efficient</b></td></tr></table><div class="sub">Conclusion</div><p>Circular queue me pointers modulo se ghoomte hain, isliye delete hone ke baad aayi jagah me naye elements aa jate hain — memory ka poora use hota hai.</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q15.</b> Convert the infix expression (A + B) × (C − D) / E into its equivalent postfix and prefix expressions. Illustrate the stack operations involved in the conversion process.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> infix se <b>postfix</b> aur <b>prefix</b> banana hai, aur stack ka use dikhana hai.</p>
+  <p><b>Rule yaad rakho:</b> operand → seedha output; operator → stack me (precedence dekh kar); ')' → stack se '(' tak pop.</p>
+  <p><b>Prefix ka shortcut:</b> infix ko ulta likho, brackets swap karo, postfix banao, phir poora ulta kar do.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>3</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Infix:</b> (A + B) × (C − D) / E</p><div class="sub">1. Postfix conversion — stack operations</div><table class="hw"><tr><th>Symbol</th><th>Action</th><th>Stack</th><th>Output</th></tr><tr><td>(</td><td>push</td><td>(</td><td>—</td></tr><tr><td>A</td><td>operand → output</td><td>(</td><td>A</td></tr><tr><td>+</td><td>push</td><td>( +</td><td>A</td></tr><tr><td>B</td><td>operand → output</td><td>( +</td><td>A B</td></tr><tr><td>)</td><td>pop till ( → +</td><td>khaali</td><td>A B +</td></tr><tr><td>×</td><td>push</td><td>×</td><td>A B +</td></tr><tr><td>(</td><td>push</td><td>× (</td><td>A B +</td></tr><tr><td>C</td><td>operand</td><td>× (</td><td>A B + C</td></tr><tr><td>−</td><td>push</td><td>× ( −</td><td>A B + C</td></tr><tr><td>D</td><td>operand</td><td>× ( −</td><td>A B + C D</td></tr><tr><td>)</td><td>pop till ( → −</td><td>×</td><td>A B + C D −</td></tr><tr><td>/</td><td>pop × (same precedence), push /</td><td>/</td><td>A B + C D − ×</td></tr><tr><td>E</td><td>operand</td><td>/</td><td>A B + C D − × E</td></tr><tr><td>end</td><td>pop /</td><td>khaali</td><td><b>A B + C D − × E /</b></td></tr></table><div class="sub">2. Postfix answer</div></div><div class="copy-page"><div class="sketch"><b>A B + C D − × E /</b><div class="cap">postfix ✔</div></div><div class="sub">3. Prefix conversion</div><p><b>Tarika:</b> expression ko <b>ulti</b> likho → brackets swap → postfix banao → poora <b>ulta</b> kar do.</p><p><b>Step 1 — reverse:</b> E / ( D − C ) × ( B + A )</p><p><b>Step 2 — brackets swap:</b> E / ) D − C ( × ) B + A (</p><p><b>Step 3 — postfix:</b> E D C − / B A + ×</p><p><b>Step 4 — reverse:</b> × + A B − C D E /</p><div class="sketch"><b>× + A B − C D E /</b><div class="cap">prefix ✔</div></div><div class="sub">4. Verify (dono barabar hone chahiye)</div><p><b>Postfix:</b> A B + C D − × E / → (A+B) × (C−D) / E ✔</p><p><b>Prefix:</b> × + A B − C D E / → ×(+AB)(−CD) / E ✔ — same expression.</p><div class="sub">5. Precedence table (yaad rakho)</div><table class="hw"><tr><th>Operator</th><th>Precedence</th><th>Associativity</th></tr><tr><td>^</td><td>3 (sabse zyada)</td><td>right to left</td></tr><tr><td>× , /</td><td>2</td><td>left to right</td></tr><tr><td>+ , −</td><td>1</td><td>left to right</td></tr><tr><td>( )</td><td>0 (sirf grouping)</td><td>—</td></tr></table><div class="sub">Conclusion</div></div><div class="copy-page"><p>Postfix/prefix me brackets aur precedence ka jhanjhat nahi hota — isliye compiler expression ko pehle postfix me badalta hai, phir stack se evaluate karta hai.</p></div></div></div></div></section>
+<section class="sec" id="s4"><div class="sec-head"><span class="sec-num">04</span><h2>Recursion</h2></div><p class="sec-tag">Q10, Q11 — Fibonacci aur Tower of Hanoi</p><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q10.</b> Examine the recursive approach for generating the Fibonacci series. Write a recursive C program to generate the first 7 Fibonacci numbers and analyse how recursive calls affect the execution of the program.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> Fibonacci ko <b>recursion</b> se banana hai — program + first 7 numbers + "recursion ka asar" (kitni calls lagti hain).</p>
+  <p><b>Formula:</b> F(n) = F(n−1) + F(n−2), base case F(0) = 0, F(1) = 1.</p>
+  <p><b>"Effect" ka matlab:</b> ek hi value baar-baar calculate hoti hai (overlapping calls) — isliye time <b>exponential</b> ho jata hai. Yahi analysis me likhna hai.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>3</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Fibonacci series:</b> har number apne pichhle do numbers ka sum hota hai — 0, 1, 1, 2, 3, 5, 8, 13 …</p><div class="def"><b>Recursive definition:</b> F(n) = F(n−1) + F(n−2), with <b>F(0) = 0, F(1) = 1</b> (base case).</div><div class="sub">1. Recursive C Program</div><div class="code">#include &lt;stdio.h&gt;<br><br>int fib(int n) {<br>    if (n == 0) return 0;          /* base case 1 */<br>    if (n == 1) return 1;          /* base case 2 */<br>    return fib(n-1) + fib(n-2);    /* recursive call */<br>}<br><br>int main() {<br>    int i;<br>    printf("First 7 Fibonacci numbers:\n");<br>    for (i = 0; i &lt; 7; i++)       /* 0 se 6 tak */<br>        printf("%d ", fib(i));<br>    return 0;<br>}</div><div class="sub">2. Output — first 7 numbers</div><div class="sketch"><b>0 &nbsp; 1 &nbsp; 1 &nbsp; 2 &nbsp; 3 &nbsp; 5 &nbsp; 8</b><div class="cap">F(0) se F(6) tak</div></div><p><b>Note:</b> agar series 1 se shuru karni ho toh <b>1, 1, 2, 3, 5, 8, 13</b> likho — dono tarike books me milte hain. Exam me jo maanga ho wahi, par base case saaf likho.</p><div class="sub">3. Recursive calls ka tree (fib(4))</div></div><div class="copy-page"><div class="sketch"><b>fib(4)</b><br>├─ fib(3)<br>&nbsp;&nbsp;├─ fib(2)<br>&nbsp;&nbsp;│&nbsp;&nbsp;├─ fib(1) = 1<br>&nbsp;&nbsp;│&nbsp;&nbsp;└─ fib(0) = 0<br>&nbsp;&nbsp;└─ fib(1) = 1<br>└─ fib(2)<br>&nbsp;&nbsp;&nbsp;├─ fib(1) = 1<br>&nbsp;&nbsp;&nbsp;└─ fib(0) = 0<div class="cap">fib(4) = 3</div></div><div class="sub">4. Analysis — recursion ka asar</div><ul><li><b>Overlapping subproblems:</b> fib(2) do baar calculate hua, fib(1) teen baar — same kaam baar-baar.</li><li><b>Recurrence:</b> T(n) = T(n−1) + T(n−2) + O(1) → <b>T(n) = O(2<sup>n</sup>)</b> (exponential).</li><li><b>Space:</b> O(n) — recursion stack ki depth n tak jati hai.</li><li><b>Problem:</b> fib(40) me ~3 crore calls lagti hain — bahut slow.</li><li><b>Solution:</b> <b>memoization</b> (DP) ya iterative loop — tab O(n) ho jata hai.</li></ul><div class="sub">5. Iterative version (behtar)</div><div class="code">int a = 0, b = 1, c, i;<br>for (i = 0; i &lt; 7; i++) {<br>    printf("%d ", a);<br>    c = a + b; a = b; b = c;   /* aage badhao */<br>}</div><div class="sub">Conclusion</div></div><div class="copy-page"><p>Recursive Fibonacci likhna aasan hai par <b>exponential</b> slow hai; same kaam loop se <b>O(n)</b> me ho jata hai. Isliye recursion tab use karo jab problem natural roop se recursive ho aur overlapping calls na ho (jaise Tower of Hanoi).</p></div></div></div></div><div class="pyq"><div class="pyq-q"><span class="mk">5 Marks</span> <b>Q11.</b> Analyse the recursive process of the Tower of Hanoi problem for 3 disks. Trace the sequence of recursive calls and determine the minimum number of moves required to transfer all disks from the source peg to the destination peg.</div><div class="expl"><div class="expl-h">🧠 Samjho pehle — yeh sawaal kya keh raha hai</div><p><b>Sawaal kya keh raha hai:</b> 3 disks ko ek peg se doosre pe le jaana hai — har move likhna hai aur total moves batana hai.</p>
+  <p><b>Rule:</b> ek baar me ek disk, aur <b>bada disk chhote ke upar nahi</b> rakh sakte.</p>
+  <p><b>Formula:</b> moves = <b>2<sup>n</sup> − 1</b> → 3 disks = <b>7 moves</b>. Exam me 7 moves ki list + recursion ka logic dono likho.</p></div><div class="copy-frame"><div class="copy-bar"><span>AKTU answer copy · page <b class="cp-cur">1</b> / <b>3</b></span><div class="copy-nav"><button class="cp-prev" disabled>◀</button><button class="cp-next">▶</button></div></div><div class="copy-stack"><div class="copy-page on"><div class="sub">Ans.</div><p><b>Tower of Hanoi</b> ek classic recursion problem hai. 3 pegs (A = source, B = auxiliary, C = destination) aur n disks hain — sabhi disks ko A se C pe le jana hai.</p><div class="def"><b>Rules:</b> (1) ek baar me ek hi disk move hoga, (2) chhota disk bade ke upar rahega, (3) sirf top disk move ho sakta hai.</div><div class="sub">1. Recursive logic (3 step)</div><ul><li><b>Step 1:</b> upar ki <b>n−1</b> disks ko A se <b>B</b> pe le jao (C ko auxiliary banao).</li><li><b>Step 2:</b> sabse badi disk (nth) ko <b>A se C</b> pe le jao.</li><li><b>Step 3:</b> ab n−1 disks ko <b>B se C</b> pe le jao (A auxiliary).</li></ul><div class="code">void hanoi(int n, char from, char to, char aux) {<br>    if (n == 1) {                      /* base case */<br>        printf("Move disk 1: %c -> %c\n", from, to);<br>        return;<br>    }<br>    hanoi(n-1, from, aux, to);         /* step 1 */<br>    printf("Move disk %d: %c -> %c\n", n, from, to);  /* step 2 */<br>    hanoi(n-1, aux, to, from);         /* step 3 */<br>}</div><div class="sub">2. Trace — 3 disks (A → C)</div></div><div class="copy-page"><table class="hw"><tr><th>Move</th><th>Disk</th><th>From → To</th><th>Kya hua</th></tr><tr><td>1</td><td>1</td><td>A → C</td><td>chhoti disk C pe</td></tr><tr><td>2</td><td>2</td><td>A → B</td><td>beech wali B pe</td></tr><tr><td>3</td><td>1</td><td>C → B</td><td>chhoti disk B pe (2 ke upar)</td></tr><tr><td>4</td><td>3</td><td>A → C</td><td><b>sabse badi C pe</b> ✔</td></tr><tr><td>5</td><td>1</td><td>B → A</td><td>chhoti wapas A pe</td></tr><tr><td>6</td><td>2</td><td>B → C</td><td>beech wali C pe</td></tr><tr><td>7</td><td>1</td><td>A → C</td><td>chhoti C pe → <b>poora ho gaya</b> ✔</td></tr></table><div class="sub">3. Recursive call tree</div><div class="sketch"><b>hanoi(3, A, C, B)</b><br>├─ hanoi(2, A, B, C)<br>&nbsp;&nbsp;├─ hanoi(1, A, C, B) → move 1<br>&nbsp;&nbsp;├─ move disk 2: A→B<br>&nbsp;&nbsp;└─ hanoi(1, C, B, A) → move 1<br>├─ <b>move disk 3: A→C</b><br>└─ hanoi(2, B, C, A)<br>&nbsp;&nbsp;├─ hanoi(1, B, A, C)<br>&nbsp;&nbsp;├─ move disk 2: B→C<br>&nbsp;&nbsp;└─ hanoi(1, A, C, B)<div class="cap">7 calls / 7 moves</div></div><div class="sub">4. Minimum moves</div><p>Recurrence: <b>T(n) = 2T(n−1) + 1</b>, T(1) = 1</p><p>Solve karo → <b>T(n) = 2<sup>n</sup> − 1</b></p></div><div class="copy-page"><div class="sketch"><b>n = 3 → 2³ − 1 = 7 moves</b><div class="cap">minimum ✔</div></div><div class="sub">5. Analysis</div><table class="hw"><tr><th>Disks (n)</th><th>Moves (2ⁿ−1)</th></tr><tr><td>1</td><td>1</td></tr><tr><td>2</td><td>3</td></tr><tr><td>3</td><td><b>7</b></td></tr><tr><td>4</td><td>15</td></tr><tr><td>10</td><td>1023</td></tr></table><p><b>Time complexity:</b> O(2<sup>n</sup>) — exponential. <b>Space:</b> O(n) recursion stack.</p><div class="sub">Conclusion</div><p>Tower of Hanoi recursion ka best example hai — chhota code, par kaam exponential. Isse samajh aata hai ki <b>recursion ka tree kitni tezi se badhta hai</b>.</p></div></div></div></div></section>
+<section class="sec" id="s5">
+  <div class="sec-head"><span class="sec-num">05</span><h2>Most repeated PYQ + 2027 prediction</h2></div>
+  <p class="sec-tag">Yeh normal page hai — table aur prediction list</p>
+<div class="dark-wrap"><p>Yeh woh questions hain jo baar-baar aaye hain. Inko sabse pehle pakka karo.</p>
+
+  <table class="hw">
+    <tr><th>#</th><th>Question</th><th>Kitni baar / saal</th><th>Marks</th></tr>
+    <tr><td>1</td><td>What is hashing? Division method + collision resolution strategies</td><td>2026, 2025-26, 2019-20 (3×)</td><td>7–10</td></tr>
+    <tr><td>2</td><td>Linear probing vs quadratic probing (with examples / disadvantages)</td><td>2026, 2024, 2023-24, 2021-22 (4×)</td><td>7–10</td></tr>
+    <tr><td>3</td><td>Construct hash table with linear probing (numerical)</td><td>2025, 2021-22, 2020-21 (3×)</td><td>7–10</td></tr>
+    <tr><td>4</td><td>Merge sort — algorithm + sort given elements + complexity</td><td>2025, 2024-25, 2021-22, 2020-21 (4×)</td><td>7–10</td></tr>
+    <tr><td>5</td><td>Quick sort — algorithm + sort + stability justify</td><td>2022-23, 2021-22 (2×)</td><td>10</td></tr>
+    <tr><td>6</td><td>Heap sort — algorithm + sort given sequence</td><td>2026, 2022-23 (2×)</td><td>7–10</td></tr>
+    <tr><td>7</td><td>Insertion sort — algorithm + sort given numbers + complexity</td><td>2026, 2021-22 (2×)</td><td>7–10</td></tr>
+    <tr><td>8</td><td>Selection sort — C program + worst case</td><td>2024 (1×)</td><td>7</td></tr>
+    <tr><td>9</td><td>Binary search — program / recursive function / average behaviour</td><td>2024, 2021-22 (2×)</td><td>7–10</td></tr>
+    <tr><td>10</td><td>Indexed sequential search (concept)</td><td>2025 (1×)</td><td>2</td></tr>
+    <tr><td>11</td><td>Stable / unstable sorting — example</td><td>2021-22 (1×)</td><td>2</td></tr>
+    <tr><td>12</td><td>Effect of pivot on quick sort</td><td>2024 (1×)</td><td>2</td></tr>
+  </table>
+
+  <div class="sub">Topic-wise weightage (2020–2026)</div>
+  <table class="hw">
+    <tr><th>Topic</th><th>Kitni baar poocha</th><th>Approx marks per paper</th></tr>
+    <tr><td>Sorting</td><td><b>14</b></td><td>14–20</td></tr>
+    <tr><td>Hashing</td><td><b>9</b></td><td>7–14</td></tr>
+    <tr><td>Searching</td><td><b>6</b></td><td>2–10</td></tr>
+    <tr><th>Total</th><th>29 questions</th><th><b>~30 marks</b></th></tr>
+  </table>
+
+  <p><b>Note:</b> 2-mark questions 7 baar, 7-mark 9 baar aur 10-mark 13 baar poochhe gaye. Iska matlab <b>long questions (7/10) sabse zyada</b> hain — dry run table aur algorithm likhne ki practice zaroori hai.</p><p><b>Dhyan do:</b> yeh <b>prediction</b> hai (pattern ke aadhar par), guarantee nahi. Par jo 4-5 baar repeat ho chuka hai woh dobara aane ke chances sabse zyada hote hain.</p>
+
+  <div class="sub">A. Sabse zyada chance (high probability)</div>
+  <table class="hw">
+    <tr><th>#</th><th>Predicted question</th><th>Marks</th><th>Kyun</th></tr>
+    <tr><td>1</td><td>Hash table construct karo (linear probing) + kisi key ka location</td><td>7–10</td><td>3 saal me aaya, numerical sabse safe</td></tr>
+    <tr><td>2</td><td>Collision resolution techniques (chaining + probing) with example</td><td>7–10</td><td>har paper me kuch na kuch</td></tr>
+    <tr><td>3</td><td>Merge sort — sort karo + complexity</td><td>7–10</td><td>4 baar repeat</td></tr>
+    <tr><td>4</td><td>Quick sort — sort karo + stability justify</td><td>10</td><td>2 baar, aur "stability" ka favourite</td></tr>
+    <tr><td>5</td><td>Heap sort — heap banao + sort</td><td>7–10</td><td>2026 me aaya, alternate saal pattern</td></tr>
+  </table>
+
+  <div class="sub">B. Medium chance</div>
+  <ul>
+    <li><b>Insertion sort</b> ka algorithm + dry run (2026 me aaya tha, ab gap ho sakta hai)</li>
+    <li><b>Binary search</b> ka recursive function + complexity</li>
+    <li><b>Radix sort</b> ka concept + ek pass ka dry run (kam poocha gaya hai — ab chance ban sakta hai)</li>
+    <li><b>Comparison table</b> — "differentiate between merge and quick sort" (naya pattern)</li>
+  </ul>
+
+  <div class="sub">C. 2-mark ke liye predict</div>
+  <ul>
+    <li>Define collision. / What is load factor?</li>
+    <li>Which sorting is stable? Give example.</li>
+    <li>Time complexity of binary search / quick sort worst case</li>
+    <li>Difference between linear and quadratic probing</li>
+    <li>What is indexed sequential search?</li>
+  </ul>
+
+  <div class="sub">D. Meri salah — last 3 din ka plan</div>
+  <table class="hw">
+    <tr><th>Din</th><th>Kya karo</th></tr>
+    <tr><td>Day 1</td><td>Hashing poora — formulas + 3 numericals haath se (Q1, Q6, Q7, Q8)</td></tr>
+    <tr><td>Day 2</td><td>Merge + Quick + Heap — algorithm + dry run table (Q10, Q11, Q12)</td></tr>
+    <tr><td>Day 3</td><td>Insertion + Selection + Binary search + saare 2-mark (Q9, Q13, Q14–Q17)</td></tr>
+  </table>
+
+  <p style="margin-top:12px"><b>Yaad rakho:</b> examiner <b>table</b>, <b>steps</b> aur <b>complexity line</b> dekhta hai. Sirf final answer likhne se aadhe marks kat jate hain. Har question me — definition → algorithm/steps → dry run table → complexity.</p></div>
+</section>
+<!-- ============================================================ S5 -->
+<section class="sec" id="s6">
+  <div class="sec-head">
+    <span class="sec-num">06</span>
+    <h2>Question Round — 26 sawaal (khud ko test karo)</h2>
+  </div>
+  <p class="sec-tag">Khud ko test karo — sab PYQ pattern se</p>
+
+  <div class="sim" style="border-color:var(--gold);background:linear-gradient(165deg,var(--gold-dim),var(--surface) 45%)">
+    <div class="sim-head" style="background:transparent;border-color:var(--border)">
+      <b>🎯 QUESTION ROUND</b>
+      <span id="qrMeta">26 sawaal · 0 poochhe · 26 bache</span>
+    </div>
+    <div class="sim-body">
+      <div class="grid2" style="align-items:start;margin-top:0">
+        <div style="text-align:center">
+          <div class="picker-name" id="qrName">—</div>
+          <div class="sim-controls" style="justify-content:center;margin-top:14px">
+            <button class="btn btn--go" id="qrSpin" style="font-size:14px;padding:11px 26px">🎯 SPIN — naam + sawaal</button>
+            <button class="btn btn--ok" id="qrOk">✓ Sahi</button>
+            <button class="btn btn--bad" id="qrBad">✕ Galat</button>
+            <button class="btn btn--warn" id="qrSkip">↻ Skip</button>
+          </div>
+          <div class="sim-msg" id="qrMsg" style="margin-top:12px">SPIN dabao — naam aur sawaal dono aayenge.</div>
+        </div>
+        <div>
+          <div style="border:1px solid var(--blue);border-radius:12px;background:var(--surface2);padding:16px 18px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+              <span class="chip chip--blue" id="qrCount">SAWAAL —</span>
+              <span class="chip chip--em" id="qrTopic">TOPIC</span>
+            </div>
+            <div id="qrText" style="font-size:16px;font-weight:600;line-height:1.55;min-height:54px">Sawaal yahan aayega.</div>
+            <div id="qrAns" style="font-size:14px;color:var(--emerald);border-top:1px dashed var(--border2);padding-top:11px;margin-top:11px;display:none"></div>
+            <div class="sim-controls" style="margin-top:12px">
+              <button class="btn btn--go" id="qrShow">Jawab dekho</button>
+            </div>
+          </div>
+          <div class="lf-meter" style="margin-top:14px"><div class="lf-fill" id="qrBar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="sim-controls">
+        <label>NAAM LIST <input id="qrNames" style="width:220px" value="Harsh, Aryan, Khusi"></label>
+        <button class="btn" id="qrSave">SAVE</button>
+        <button class="btn btn--go" id="qrResult">🏆 RESULT DIKHAO</button>
+        <button class="btn btn--warn" id="qrReset">SCORE RESET</button>
+      </div>
+      <div class="table-wrap" style="margin:18px 0 0">
+        <div class="table-scroll"><table class="score-tbl">
+          <thead><tr><th>Student</th><th>Poocha gaya</th><th>Sahi</th><th>Score</th></tr></thead>
+          <tbody id="qrBoard"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="memo">
+    <span class="memo-label">✅ Exam-day checklist</span>
+    <ul>
+      <li><b>Formula yaad</b>: h(k) = k mod m · (h+i) · (h+i²) · (h + i·h₂) · α = n/m · mid = (low+high)/2</li>
+      <li><b>Table banao</b> — har sort/hash question me (yahi marks deta hai)</li>
+      <li><b>Complexity line</b> — best/avg/worst + space + stable</li>
+      <li><b>Stable = BIMR</b> likh lo kisi bhi stable question pe</li>
+      <li><b>Dry run</b> — kam se kam 3-4 passes dikhao, seedha final answer mat likho</li>
+    </ul>
+  </div>
+
+  <p class="foot">TEAM DEVDoots · UNIT 3 MASTER SHEET · 29 PYQ (2020–2026) + CHEAT SHEET</p>
+</section>
+
+</div><!-- /main -->
+</div><!-- /wrap -->
+
+<div class="player" id="player">
+  <button class="pbtn pbtn--main" id="btnPlay" title="Play / Pause">▶</button>
+  <button class="pbtn" id="btnStop" title="Stop">■</button>
+  <button class="pbtn" id="btnPrev" title="Pichla section">⏮</button>
+  <button class="pbtn" id="btnNext" title="Agla section">⏭</button>
+  <select id="rateSel" title="Speed">
+    <option value="0.75">0.75×</option>
+    <option value="1" selected>1×</option>
+    <option value="1.25">1.25×</option>
+    <option value="1.5">1.5×</option>
+  </select>
+  <select id="voiceSel" title="Voice"><option>Loading voices…</option></select>
+  <div class="p-meta">
+    <div class="p-now" id="pNow">Player ready — Play dabao</div>
+    <div class="p-voice" id="pVoice">Voices check kar rahe hain…</div>
+  </div>
+</div>
+
+<div class="timeup-banner" id="tuBanner">⏰ TIME UP — agla block!</div>
+
+<div class="result-overlay" id="resOverlay">
+  <div class="result-card">
+    <h3>🏆 Team Devdoots — Score</h3>
+    <div class="sub" id="resSub">Aaj ke session ke sawaalon ka hisaab</div>
+    <div id="resBody"></div>
+    <div class="win" id="resWin"></div>
+    <div class="sim-controls">
+      <button class="btn btn--go" id="resClose">Band karo</button>
+      <button class="btn btn--warn" id="resReset">SCORE RESET</button>
+    </div>
+  </div>
+</div>
+<script>
+/* ================= 30-MIN CLASS PAGE — ENGINE ================= */
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+
+/* ---------- THEME ---------- */
+var root = document.documentElement;
+try { var sv = localStorage.getItem('u3s2-theme'); if (sv === 'light' || sv === 'dark') root.setAttribute('data-theme', sv); } catch (e) {}
+if ($('themeToggle')) $('themeToggle').addEventListener('click', function () {
+  var nx = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', nx);
+  try { localStorage.setItem('u3s2-theme', nx); } catch (e) {}
+});
+
+/* ---------- SIDEBAR + AUDIO ---------- */
+var sideOff = false, audioOn = false;
+try { sideOff = localStorage.getItem('u3s2-side') === '1'; } catch (e) {}
+function applySide() { document.body.classList.toggle('noside', sideOff); if ($('dkSide')) $('dkSide').textContent = sideOff ? '⇥ SIDEBAR' : '⇤ SIDEBAR'; }
+if ($('dkSide')) $('dkSide').addEventListener('click', function () { sideOff = !sideOff; try { localStorage.setItem('u3s2-side', sideOff ? '1' : '0'); } catch (e) {} applySide(); });
+applySide();
+function applyAudio() { document.body.classList.toggle('audio-off', !audioOn); if ($('dkAudio')) $('dkAudio').textContent = audioOn ? '🎧 ON' : '🎧 AUDIO'; }
+if ($('dkAudio')) $('dkAudio').addEventListener('click', function () { audioOn = !audioOn; applyAudio(); });
+applyAudio();
+
+/* ---------- SCROLL SPY ---------- */
+(function () {
+  var toc = $('toc'); if (!toc) return;
+  var links = toc.querySelectorAll('a'), secs = [];
+  links.forEach(function (l) { var el = $(l.getAttribute('href').slice(1)); if (el) secs.push({ el: el, link: l }); });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        links.forEach(function (l) { l.classList.remove('active'); });
+        var m = secs.find(function (s) { return s.el === en.target; });
+        if (m) { m.link.classList.add('active'); if (window.innerWidth <= 1000) m.link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  secs.forEach(function (s) { obs.observe(s.el); });
+})();
+
+/* ================= NEON PEN (page ke saath scroll hota hai) ================= */
+var PEN = (function () {
+  var cv = $('penCanvas'); if (!cv || !cv.getContext) return null;
+  var ctx = cv.getContext('2d');
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  var strokes = [], cur = null, color = '#39ff14', width = 4, on = false, eraser = false;
+  var raf = null;
+  function resize() {
+    cv.width = Math.floor(window.innerWidth * dpr);
+    cv.height = Math.floor(window.innerHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  function draw() {
+    var sx = window.scrollX || 0, sy = window.scrollY || 0;
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    strokes.forEach(function (st) {
+      if (!st.pts.length) return;
+      var pass = function (w, blur, alpha) {
+        ctx.globalAlpha = alpha; ctx.lineWidth = w;
+        ctx.strokeStyle = st.color; ctx.shadowColor = st.color; ctx.shadowBlur = blur;
+        ctx.beginPath();
+        if (st.pts.length === 1) {
+          ctx.arc(st.pts[0][0] - sx, st.pts[0][1] - sy, Math.max(1, w / 2), 0, Math.PI * 2);
+          ctx.fillStyle = st.color; ctx.fill();
+          return;
+        }
+        for (var i = 0; i < st.pts.length; i++) {
+          var p = st.pts[i], x = p[0] - sx, y = p[1] - sy;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      };
+      pass(st.w * 2.8, 18, 0.28);   /* outer glow */
+      pass(st.w * 1.5, 10, 0.55);   /* mid glow */
+      pass(st.w, 6, 1);             /* core */
+    });
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+  }
+  function schedule() { if (raf) return; raf = requestAnimationFrame(function () { raf = null; draw(); }); }
+  function pt(e) { return [e.clientX + (window.scrollX || 0), e.clientY + (window.scrollY || 0)]; }
+  function eraseAt(x, y) {
+    var keep = [];
+    strokes.forEach(function (st) {
+      var hit = st.pts.some(function (p) { var dx = p[0] - x, dy = p[1] - y; return dx * dx + dy * dy < 22 * 22; });
+      if (!hit) keep.push(st);
+    });
+    strokes = keep;
+  }
+  cv.addEventListener('pointerdown', function (e) {
+    if (!on) return;
+    try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+    if (eraser) { eraseAt.apply(null, pt(e)); schedule(); e.preventDefault(); return; }
+    cur = { color: color, w: width, pts: [pt(e)] };
+    strokes.push(cur); schedule();
+    e.preventDefault();
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (!on) return;
+    if (eraser) { eraseAt.apply(null, pt(e)); schedule(); e.preventDefault(); return; }
+    if (!cur) return;
+    cur.pts.push(pt(e)); schedule();
+    e.preventDefault();
+  });
+  ['pointerup', 'pointercancel', 'pointerleave', 'pointerout'].forEach(function (ev) {
+    cv.addEventListener(ev, function () { cur = null; });
+  });
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', resize);
+  resize();
+  function setOn(v) {
+    on = v;
+    document.body.classList.toggle('pen-on', on);
+    if ($('dkPen')) $('dkPen').textContent = on ? '✏️ PEN ON' : '✏️ PEN';
+    schedule();
+  }
+  window.__penDbg = { count: function () { return strokes.length; }, draw: draw, pts: function () { return strokes.map(function (s) { return s.pts.length; }); } };
+  return {
+    setOn: setOn, isOn: function () { return on; },
+    setColor: function (c) { color = c; eraser = false; },
+    setWidth: function (w) { width = w; },
+    setEraser: function (v) { eraser = v; },
+    undo: function () { strokes.pop(); schedule(); },
+    clear: function () { strokes = []; schedule(); },
+    count: function () { return strokes.length; }
+  };
+})();
+
+/* pen toolbar wiring */
+(function () {
+  if (!PEN) return;
+  var sws = document.querySelectorAll('.pen-bar .sw');
+  sws.forEach(function (s) {
+    s.addEventListener('click', function () {
+      sws.forEach(function (x) { x.classList.remove('sel'); });
+      s.classList.add('sel');
+      PEN.setColor(s.getAttribute('data-c'));
+      if ($('penErase')) $('penErase').classList.remove('on');
+    });
+  });
+  function widthBtn(id, w) {
+    if (!$(id)) return;
+    $(id).addEventListener('click', function () {
+      ['penThin', 'penMed', 'penThick'].forEach(function (k) { if ($(k)) $(k).classList.remove('on'); });
+      $(id).classList.add('on');
+      PEN.setWidth(w);
+    });
+  }
+  widthBtn('penThin', 2.5); widthBtn('penMed', 4); widthBtn('penThick', 7);
+  if ($('penErase')) $('penErase').addEventListener('click', function () {
+    var on = $('penErase').classList.toggle('on');
+    PEN.setEraser(on);
+  });
+  if ($('penUndo')) $('penUndo').addEventListener('click', function () { PEN.undo(); });
+  if ($('penClear')) $('penClear').addEventListener('click', function () { PEN.clear(); });
+  if ($('dkPen')) $('dkPen').addEventListener('click', function () { PEN.setOn(!PEN.isOn()); });
+  /* keyboard: P = pen toggle, Z = undo, E = eraser */
+  document.addEventListener('keydown', function (e) {
+    if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === 'p' || e.key === 'P') { PEN.setOn(!PEN.isOn()); }
+    if (e.key === 'z' || e.key === 'Z') { PEN.undo(); }
+    if (e.key === 'e' || e.key === 'E') { PEN.setEraser(true); if ($('penErase')) $('penErase').classList.add('on'); }
+  });
+})();
+
+/* ================= AUDIO ENGINE ================= */
+var synth = window.speechSynthesis;
+var SEC_IDS = ['s0','s1','s2','s3','s4','s5','s6'];
+var SEC_NAMES = { s0: 'Kaise use karo', s1: 'Searching + Hashing', s2: 'Sorting', s3: 'Stack + Queue', s4: 'Recursion', s5: 'Repeated + 2027', s6: 'Question round' };
+var units = [], cur = -1, endSec = null, stopFlag = false, keepAlive = null, activeSection = 's0';
+var btnPlay = $('btnPlay'), btnStop = $('btnStop'), btnPrev = $('btnPrev'), btnNext = $('btnNext');
+var rateSel = $('rateSel'), voiceSel = $('voiceSel'), pNow = $('pNow'), pVoice = $('pVoice');
+var allVoices = [], hindiVoice = null;
+SEC_IDS.forEach(function (sid) { var sec = $(sid); if (!sec) return; var n = 0; sec.querySelectorAll('.rd').forEach(function (el) { units.push({ el: el, sec: sid, inSec: n++ }); }); });
+function firstIndexOfSection(sid) { for (var k = 0; k < units.length; k++) if (units[k].sec === sid) return k; return -1; }
+function isHindi(v) { if (!v) return false; var l = (v.lang || '').toLowerCase(); return l.indexOf('hi') === 0 || /hindi|swara|hemant|kalpana|madhur|lekha|prabhat/i.test(v.name || ''); }
+function refreshVoices() {
+  if (!synth) return;
+  var vs = synth.getVoices() || []; if (!vs.length) return;
+  allVoices = vs; hindiVoice = null;
+  var hindi = [], others = [];
+  vs.forEach(function (v) { (isHindi(v) ? hindi : others).push(v); });
+  hindiVoice = hindi[0] || null;
+  var opts = '';
+  hindi.forEach(function (v) { opts += '<option value="' + encodeURIComponent(v.voiceURI) + '">★ ' + v.name + ' (' + v.lang + ')</option>'; });
+  if (hindi.length && others.length) opts += '<option disabled>— — —</option>';
+  others.forEach(function (v) { opts += '<option value="' + encodeURIComponent(v.voiceURI) + '">' + v.name + ' (' + v.lang + ')</option>'; });
+  voiceSel.innerHTML = opts;
+  voiceSel.value = encodeURIComponent((hindiVoice || others[0]).voiceURI);
+  if (allVoices.length) {
+    var v = getSelVoice();
+    pVoice.innerHTML = isHindi(v) ? '<span class="on">★ ' + v.name + ' — Hindi voice active</span>' : '<span class="off">⚠ Hindi voice nahi mili</span> · using ' + v.name;
+  }
+}
+function getSelVoice() { var uri = decodeURIComponent(voiceSel.value || ''); for (var k = 0; k < allVoices.length; k++) if (allVoices[k].voiceURI === uri) return allVoices[k]; return null; }
+if (synth) { refreshVoices(); synth.onvoiceschanged = refreshVoices; setTimeout(refreshVoices, 700); }
+else { btnPlay.disabled = btnStop.disabled = btnPrev.disabled = btnNext.disabled = true; }
+voiceSel.addEventListener('change', refreshVoices);
+function clearHi() { document.querySelectorAll('.rd.speaking').forEach(function (e) { e.classList.remove('speaking'); }); }
+function highlight(u) { clearHi(); u.el.classList.add('speaking'); try { u.el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }
+function snippet(el, len) { var t = (el.innerText || '').replace(/\s+/g, ' ').trim(); return t.length > len ? t.slice(0, len) + '…' : t; }
+function updateNow(u) {
+  if (!u) { pNow.textContent = 'Player ready'; return; }
+  var per = units.filter(function (x) { return x.sec === u.sec; }).length;
+  pNow.textContent = '▶ ' + SEC_NAMES[u.sec] + ' — para ' + (u.inSec + 1) + '/' + per + ' · ' + snippet(u.el, 52);
+}
+function speakUnit(i) {
+  if (stopFlag) return;
+  if (i >= units.length) { finishAll(); return; }
+  var u = units[i];
+  if (endSec !== null && u.sec !== endSec) { finishAll(); return; }
+  cur = i;
+  var v = getSelVoice();
+  var text = isHindi(v) ? (u.el.getAttribute('data-dev') || u.el.innerText) : u.el.innerText;
+  var utt = new SpeechSynthesisUtterance(text);
+  if (v) { utt.voice = v; utt.lang = v.lang; } else { utt.lang = 'hi-IN'; }
+  utt.rate = parseFloat(rateSel.value) || 1;
+  utt.onstart = function () { highlight(u); updateNow(u); btnPlay.textContent = '❚❚'; };
+  utt.onend = function () { if (!stopFlag) speakUnit(cur + 1); };
+  utt.onerror = function (ev) { if (ev && (ev.error === 'interrupted' || ev.error === 'canceled')) return; if (!stopFlag) setTimeout(function () { if (!stopFlag) speakUnit(cur + 1); }, 400); };
+  synth.speak(utt);
+}
+function finishAll() { stopKeepAlive(); clearHi(); btnPlay.textContent = '▶'; pNow.textContent = 'Khatam ✓'; endSec = null; cur = -1; }
+function hardStop() { stopFlag = true; try { synth.cancel(); } catch (e) {} stopKeepAlive(); clearHi(); btnPlay.textContent = '▶'; setTimeout(function () { stopFlag = false; }, 60); }
+function startKeepAlive() {
+  if (keepAlive) return;
+  var ua = navigator.userAgent || '';
+  if (/Chrome/.test(ua) && !/Edg|Android|iPhone|iPad/.test(ua)) keepAlive = setInterval(function () { if (synth.speaking && !synth.paused) { synth.pause(); synth.resume(); } }, 12000);
+}
+function stopKeepAlive() { if (keepAlive) { clearInterval(keepAlive); keepAlive = null; } }
+function startFrom(sid) {
+  if (!synth) return;
+  hardStop();
+  setTimeout(function () { var idx = firstIndexOfSection(sid); if (idx < 0) { finishAll(); return; } endSec = null; cur = idx - 1; startKeepAlive(); speakUnit(idx); }, 80);
+}
+btnPlay.addEventListener('click', function () {
+  if (!synth) return;
+  if (synth.speaking && !synth.paused) { synth.pause(); btnPlay.textContent = '▶'; return; }
+  if (synth.speaking && synth.paused) { synth.resume(); btnPlay.textContent = '❚❚'; return; }
+  startFrom(activeSection);
+});
+btnStop.addEventListener('click', function () { hardStop(); cur = -1; updateNow(null); });
+function curSection() { return (cur >= 0 && units[cur]) ? units[cur].sec : activeSection; }
+btnPrev.addEventListener('click', function () { var i = SEC_IDS.indexOf(curSection()); startFrom(SEC_IDS[Math.max(0, i - 1)]); });
+btnNext.addEventListener('click', function () { var i = SEC_IDS.indexOf(curSection()); startFrom(SEC_IDS[Math.min(SEC_IDS.length - 1, i + 1)]); });
+document.querySelectorAll('.sec-play').forEach(function (b) {
+  b.addEventListener('click', function () { if (b.textContent === '■') { hardStop(); return; } startFrom(b.getAttribute('data-sec')); });
+});
+(function () {
+  var obs = new IntersectionObserver(function (entries) { entries.forEach(function (en) { if (en.isIntersecting) activeSection = en.target.id; }); }, { rootMargin: '-15% 0px -75% 0px' });
+  SEC_IDS.forEach(function (sid) { var el = $(sid); if (el) obs.observe(el); });
+})();
+
+/* ================= 30-MIN AGENDA + TIMER ================= */
+var BLOCKS = [
+  { m: 3, t: 'Pattern samjho', d: 'Sorting 14 baar, hashing 9, searching 6 — ~30 marks.', n: 'Students se poochho' },
+  { m: 7, t: 'PYQ Theory (s1)', d: 'Q1-Q5 copy page pe padho — heading, diagram, complexity.', n: 'SPIN 1-2 sawaal' },
+  { m: 9, t: 'Numericals (s2)', d: 'Q6-Q8 hash table — copy pe steps dekho, phir khud karo.', n: 'SPIN 2 sawaal' },
+  { m: 9, t: 'Sorting (s3)', d: 'Q9-Q13 — dry run table copy page pe.', n: 'SPIN 2 sawaal' },
+  { m: 4, t: '2-mark (s4)', d: 'Q14-Q17 — chhote jawab, 2-3 line.', n: 'Rapid fire' },
+  { m: 5, t: 'Repeated + 2027 (s5)', d: 'Most repeated list + prediction padho.', n: 'SPIN 2 sawaal' },
+  { m: 3, t: 'Question round (s6)', d: '26 sawaal — score dikhao.', n: '🏆 RESULT' }
+];
+var tcur = -1, left = 0, ticker = null;
+function fmt(s) { var m = Math.floor(s / 60), x = s % 60; return (m < 10 ? '0' : '') + m + ':' + (x < 10 ? '0' : '') + x; }
+function paintTimer() {
+  var t = fmt(left), warn = left <= 30 && tcur >= 0;
+  ['dkTimer', 'tkTimer'].forEach(function (id) { var e = $(id); if (e) { e.textContent = t; e.classList.toggle('warn', warn); } });
+}
+function paintPlan() {
+  if (!$('planSteps')) return;
+  var html = '';
+  BLOCKS.forEach(function (b, i) {
+    html += '<div class="plan-step' + (i === tcur ? ' on' : '') + '" data-i="' + i + '" style="cursor:pointer' + (i === tcur ? ';border-color:var(--gold);background:var(--gold-dim)' : '') + '">' +
+      '<span class="tm">' + b.m + ' min</span><span class="tx"><b>' + b.t + '</b>' + b.d + '</span></div>';
+  });
+  $('planSteps').innerHTML = html;
+  $('planSteps').querySelectorAll('.plan-step').forEach(function (el) { el.addEventListener('click', function () { selectBlock(+el.getAttribute('data-i')); }); });
+}
+function selectBlock(i) {
+  tcur = i; left = BLOCKS[i].m * 60; paintTimer();
+  var label = 'Block ' + (i + 1) + '/' + BLOCKS.length + ' — ' + BLOCKS[i].t;
+  if ($('tkBlkName')) $('tkBlkName').textContent = label;
+  if ($('dkBlk')) $('dkBlk').textContent = label;
+  if ($('tkNote')) $('tkNote').innerHTML = '<b style="color:var(--blue)">' + BLOCKS[i].n + '</b>';
+  paintPlan();
+}
+function beep() {
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    var ac = new AC(), o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination); o.type = 'sine'; o.frequency.value = 900; g.gain.value = 0.1;
+    o.start(); setTimeout(function () { o.frequency.value = 640; }, 190); setTimeout(function () { o.stop(); try { ac.close(); } catch (e) {} }, 430);
+  } catch (e) {}
+}
+function timeUpAlert(msg) {
+  document.body.classList.add('timeup');
+  if ($('dock')) $('dock').classList.add('timeup');
+  var b = $('tuBanner'); if (b) { b.textContent = msg; b.classList.add('show'); }
+  beep();
+  setTimeout(function () { document.body.classList.remove('timeup'); if ($('dock')) $('dock').classList.remove('timeup'); if (b) b.classList.remove('show'); }, 3600);
+}
+function tickFn() {
+  left--;
+  if (left <= 0) {
+    left = 0; paintTimer();
+    var nx = tcur + 1;
+    if (nx < BLOCKS.length) { timeUpAlert('⏰ Block khatam — ab: ' + BLOCKS[nx].t); selectBlock(nx); }
+    else { timeUpAlert('⏰ Class poora! 🎉'); stopTimer(); }
+    return;
+  }
+  paintTimer();
+}
+function startTimer() {
+  if (ticker) { stopTimer(); return; }
+  if (tcur < 0) selectBlock(0);
+  ticker = setInterval(tickFn, 1000);
+  if ($('dkStart')) $('dkStart').textContent = '⏸';
+  if ($('tkStart')) $('tkStart').textContent = '⏸ PAUSE';
+}
+function stopTimer() { if (ticker) { clearInterval(ticker); ticker = null; } if ($('dkStart')) $('dkStart').textContent = '▶'; if ($('tkStart')) $('tkStart').textContent = '▶ START'; }
+function nextBlock() { var i = (tcur < 0 ? 0 : tcur + 1); if (i >= BLOCKS.length) { stopTimer(); return; } selectBlock(i); }
+if ($('dkStart')) $('dkStart').addEventListener('click', startTimer);
+if ($('dkNext')) $('dkNext').addEventListener('click', nextBlock);
+if ($('tkStart')) $('tkStart').addEventListener('click', startTimer);
+if ($('tkNext')) $('tkNext').addEventListener('click', nextBlock);
+if ($('tkReset')) $('tkReset').addEventListener('click', function () {
+  stopTimer(); tcur = -1; left = 0; paintTimer();
+  if ($('tkBlkName')) $('tkBlkName').textContent = 'Block select karo →';
+  if ($('dkBlk')) $('dkBlk').textContent = 'Block select karo (neeche plan se)';
+  if ($('tkNote')) $('tkNote').innerHTML = '';
+  paintPlan();
+});
+paintPlan();
+window.__cls = { setSeconds: function (v) { left = v; paintTimer(); }, timeUp: function (m) { timeUpAlert(m || '⏰ TIME UP'); }, state: function () { return { cur: tcur, left: left, running: !!ticker }; } };
+
+/* ================= QUESTION BANK ================= */
+var TOPICS = { hash: 'Hashing', sel: 'Selection sort', ins: 'Insertion sort' };
+var TOPICS = { search: 'Searching', hash: 'Hashing', sort: 'Sorting', heap: 'Heap sort', radix: 'Radix sort', stab: 'Stability' };
+var TOPICS = { hash: 'Hashing (PYQ)', search: 'Searching (PYQ)', sort: 'Sorting (PYQ)', num: 'Numerical (PYQ)' };
+var Q = [
+  { t: 'hash', keep: 1, q: 'PYQ 2026: Hashing me division method ka formula kya hai?', a: '<b>h(k) = k mod m</b> — remainder hi index. Example: 45 mod 10 = 5.', w: 'PYQ theory me' },
+  { t: 'hash', keep: 1, q: 'PYQ 2026: Linear probing ka formula?', a: '<b>h<sub>i</sub>(k) = (h(k) + i) mod m</b>, i = 0,1,2…', w: 'Formula poochho' },
+  { t: 'hash', keep: 1, q: 'PYQ 2026: Quadratic probing ka formula?', a: '<b>h<sub>i</sub>(k) = (h(k) + i²) mod m</b> — step 1, 4, 9, 16…', w: 'Formula poochho' },
+  { t: 'hash', keep: 1, q: 'PYQ 2024: Linear probing ka sabse bada nuksaan?', a: '<b>Primary clustering</b> — bhare slots ka block ban jata hai.', w: 'Theory me' },
+  { t: 'hash', keep: 1, q: 'PYQ 2024: Hashing ke 2 forms kaunse hain?', a: '<b>Open hashing (chaining)</b> aur <b>closed hashing (open addressing)</b>.', w: '2-mark sawaal' },
+  { t: 'hash', keep: 1, q: 'PYQ 2020-21: Double hashing ka formula?', a: '<b>h<sub>i</sub>(k) = (h(k) + i·h<sub>2</sub>(k)) mod m</b>.', w: 'Formula poochho' },
+  { t: 'hash', q: 'Load factor α = n/m me ideal range?', a: '<b>0.5–0.75</b> · α &gt; 1 → rehashing.', w: 'Table pe' },
+  { t: 'num', keep: 1, q: 'PYQ 2025: m = 10, linear probing, keys 43,165,62,123,142 — 142 kahan jayegi?', a: '142 mod 10 = 2 → 2,3,4,5 bhare → <b>index 6</b> (5 probes).', w: 'Numericals me' },
+  { t: 'num', keep: 1, q: 'PYQ 2020-21: h(k)=k%7, keys 37,38,72,48,98,11,66 — key 11 kahan?', a: '11%7 = 4 → 4 bhara → <b>index 5</b>.', w: 'Numericals me' },
+  { t: 'num', q: 'PYQ 2021-22: keys 12,17,13,2,5,43,5,15 (h=k mod 10) me 2 ka index?', a: '2 → 2 bhara → 3 bhara → <b>index 4</b>.', w: 'Numericals me' },
+  { t: 'search', keep: 1, q: 'PYQ 2024: Binary search ke liye kya zaroori hai?', a: '<b>Sorted array</b>. Unsorted pe galat half chhod dega.', w: 'Searching me' },
+  { t: 'search', keep: 1, q: 'PYQ 2025: Indexed sequential search ka concept?', a: 'Sorted file ko <b>blocks</b> me baanto + <b>index table</b>; pehle index se block, phir us block me linear. ~<b>O(√n)</b>.', w: '2-mark sawaal' },
+  { t: 'search', q: 'PYQ 2021-22: Linear vs binary search ka ek main fark?', a: 'Linear <b>unsorted</b> pe bhi chalta hai (O(n)); binary ko <b>sorted</b> chahiye (O(log n)).', w: 'Searching me' },
+  { t: 'sort', keep: 1, q: 'PYQ 2026: Insertion sort ki best-case complexity?', a: '<b>O(n)</b> — array already sorted ho toh sirf compare, koi shift nahi.', w: 'Sorting me' },
+  { t: 'sort', keep: 1, q: 'PYQ 2025: Merge sort ki time aur space complexity?', a: 'Time <b>O(n log n)</b> (har case) · Space <b>O(n)</b> · stable.', w: 'Sorting me' },
+  { t: 'sort', keep: 1, q: 'PYQ 2024: Quick sort me pivot ka asar?', a: 'Pivot aadha baante → O(n log n); sorted array + last pivot → <b>O(n²)</b>.', w: '2-mark sawaal' },
+  { t: 'sort', keep: 1, q: 'PYQ 2026: Heap sort ki khaas baat?', a: '<b>Har case O(n log n) + O(1) space</b> (in-place), par unstable.', w: 'Sorting me' },
+  { t: 'sort', q: 'PYQ 2021-22: Quick sort stable hai? Justify.', a: '<b>Nahi</b> — partition ke swap se barabar elements ka order badal sakta hai.', w: 'Stability sawaal' },
+  { t: 'sort', q: 'PYQ 2021-22: Ek stable aur ek unstable sort ka example?', a: 'Stable: <b>Merge</b> · Unstable: <b>Quick</b> (ya selection/heap).', w: '2-mark sawaal' },
+  { t: 'sort', q: 'PYQ 2024: Selection sort ka worst case?', a: '<b>O(n²)</b> — best case bhi O(n²), kyunki poora scan hamesha.', w: 'Sorting me' }
+];
+var RAPID = [
+  { q: 'Hashing average me O(1) hai — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Binary search unsorted array pe chalta hai — sahi ya galat?', a: 'Galat.' },
+  { q: 'Merge sort stable hai — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Heap sort O(1) space leta hai — sahi ya galat?', a: 'Sahi.' },
+  { q: 'Radix sort comparison karta hai — sahi ya galat?', a: 'Galat.' },
+  { q: 'Selection sort minimum swaps karta hai — sahi ya galat?', a: 'Sahi (n−1).' }
+];
+var SEC_TOPICS = { s0: ['hash', 'search', 'sort'], s1: ['hash', 'search', 'sort'], s2: ['num', 'hash'], s3: ['hash', 'sort', 'search'], s4: ['hash', 'sort'], s5: ['hash', 'search', 'sort', 'num'] };
+function qsFor(sec) { var keys = SEC_TOPICS[sec] || ['search']; var l = Q.filter(function (q) { return keys.indexOf(q.t) > -1; }); return l.length ? l : Q; }
+
+/* ================= QUESTION ROUND (combined: topic + rapid) ================= */
+var names = ['Harsh', 'Aryan', 'Khusi'], scores = {}, current = null, curQ = null, spinTimer = null;
+var pool = [], poolIdx = 0, askedTotal = 0;
+try { var sn = localStorage.getItem('u3s2b-names'); if (sn) names = JSON.parse(sn); } catch (e) {}
+try { var sc = localStorage.getItem('u3s2b-scores'); if (sc) scores = JSON.parse(sc); } catch (e) {}
+names.forEach(function (n) { if (!scores[n]) scores[n] = { a: 0, c: 0 }; });
+function saveScore() { try { localStorage.setItem('u3s2b-names', JSON.stringify(names)); localStorage.setItem('u3s2b-scores', JSON.stringify(scores)); } catch (e) {} }
+function pct(o) { return o.a ? Math.round(o.c * 100 / o.a) : 0; }
+function buildPool() {
+  pool = [];
+  Q.forEach(function (q) { pool.push({ q: q.q, a: q.a, t: TOPICS[q.t] || 'Concept', kind: 'concept' }); });
+  RAPID.forEach(function (q) { pool.push({ q: q.q, a: q.a, t: 'Rapid (yes/no)', kind: 'rapid' }); });
+  for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+  poolIdx = 0;
+  paintMeta();
+}
+function paintMeta() {
+  var total = pool.length, left = Math.max(0, total - poolIdx);
+  if ($('qrMeta')) $('qrMeta').textContent = total + ' sawaal · ' + poolIdx + ' poochhe · ' + left + ' bache';
+  if ($('qrBar')) $('qrBar').style.width = (total ? (poolIdx / total) * 100 : 0) + '%';
+}
+function nextQ() { if (poolIdx >= pool.length) buildPool(); return pool[poolIdx++]; }
+function paintBoard() {
+  if (!$('qrBoard')) return;
+  var minA = Math.min.apply(null, names.map(function (n) { return scores[n].a; }));
+  var best = -1;
+  names.forEach(function (n) { if (scores[n].a && pct(scores[n]) > best) best = pct(scores[n]); });
+  var rows = names.map(function (n) { return { n: n, o: scores[n] }; }).sort(function (x, y) { var d = pct(y.o) - pct(x.o); return d ? d : y.o.c - x.o.c; });
+  var html = '';
+  rows.forEach(function (r) {
+    var cls = (r.o.a && pct(r.o) === best) ? 'top' : '';
+    var least = (r.o.a === minA) ? ' <span style="color:var(--emerald);font-size:11px">· kam poocha</span>' : '';
+    html += '<tr class="' + cls + '"><td><b>' + r.n + '</b>' + least + '</td><td class="num">' + r.o.a + '</td><td class="num">' + r.o.c + '</td><td class="num">' + pct(r.o) + '%</td></tr>';
+  });
+  $('qrBoard').innerHTML = html;
+}
+function showQ(where) {
+  if (!curQ) return;
+  var q = curQ, nm = current || '—';
+  var num = 'SAWAAL ' + poolIdx + '/' + pool.length;
+  if (where === 'dock' || where === 'both') {
+    if ($('dkQWho')) $('dkQWho').textContent = current ? '🎯 ' + nm + ' — ' + num : '🎲 ' + num;
+    if ($('dkQText')) $('dkQText').innerHTML = q.q;
+    if ($('dkQAns')) { $('dkQAns').innerHTML = q.a; $('dkQAns').classList.remove('show'); }
+    if ($('dkQShow')) $('dkQShow').textContent = 'Jawab dekho';
+    if ($('dkQCard')) $('dkQCard').classList.add('show');
+  }
+  if (where === 'tool' || where === 'both') {
+    if ($('qrCount')) $('qrCount').textContent = num;
+    if ($('qrTopic')) $('qrTopic').textContent = q.t;
+    if ($('qrText')) $('qrText').innerHTML = q.q;
+    if ($('qrAns')) { $('qrAns').innerHTML = q.a; $('qrAns').style.display = 'none'; }
+    if ($('qrShow')) $('qrShow').textContent = 'Jawab dekho';
+  }
+  paintMeta();
+}
+function doSpin() {
+  if (spinTimer) return;
+  var minA = Math.min.apply(null, names.map(function (n) { return scores[n].a; }));
+  var poolN = names.filter(function (n) { return scores[n].a === minA; });
+  var chosen = poolN[Math.floor(Math.random() * poolN.length)];
+  curQ = nextQ();
+  var targets = [$('dkName'), $('qrName')].filter(Boolean);
+  var i = 0;
+  targets.forEach(function (t) { t.classList.add('spinning'); });
+  spinTimer = setInterval(function () { targets.forEach(function (t) { t.textContent = names[i % names.length]; }); i++; }, 80);
+  setTimeout(function () {
+    clearInterval(spinTimer); spinTimer = null;
+    current = chosen;
+    targets.forEach(function (t) { t.classList.remove('spinning'); t.textContent = current; });
+    showQ('both');
+    if ($('qrMsg')) $('qrMsg').innerHTML = '<b>' + current + '</b> — sawaal dikh raha hai. Jawab suno, phir ✓ ya ✕ dabao.';
+  }, 1300);
+}
+function mark(ok) {
+  if (!current) { if ($('qrMsg')) $('qrMsg').textContent = 'Pehle SPIN karo.'; return; }
+  scores[current].a++; if (ok) scores[current].c++;
+  askedTotal++;
+  saveScore(); paintBoard(); paintMeta();
+  if ($('qrMsg')) $('qrMsg').innerHTML = '<b>' + current + '</b> → ' + (ok ? '✓ sahi (+1)' : '✕ galat') + ' · ab agla SPIN.';
+  current = null; curQ = null;
+  [$('dkName'), $('qrName')].filter(Boolean).forEach(function (t) { t.textContent = '—'; });
+  if ($('dkQCard')) $('dkQCard').classList.remove('show');
+}
+if ($('dkSpin')) $('dkSpin').addEventListener('click', doSpin);
+if ($('qrSpin')) $('qrSpin').addEventListener('click', doSpin);
+[['dkOk', true], ['qrOk', true], ['dkQOk', true], ['dkBad', false], ['qrBad', false], ['dkQBad', false]].forEach(function (p) { if ($(p[0])) $(p[0]).addEventListener('click', function () { mark(p[1]); }); });
+if ($('qrSkip')) $('qrSkip').addEventListener('click', function () {
+  [$('dkName'), $('qrName')].filter(Boolean).forEach(function (t) { t.textContent = '—'; });
+  current = null; curQ = null;
+  if ($('dkQCard')) $('dkQCard').classList.remove('show');
+  if ($('qrMsg')) $('qrMsg').textContent = 'Skip — dobara SPIN.';
+});
+if ($('dkQShow')) $('dkQShow').addEventListener('click', function () { var el = $('dkQAns'); var on = el.classList.toggle('show'); $('dkQShow').textContent = on ? 'Jawab chhupao' : 'Jawab dekho'; });
+if ($('qrShow')) $('qrShow').addEventListener('click', function () { var el = $('qrAns'); var on = el.style.display === 'block'; el.style.display = on ? 'none' : 'block'; $('qrShow').textContent = on ? 'Jawab dekho' : 'Jawab chhupao'; });
+if ($('dkQ')) $('dkQ').addEventListener('click', function () { curQ = nextQ(); current = null; showQ('dock'); });
+if ($('dkQNext')) $('dkQNext').addEventListener('click', function () { curQ = nextQ(); current = null; showQ('dock'); });
+if ($('dkQClose')) $('dkQClose').addEventListener('click', function () { $('dkQCard').classList.remove('show'); });
+if ($('qrSave')) $('qrSave').addEventListener('click', function () {
+  var arr = $('qrNames').value.split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s.length; });
+  if (!arr.length) { $('qrMsg').textContent = 'Kam se kam ek naam likho.'; return; }
+  names = arr; names.forEach(function (n) { if (!scores[n]) scores[n] = { a: 0, c: 0 }; });
+  saveScore(); paintBoard(); $('qrMsg').innerHTML = 'List save: <b>' + names.join(', ') + '</b>';
+});
+if ($('qrReset')) $('qrReset').addEventListener('click', function () { names.forEach(function (n) { scores[n] = { a: 0, c: 0 }; }); saveScore(); paintBoard(); buildPool(); $('qrMsg').textContent = 'Score aur sawaal reset.'; });
+function showResult() {
+  var rows = names.map(function (n) { return { n: n, o: scores[n] }; });
+  var asked = rows.reduce(function (s, r) { return s + r.o.a; }, 0);
+  rows.sort(function (x, y) { var d = pct(y.o) - pct(x.o); return d ? d : y.o.c - x.o.c; });
+  var html = '<table class="score-tbl"><thead><tr><th>#</th><th>Student</th><th>Poocha gaya</th><th>Sahi</th><th>Score</th></tr></thead><tbody>';
+  var best = null;
+  rows.forEach(function (r, i) {
+    if (i === 0 && r.o.a > 0) best = r;
+    html += '<tr class="' + ((i === 0 && r.o.a > 0) ? 'top' : '') + '"><td class="num">' + (i + 1) + '</td><td><b>' + r.n + '</b></td><td class="num">' + r.o.a + '</td><td class="num">' + r.o.c + '</td><td class="num">' + pct(r.o) + '%</td></tr>';
+  });
+  html += '</tbody></table>';
+  if ($('resBody')) $('resBody').innerHTML = html;
+  if ($('resSub')) $('resSub').innerHTML = 'Aaj kul <b>' + asked + '</b> sawaal poochhe gaye · pool me <b>' + pool.length + '</b> the';
+  if ($('resWin')) {
+    if (best && asked) {
+      var msg = pct(best.o) >= 75 ? 'Shandaar kaam! 🚩' : pct(best.o) >= 50 ? 'Achha kiya — thoda aur practice.' : 'Practice chahiye — concepts dobara dekh lo.';
+      $('resWin').innerHTML = '🏆 Sabse achha: <b>' + best.n + '</b> — ' + best.o.c + '/' + best.o.a + ' sahi (' + pct(best.o) + '%). ' + msg;
+    } else $('resWin').innerHTML = 'Abhi koi sawaal nahi poochha gaya — SPIN karke shuru karo.';
+  }
+  if ($('resOverlay')) $('resOverlay').classList.add('show');
+}
+if ($('qrResult')) $('qrResult').addEventListener('click', showResult);
+if ($('resClose')) $('resClose').addEventListener('click', function () { $('resOverlay').classList.remove('show'); });
+if ($('resReset')) $('resReset').addEventListener('click', function () { names.forEach(function (n) { scores[n] = { a: 0, c: 0 }; }); saveScore(); paintBoard(); showResult(); });
+if ($('qrNames')) $('qrNames').value = names.join(', ');
+buildPool(); paintBoard();
+
+/* ================= AMBIENT: SCANLINE SWEEP ================= */
+(function () {
+  var cv = document.getElementById('ambient');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1), y = 0, t = 0;
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.floor(W * dpr); cv.height = Math.floor(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    /* faint grid */
+    ctx.strokeStyle = 'rgba(77,157,255,0.05)';
+    ctx.lineWidth = 1;
+    for (var x = 0; x < W; x += 64) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    for (var yy = 0; yy < H; yy += 64) { ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(W, yy); ctx.stroke(); }
+    /* scanline glow */
+    var g = ctx.createLinearGradient(0, y - 70, 0, y + 70);
+    g.addColorStop(0, 'rgba(77,157,255,0)');
+    g.addColorStop(0.5, 'rgba(77,157,255,0.13)');
+    g.addColorStop(1, 'rgba(77,157,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, y - 70, W, 140);
+    ctx.fillStyle = 'rgba(255,210,74,0.20)';
+    ctx.fillRect(0, y, W, 1.2);
+  }
+  function step() { t++; y += 1.1; if (y > H + 70) y = -70; draw(); }
+  resize();
+  window.addEventListener('resize', resize);
+  if (reduce) { y = H / 2; draw(); return; }
+  setInterval(function () { if (!document.hidden) step(); }, 40);
+})();
+
+
+/* ================= COPY PAGE NAV (embedded AKTU pages) ================= */
+(function () {
+  document.querySelectorAll('.copy-frame').forEach(function (frame) {
+    var pages = frame.querySelectorAll('.copy-page');
+    var cur = frame.querySelector('.cp-cur');
+    var prev = frame.querySelector('.cp-prev');
+    var next = frame.querySelector('.cp-next');
+    if (!pages.length) return;
+    var i = 0;
+    function paint() {
+      pages.forEach(function (p, k) { p.classList.toggle('on', k === i); });
+      if (cur) cur.textContent = (i + 1);
+      if (prev) prev.disabled = (i === 0);
+      if (next) next.disabled = (i === pages.length - 1);
+    }
+    if (prev) prev.addEventListener('click', function () { if (i > 0) { i--; paint(); } });
+    if (next) next.addEventListener('click', function () { if (i < pages.length - 1) { i++; paint(); } });
+    paint();
+  });
+})();
+
+})();
+</script>
+
+<script>
+/* ============================================================
+   COPY PAGE EXTRAS — question on page · swipe turn · TTS
+   ============================================================ */
+(function () {
+  var frames = Array.prototype.slice.call(document.querySelectorAll('.copy-frame'));
+
+  /* ---------- 1. QUESTION ko copy page pe likho (alag handwriting) ---------- */
+  frames.forEach(function (frame, idx) {
+    var host = frame.closest('.pyq') || frame.parentElement;
+    var qEl = host ? host.querySelector('.pyq-q') : null;
+    if (!qEl) return;
+    var clone = qEl.cloneNode(true);
+    var mkEl = clone.querySelector('.mk');
+    var marks = mkEl ? mkEl.textContent.trim() : '';
+    if (mkEl) mkEl.remove();
+    var qText = clone.textContent.replace(/\s+/g, ' ').trim();
+    var numMatch = qText.match(/^Q\s*(\d+)[.\s]*/i);
+    var qn = numMatch ? 'Q' + numMatch[1] + '.' : ('Q' + (idx + 1) + '.');
+    if (numMatch) qText = qText.replace(/^Q\s*\d+[.\s]*/i, '');
+
+    var firstPage = frame.querySelector('.copy-page');
+    if (!firstPage || firstPage.querySelector('.cq')) return;
+
+    var div = document.createElement('div');
+    div.className = 'cq';
+    div.innerHTML = '<span class="cq-qn">' + qn + '</span> ' + qText +
+                    (marks ? ' <span class="cq-mk">' + marks + '</span>' : '');
+    firstPage.insertBefore(div, firstPage.firstChild);
+  });
+
+  /* ---------- 2. PAGE TURN — swipe (right to left) ---------- */
+  function curPage(frame) { return frame.querySelector('.copy-page.on'); }
+  function btn(frame, dir) { return frame.querySelector(dir > 0 ? '.cp-next' : '.cp-prev'); }
+
+  var lastTurn = 0;
+  function turn(frame, dir) {
+    var now = Date.now();
+    if (now - lastTurn < 350) return false;   /* pointer + touch dono se double turn na ho */
+    lastTurn = now;
+    var b = btn(frame, dir);
+    if (!b || b.disabled) return false;
+    stopSpeak();
+    var old = curPage(frame);
+    if (old) {
+      var a = old.animate(
+        [{ transform: 'translateX(0) rotate(0deg)', opacity: 1 },
+         { transform: 'translateX(' + (-dir * 88) + '%) rotate(' + (-dir * 2) + 'deg)', opacity: 0 }],
+        { duration: 220, easing: 'cubic-bezier(.4,0,.7,1)' }
+      );
+      a.onfinish = function () { a.cancel(); };
+    }
+    setTimeout(function () {
+      b.click();
+      var now = curPage(frame);
+      if (now) {
+        var b2 = now.animate(
+          [{ transform: 'translateX(' + (dir * 88) + '%) rotate(' + (dir * 2) + 'deg)', opacity: 0 },
+           { transform: 'translateX(0) rotate(0deg)', opacity: 1 }],
+          { duration: 280, easing: 'cubic-bezier(.2,.8,.3,1)' }
+        );
+        b2.onfinish = function () { b2.cancel(); };
+      }
+    }, 200);
+    return true;
+  }
+
+  frames.forEach(function (frame) {
+    var stack = frame.querySelector('.copy-stack');
+    if (!stack) return;
+
+    /* hint + TTS button in the bar */
+    var bar = frame.querySelector('.copy-bar');
+    if (bar && !bar.querySelector('.cp-tts')) {
+      var hint = document.createElement('span');
+      hint.className = 'sw-hint';
+      hint.textContent = 'swipe ← →';
+      var tts = document.createElement('button');
+      tts.className = 'cp-tts';
+      tts.type = 'button';
+      tts.title = 'Sun kar padho (TTS)';
+      tts.textContent = '🔊 Suno';
+      tts.addEventListener('click', function () { toggleSpeak(frame, tts); });
+      var nav = bar.querySelector('.copy-nav');
+      if (nav) {
+        bar.insertBefore(hint, nav);
+        bar.insertBefore(tts, nav);
+      } else {
+        bar.appendChild(hint); bar.appendChild(tts);
+      }
+    }
+
+    /* pointer drag = real page turn */
+    var drag = null;
+    stack.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      drag = { x: e.clientX, y: e.clientY, dx: 0, el: curPage(frame), moved: false };
+    });
+    stack.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.moved && Math.abs(dx) < 10) return;
+      if (Math.abs(dy) > Math.abs(dx) && !drag.moved) { drag = null; return; }
+      drag.moved = true; drag.dx = dx;
+      stack.classList.add('swiping');
+      if (drag.el) {
+        drag.el.style.transition = 'none';
+        drag.el.style.transform = 'translateX(' + (dx * .72) + 'px) rotate(' + (dx * .012) + 'deg)';
+        drag.el.style.opacity = Math.max(.35, 1 - Math.abs(dx) / 620);
+      }
+      e.preventDefault();
+    }, { passive: false });
+
+    function endDrag() {
+      if (!drag) return;
+      var d = drag; drag = null;
+      stack.classList.remove('swiping');
+      if (!d.el) return;
+      d.el.style.transition = '';
+      d.el.style.opacity = '';
+      if (Math.abs(d.dx) > 70) {
+        d.el.style.transform = '';
+        turn(frame, d.dx < 0 ? 1 : -1);
+      } else {
+        d.el.style.transform = '';
+      }
+    }
+    stack.addEventListener('pointerup', endDrag);
+    stack.addEventListener('pointercancel', endDrag);
+    stack.addEventListener('pointerleave', endDrag);
+
+    /* touch fallback — purane mobile browsers ke liye */
+    var td = null;
+    stack.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) return;
+      var t = e.touches[0];
+      td = { x: t.clientX, y: t.clientY, dx: 0, moved: false };
+    }, { passive: true });
+    stack.addEventListener('touchmove', function (e) {
+      if (!td || e.touches.length !== 1) return;
+      var t = e.touches[0];
+      var dx = t.clientX - td.x, dy = t.clientY - td.y;
+      if (!td.moved && Math.abs(dx) < 12) return;
+      if (Math.abs(dy) > Math.abs(dx) && !td.moved) { td = null; return; }
+      td.moved = true; td.dx = dx;
+    }, { passive: true });
+    stack.addEventListener('touchend', function () {
+      if (!td) return;
+      var d = td; td = null;
+      if (Math.abs(d.dx) > 60) turn(frame, d.dx < 0 ? 1 : -1);
+    });
+  });
+
+  /* ---------- 3. TTS ---------- */
+  var synth = window.speechSynthesis;
+  var speakingFrame = null, speakingBtn = null, voice = null;
+
+  function pickVoice() {
+    if (!synth) return;
+    var vs = synth.getVoices() || [];
+    voice = vs.find(function (v) { return /en-IN/i.test(v.lang); }) ||
+            vs.find(function (v) { return /en-GB|en-US/i.test(v.lang); }) || null;
+  }
+  if (synth) {
+    pickVoice();
+    if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = pickVoice;
+  }
+
+  function stopSpeak() {
+    if (!synth) return;
+    synth.cancel();
+    if (speakingBtn) { speakingBtn.classList.remove('speaking'); speakingBtn.textContent = '🔊 Suno'; }
+    speakingFrame = null; speakingBtn = null;
+  }
+
+  function toggleSpeak(frame, btnEl) {
+    if (!synth) { alert('Is browser me voice support nahi hai. Chrome / Edge try karo.'); return; }
+    if (speakingFrame === frame) { stopSpeak(); return; }
+    stopSpeak();
+    var page = curPage(frame);
+    if (!page) return;
+
+    var text = page.innerText.replace(/\n{2,}/g, '\n').replace(/[ \t]{2,}/g, ' ').trim();
+    if (!text) return;
+
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-IN';
+    if (voice) u.voice = voice;
+    u.rate = 0.98;
+    u.pitch = 1;
+    u.onend = function () { if (speakingFrame === frame) stopSpeak(); };
+    u.onerror = function () { if (speakingFrame === frame) stopSpeak(); };
+
+    speakingFrame = frame; speakingBtn = btnEl;
+    btnEl.classList.add('speaking');
+    btnEl.textContent = '⏹ Ruko';
+    synth.speak(u);
+  }
+
+  /* page change / navigation pe awaaz band */
+  window.addEventListener('beforeunload', stopSpeak);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) stopSpeak(); });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('.cp-prev, .cp-next, .toc a')) stopSpeak();
+  }, true);
+})();
+</script>
+
+
+<div class="dsnav" role="navigation" aria-label="Page navigation">
+  <a class="dsnav-b" href="DS_Unit3_PYQ_Copy.html" title="Pichla page (←)">←</a>
+  <a class="dsnav-b" href="../index.html" title="Sab pages (Home)">⌂</a>
+  <a class="dsnav-b" href="DS_Unit3_AnswerCopy.html" title="Agla page (→)">→</a>
+</div>
+<style>
+/* ===== DS page nav (auto-injected) ===== */
+.dsnav{position:fixed;right:14px;bottom:78px;z-index:650;display:flex;gap:6px;align-items:center;
+  background:rgba(10,14,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:6px 8px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);opacity:.6;transition:opacity .2s ease, transform .2s ease;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.dsnav:hover{opacity:1;transform:translateY(-2px)}
+.dsnav-b{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:15px;line-height:1;
+  transition:background .15s ease,color .15s ease}
+.dsnav-b:hover{background:#ff9f45;color:#101820}
+.dsnav-b.dsnav-off{opacity:.25;pointer-events:none}
+.dsnav-tip{font-size:10px;letter-spacing:.8px;color:rgba(255,255,255,.45);padding:0 4px;white-space:nowrap}
+@media (max-width:640px){.dsnav-tip{display:none}.dsnav{right:10px;bottom:70px;padding:5px 6px}.dsnav-b{width:30px;height:30px;font-size:14px}}
+@media print{.dsnav{display:none!important}}
+</style>
+<script>
+(function(){
+  var PREV="DS_Unit3_PYQ_Copy.html", NEXT="DS_Unit3_AnswerCopy.html";
+  document.addEventListener('keydown', function(e){
+    var t=e.target||{};
+    if(/INPUT|TEXTAREA|SELECT/.test(t.tagName||'')) return;
+    if(e.key==='ArrowRight' && NEXT) window.location.href=NEXT;
+    else if(e.key==='ArrowLeft' && PREV) window.location.href=PREV;
+    else if(e.key==='Home') window.location.href='../index.html';
+  });
+})();
+</script>
+
+</body>
+</html>

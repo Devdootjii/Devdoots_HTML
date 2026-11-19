@@ -741,7 +741,7 @@ h1 em { font-style: normal; color: var(--gold); }
   <div class="toc-title">UNIT 4 · SESSION 5</div>
   <a href="#s0"><span class="n">00</span>Revision plan</a>
   <a href="#s1"><span class="n">01</span>Basics + formulas</a>
-  <a href="#s2"><span class="n">02</span>Traversals</a>
+  <a href="#s2"><span class="n">02</span>Traversals (4)</a>
   <a href="#s3"><span class="n">03</span>BST + AVL</a>
   <a href="#s4"><span class="n">04</span>B-Tree · Heap</a>
   <a href="#s5"><span class="n">05</span>Rapid-fire</a>
@@ -811,11 +811,11 @@ h1 em { font-style: normal; color: var(--gold); }
 <header class="hero">
   <div class="hero-badges">
     <span class="chip chip--gold">UNIT 4 · SESSION 5</span>
-    <span class="chip chip--blue">FULL REVISION</span>
+    <span class="chip chip--blue">SIRF PADHAYA HUA</span>
     <span class="chip chip--em">30 MIN · 15 DIN BAAD</span>
   </div>
-  <h1>Unit 4 — <em>wapas</em> se, poora</h1>
-  <p class="hero-sub">Kuch naya nahi — sirf <b>jo padha tha wo pakka</b> karna. Har topic ka ek line + ek example, phir 10 rapid-fire. 🔀 Section-wise spin se class me test bhi kar sakte ho.</p>
+  <h1>Unit 4 — <em>jo padha tha</em>, wapas</h1>
+  <p class="hero-sub">Sirf <b>wahi 4 sessions</b> jo class me padhe — kuch naya nahi. Har topic ka ek line + ek example, phir 10 rapid-fire. (Tree banana, threaded tree, B-tree deletion — ye <b>agle sessions</b> me naye topics aayenge.)</p>
   <hr class="hero-hr">
 </header>
 
@@ -839,8 +839,8 @@ h1 em { font-style: normal; color: var(--gold); }
       <thead><tr><th>#</th><th>Kya revise karenge</th><th>Time</th><th>Yaad rakhne ki cheez</th></tr></thead>
       <tbody>
         <tr><td>01</td><td>Basics — terminology, types, formulas</td><td>6 min</td><td><b>n₀ = n₂ + 1</b></td></tr>
-        <tr><td>02</td><td>Traversals + tree banana</td><td>7 min</td><td>pre me root <b>pehle</b>, post me <b>aakhir</b> me</td></tr>
-        <tr><td>03</td><td>BST + AVL</td><td>8 min</td><td><b>BF = hL − hR</b>, LL→right</td></tr>
+        <tr><td>02</td><td>Traversals (4 orders)</td><td>6 min</td><td>pre me root <b>pehle</b>, post me <b>aakhir</b> me</td></tr>
+        <tr><td>03</td><td>BST + AVL</td><td>9 min</td><td><b>BF = hL − hR</b>, LL→right</td></tr>
         <tr><td>04</td><td>B-tree · B+ · Huffman · Heap</td><td>6 min</td><td>split me <b>beech wali upar</b></td></tr>
         <tr><td>05</td><td>Rapid-fire 10 sawaal</td><td>3 min</td><td>—</td></tr>
       </tbody>
@@ -894,8 +894,8 @@ h1 em { font-style: normal; color: var(--gold); }
   </div>
 </section>
 <section class="sec" id="s2">
-  <div class="sec-head"><span class="sec-num">02</span><h2>Traversals + tree banana</h2></div>
-  <p class="sec-tag">4 traversal + preorder/inorder se tree construct</p>
+  <div class="sec-head"><span class="sec-num">02</span><h2>Traversals — 4 orders</h2></div>
+  <p class="sec-tag">Preorder · Inorder · Postorder · Level order</p>
 
   <div class="table-wrap">
     <div class="table-scroll"><table class="data-table">
@@ -913,22 +913,8 @@ h1 em { font-style: normal; color: var(--gold); }
     <b>Yaad rakho:</b> naam me hi rule hai — <b>Pre</b> = node pehle · <b>In</b> = node beech me · <b>Post</b> = node baad me. Aur <b>BST ka inorder hamesha sorted</b> deta hai.
   </div>
 
-  <div class="sub" style="font-family:'Onest';font-weight:700;font-size:17px;margin:20px 0 6px">Tree banana — preorder + inorder se</div>
-  <p class="rd"><b>Preorder:</b> A B D E C F G · <b>Inorder:</b> D B E A F C G</p>
-  <div class="table-wrap">
-    <div class="table-scroll"><table class="data-table">
-      <thead><tr><th>Step</th><th>Kya karo</th><th>Result</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>Preorder ka <b>pehla</b> = root</td><td>root = <b>A</b></td></tr>
-        <tr><td>2</td><td>Inorder me A dhoondho → left/right baanto</td><td>left: D B E (3) · right: F C G (3)</td></tr>
-        <tr><td>3</td><td>Left ka preorder = B D E → root <b>B</b></td><td>B ke left D, right E</td></tr>
-        <tr><td>4</td><td>Right ka preorder = C F G → root <b>C</b></td><td>C ke left F, right G</td></tr>
-      </tbody>
-    </table></div>
-  </div>
-  <div class="tree-wrap" style="background:transparent;border:none;padding:4px 0;margin:0"><ul class="tree"><li><span class="tnode ">A</span><ul><li><span class="tnode ">B</span><ul><li><span class="tnode leaf">D</span></li><li><span class="tnode leaf">E</span></li></ul></li><li><span class="tnode ">C</span><ul><li><span class="tnode leaf">F</span></li><li><span class="tnode leaf">G</span></li></ul></li></ul></li></ul><div class="tree-cap">Answer — wahi Fig. 1 wala tree</div></div>
   <div class="callout callout--info">
-    <b>Important:</b> <b>Inorder + Preorder</b> → tree <b>unique</b> ✔ · <b>Inorder + Postorder</b> → unique ✔ · <b>Preorder + Postorder</b> → <b>unique nahi</b> ✕ (inorder ke bina left/right pata nahi chalta).
+    <b>Note:</b> <b>"Traversals se tree banana"</b> — yeh topic class me <b>padhaya nahi gaya</b>, isliye is revision me nahi hai. Agle session me naya topic banega.
   </div>
 </section>
 <section class="sec" id="s3">
@@ -1122,8 +1108,8 @@ h1 em { font-style: normal; color: var(--gold); }
   var BLOCKS = [
     { m: 3, t: 'Plan + recall', d: '15 din baad — kya yaad karna hai.', n: '5 formulas bolwao' },
     { m: 6, t: 'Basics + formulas', d: 'Terminology, types, 5 formulas, representation.', n: 'n0 = n2 + 1 poochho' },
-    { m: 7, t: 'Traversals + tree banana', d: '4 traversal + preorder/inorder se construct.', n: 'Fig. 1 ka postorder?' },
-    { m: 8, t: 'BST + AVL', d: 'Rule, delete 3 case, BF, 4 rotation.', n: '30,10,20 pe kaunsi?' },
+    { m: 6, t: 'Traversals', d: 'Chaaron traversal + kahan use hote hain.', n: 'Fig. 1 ka postorder?' },
+    { m: 9, t: 'BST + AVL', d: 'Rule, delete 3 case, BF, 4 rotation.', n: '30,10,20 pe kaunsi?' },
     { m: 5, t: 'B-Tree · B+ · Huffman · Heap', d: 'Chaar cards — core facts.', n: 'Split me kaun upar?' },
     { m: 2, t: 'Rapid-fire', d: '10 sawaal + spin test.', n: 'Scoreboard dekho' }
   ];
@@ -1271,7 +1257,7 @@ h1 em { font-style: normal; color: var(--gold); }
     { s: 's2', q: 'Fig. 1 ka inorder?', a: '<b>D B E A F C G</b>' },
     { s: 's2', q: 'Fig. 1 ka postorder?', a: '<b>D E B F G C A</b>' },
     { s: 's2', q: 'BST ka inorder kaisa hota hai?', a: '<b>Sorted</b> (ascending)' },
-    { s: 's2', q: 'Inorder + Preorder se tree banta hai?', a: '<b>Haan, unique</b> ✔ (preorder + postorder se nahi)' },
+    { s: 's2', q: 'Postorder kahan use hota hai?', a: 'Tree <b>delete</b> karne me (bachche pehle) aur postfix expression me' },
     { s: 's2', q: 'Level order ke liye kya chahiye?', a: '<b>Queue</b>' },
     { s: 's3', q: 'BST me 30 delete (do bachche) — kaun aayega?', a: '<b>Inorder successor</b> = right subtree ka sabse chhota' },
     { s: 's3', q: 'BF ka formula?', a: '<b>BF = height(left) − height(right)</b>' },
